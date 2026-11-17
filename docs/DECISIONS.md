@@ -176,3 +176,15 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 
 ## D-039: Outbox worker
 **Decision:** A separate process (`node dist/worker/worker.js`, Compose service `worker`) connects as `zuru_worker` and runs the same startup role guard as the API. Each pass claims up to 10 due rows with `for update skip locked`, sends them, and sets `sent`, or a retry after 1 m, 5 m, 30 m, 2 h, 6 h, or `failed` after 6 attempts. Only the error message is stored in `last_error`, never the email body. `EMAIL_PROVIDER=resend` uses Resend's HTTP API (not exercised locally; no network calls are made in dev or tests).
+
+---
+
+## Decisions made during M4 (2026-11-17)
+
+## D-040: `GET /device/bootstrap` payload and `menu_version`
+**Context:** §9 says `menu_version` is the max `updated_at`. Removing an item→group link deletes a row, and hiding an inactive category or option changes what the app should show without necessarily touching the rows it does show, so a max timestamp can stay the same while the menu changed.
+**Decision:**
+- `menu_version` is a SHA-256 (first 32 hex chars) of the payload itself. `?since=<menu_version>` → `304` with an empty body when it matches. Any visible change gives a new version, and nothing else does.
+- The payload holds the settings subset (no alert settings), active non-archived categories and items (sold-out items included with `is_available: false`), each item's modifier group ids in sheet order (D-033), live groups with their active options, and active preset discounts. No costs, recipes or stock.
+- Permission `orders.create` (owner, manager, cashier). Employees have no order screen; they use `GET /settings`, `/ingredients` and `/orders/today`.
+**Consequences:** §14.1 #5 (delta sync later) still works: every table keeps `updated_at`; a delta endpoint can be added next to this one.

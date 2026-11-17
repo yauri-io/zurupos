@@ -145,6 +145,7 @@ const SCAN_ROUTES: Record<string, Caller[]> = {
   'GET /v1/discounts': ['dashboard', 'staff'],
   'GET /v1/orders/today': ['dashboard', 'staff'],
   'GET /v1/admin/stock-invariant': ['dashboard', 'staff'],
+  'GET /v1/device/bootstrap': ['dashboard', 'staff'],
 }
 
 // Routes that take no tenant resource id at all, with the reason.

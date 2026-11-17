@@ -25,6 +25,7 @@ import { settingsRoutes } from './modules/settings/routes.js'
 import { stockRoutes } from './modules/stock/routes.js'
 import { orderRoutes } from './modules/orders/routes.js'
 import { adminRoutes } from './modules/admin/routes.js'
+import { bootstrapRoutes } from './modules/bootstrap/routes.js'
 
 export type AppDeps = { config: Config; db: Database; limiters?: Limiters }
 
@@ -98,6 +99,7 @@ export const buildApp = async ({ config, db, limiters = createLimiters() }: AppD
       await v1.register(stockRoutes, { config })
       await v1.register(orderRoutes, { config })
       await v1.register(adminRoutes)
+      await v1.register(bootstrapRoutes)
     },
     { prefix: '/v1' },
   )

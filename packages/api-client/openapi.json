@@ -7293,6 +7293,305 @@
           }
         }
       }
+    },
+    "/v1/device/bootstrap": {
+      "get": {
+        "tags": ["device"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "in": "query",
+            "name": "since",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "menu_version",
+                    "settings",
+                    "categories",
+                    "items",
+                    "modifier_groups",
+                    "discounts"
+                  ],
+                  "properties": {
+                    "menu_version": {
+                      "type": "string"
+                    },
+                    "settings": {
+                      "type": "object",
+                      "required": [
+                        "name",
+                        "address",
+                        "phone",
+                        "timezone",
+                        "business_day_cutoff_hour",
+                        "receipt_header",
+                        "receipt_footer",
+                        "service_charge_enabled",
+                        "service_charge_bps",
+                        "tax_enabled",
+                        "tax_name",
+                        "tax_bps",
+                        "tax_on_service_charge",
+                        "enabled_payment_methods",
+                        "idle_lock_minutes"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "address": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "phone": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "timezone": {
+                          "type": "string"
+                        },
+                        "business_day_cutoff_hour": {
+                          "type": "integer"
+                        },
+                        "receipt_header": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "receipt_footer": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "service_charge_enabled": {
+                          "type": "boolean"
+                        },
+                        "service_charge_bps": {
+                          "type": "integer"
+                        },
+                        "tax_enabled": {
+                          "type": "boolean"
+                        },
+                        "tax_name": {
+                          "type": "string"
+                        },
+                        "tax_bps": {
+                          "type": "integer"
+                        },
+                        "tax_on_service_charge": {
+                          "type": "boolean"
+                        },
+                        "enabled_payment_methods": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": ["cash"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["qris"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["debit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["credit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["transfer"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["other"]
+                              }
+                            ]
+                          }
+                        },
+                        "idle_lock_minutes": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "categories": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "name"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "category_id",
+                          "name",
+                          "price",
+                          "color",
+                          "is_available",
+                          "modifier_group_ids"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "category_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "price": {
+                            "type": "integer"
+                          },
+                          "color": {
+                            "type": "string"
+                          },
+                          "is_available": {
+                            "type": "boolean"
+                          },
+                          "modifier_group_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "modifier_groups": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "name", "selection", "min_select", "max_select", "options"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "selection": {
+                            "enum": ["single", "multiple"]
+                          },
+                          "min_select": {
+                            "type": "integer"
+                          },
+                          "max_select": {
+                            "type": "integer"
+                          },
+                          "options": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": ["id", "name", "price_delta", "is_default"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "price_delta": {
+                                  "type": "integer"
+                                },
+                                "is_default": {
+                                  "type": "boolean"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "discounts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "name", "kind", "value", "scope"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": ["percent", "fixed"]
+                          },
+                          "value": {
+                            "type": "integer"
+                          },
+                          "scope": {
+                            "enum": ["item", "order"]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Default Response"
+          }
+        }
+      }
     }
   }
 }

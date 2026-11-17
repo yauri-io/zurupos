@@ -9,7 +9,7 @@ import { PAYMENT_METHODS } from './schemas.js'
 const TIMEZONES = new Set([...Intl.supportedValuesOf('timeZone'), 'UTC'])
 export const isValidTimezone = (tz: string): boolean => TIMEZONES.has(tz)
 
-const toResponse = (row: q.SettingsRow, withAlerts: boolean) => ({
+export const presentSettings = (row: q.SettingsRow, withAlerts: boolean) => ({
   name: row.name,
   address: row.address,
   phone: row.phone,
@@ -37,7 +37,7 @@ const toResponse = (row: q.SettingsRow, withAlerts: boolean) => ({
 })
 
 export const getSettings = async (trx: Tx, auth: AuthContext) =>
-  toResponse(await q.findSettings(trx, auth.tenantId), can(auth.role, 'settings.manage'))
+  presentSettings(await q.findSettings(trx, auth.tenantId), can(auth.role, 'settings.manage'))
 
 export const updateSettings = async (trx: Tx, auth: AuthContext, patch: Partial<q.SettingsRow>) => {
   if (patch.timezone !== undefined && !isValidTimezone(patch.timezone)) {
@@ -61,5 +61,5 @@ export const updateSettings = async (trx: Tx, auth: AuthContext, patch: Partial<
       data: { changes: patch },
     })
   }
-  return toResponse(row, true)
+  return presentSettings(row, true)
 }
