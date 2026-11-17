@@ -8,7 +8,7 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M1 | DB roles, migrations, RLS, auth, permissions | ✅ Done (reviewed) | **User review required** |
 | M2 | Menu, modifiers, ingredients, recipes, discounts, settings | ✅ Done | |
 | M3 | Pricing engine, orders, void, stock ops, low-stock email | ✅ Done (reviewed) | **User review required** |
-| M4 | Flutter cashier app | 🟡 In progress | |
+| M4 | Flutter cashier app | ✅ Done | |
 | M5 | Printing (Bluetooth + network) | ⬜ Not started | Manual printer test by user |
 | M6 | Dashboard reports and remaining pages | ⬜ Not started | |
 | M7 | Hardening, demo seed, user guide, UAT | ⬜ Not started | UAT with the shop owner |
@@ -83,3 +83,21 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 
 ### M3 review — 2026-11-17
 - User reviewed M3 and approved continuing. Stock-in/waste/count dashboard pages stay in M6 as planned (the API exists since M3).
+
+### M4 — 2026-11-18
+- Done:
+  - API: `GET /device/bootstrap` with a content-hash `menu_version` and `?since` → 304 (D-040).
+  - Flutter app (`apps/cashier`):
+    - Screens: pairing; staff picker with PIN pad and lockout countdown; register (category tabs, colour tiles, sold-out greyed, cart with qty stepper, swipe delete, line note/discount, order type, customer name, order discount, totals, Pay); modifier sheet; payment (enabled methods, cash quick amounts + pad + change, provider chips + reference, split payments); Done (order number, change, 5 s auto-return); orders today (search, detail, void with owner/manager PIN approval for cashiers); stock (levels with low/negative badges, stock-in in base or purchase units, waste, count); settings (language, sold-out toggles). Employee home is orders today + stock.
+    - Dart pricing port (`lib/domain/pricing.dart`) passing all 53 shared fixtures; the app's copy is checked against the API's.
+    - drift local store: menu cache, pending orders (written before sending, retried with the same `client_order_id`, D-042), settings. Device token in secure storage.
+    - Heartbeat every 30 s + offline banner (Pay disabled); menu refresh on login, every 5 min and on `PRICE_CHANGED`; idle auto-lock; screen kept awake on the register.
+- Tests: API 572 passing. Flutter 104 passing (`flutter test`): 53 pricing fixtures, domain (cart, selection, payment, formatting), drift store, and widget tests for pairing/PIN/roles, the cart, payment (cash, split, partial cash, pending + retry, `PRICE_CHANGED`), orders today + void with approval, and the stock screens.
+- Against the local API: `ZURU_API_URL=http://localhost:4000 flutter test test/integration` (2 tests, passing) pairs, signs in, loads bootstrap (and a 304), takes a split-paid order whose server total matches the app's, retries it idempotently, checks stock deduction, voids it with owner approval and restock, and recovers from a price change.
+- Run: see `apps/cashier/README.md` and CLAUDE.md commands.
+- Manual checks for the user (no emulator or tablet on this machine, D-043):
+  1. `docker compose up -d --build --wait`; create a shop (signup API) and its menu in the dashboard.
+  2. `cd apps/cashier && flutter run --dart-define=API_BASE_URL=http://<this-mac's-LAN-IP>:4000` on the tablet.
+  3. Pair with the owner's email/password, sign in as a cashier, take a cash order and a split order, see them in the dashboard API / orders today, void one with the owner's PIN.
+  4. Turn Wi-Fi off before *Selesai*: the order stays pending with *Coba lagi*; turn it back on and retry: one order, same number.
+- Known issues / notes: reprint and print status are M5. Done-screen auto-return isn't configurable yet (M5 device settings). CI runs `flutter analyze` and `flutter test` (the integration test skips without `ZURU_API_URL`); CI still hasn't run on GitHub.

@@ -188,3 +188,24 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - The payload holds the settings subset (no alert settings), active non-archived categories and items (sold-out items included with `is_available: false`), each item's modifier group ids in sheet order (D-033), live groups with their active options, and active preset discounts. No costs, recipes or stock.
 - Permission `orders.create` (owner, manager, cashier). Employees have no order screen; they use `GET /settings`, `/ingredients` and `/orders/today`.
 **Consequences:** §14.1 #5 (delta sync later) still works: every table keeps `updated_at`; a delta endpoint can be added next to this one.
+
+## D-041: Cashier app structure and tokens
+**Decision:**
+- Riverpod `Notifier`s per concern (`state/auth`, `menu`, `cart`, `checkout`, `connection`, `locale`); pure Dart domain in `lib/domain` (pricing port, cart, selection, payment); a hand-written client in `lib/api` (`ZuruApi` interface, `HttpZuruApi` over dio) per SPEC §2.
+- The device token lives in `flutter_secure_storage`. The staff token is kept in memory only: restarting the app asks for the PIN again (the 12 h server session still ends on its own).
+- The API address is a build-time setting: `--dart-define=API_BASE_URL=…` (default `http://10.0.2.2:4000`, the host's localhost from the Android emulator).
+- Debug builds allow cleartext HTTP (`src/debug/AndroidManifest.xml`) so the app can reach the local Docker API; release builds keep Android's default and need HTTPS.
+- The app mirrors the slice of the permission matrix it needs to choose screens (`lib/domain/permissions.dart`); the API stays the authority.
+
+## D-042: What happens to an order the server didn't accept
+**Context:** SPEC §11.2 says the payload is saved before sending and a network error keeps it pending.
+**Decision:**
+- Network error or 5xx: stays pending (`pending_orders.status = 'pending'`), the cart is cleared, a banner offers *Retry* with the same `client_order_id`, and *Pay* is disabled until it resolves.
+- 4xx: the server refused the order for good, so the row becomes `rejected` and the cashier stays on (or returns to) the cart. `PRICE_CHANGED` and `ITEM_UNAVAILABLE` also refresh the menu and re-price the cart with the new prices.
+- 401 (the staff session ended): stays pending and the app returns to the staff picker; whoever signs in next retries it. The server records that person as `created_by`, because the retry runs under their session.
+- Synced and rejected rows are kept in SQLite for troubleshooting.
+
+## D-043: M4 scope details
+- **Sold out:** cashiers may toggle sold out (`menu.availability`), so besides the Settings list (owner, manager) a long press on an item tile toggles it.
+- **Reprint and print status** (Orders today, Done screen) arrive with printing in M5. The Done screen's auto-return is fixed at 5 s until the device settings in M5 make it configurable.
+- **"Manual run against the local API":** this machine has no Android emulator or device. The run is automated instead: `test/integration/local_api_test.dart` drives the app's own state layer and HTTP client against the Docker API (pair, PIN, bootstrap + 304, split-paid order, idempotent retry, stock deduction, void with approval and restock, `PRICE_CHANGED` refresh). A debug APK builds. Running it on a real tablet is listed for the user in PROGRESS.

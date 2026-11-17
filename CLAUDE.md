@@ -107,6 +107,11 @@ pnpm api:client
 
 # Cashier app (apps/cashier)
 flutter pub get && flutter analyze && flutter test
+ZURU_API_URL=http://localhost:4000 flutter test test/integration   # against the running stack
+pnpm cashier:fixtures          # copy pricing-cases.json into the app after regenerating it
+dart run build_runner build    # regenerate drift code after changing lib/data/database.dart
+flutter run --dart-define=API_BASE_URL=http://<host-ip>:4000      # on a tablet (emulator default: 10.0.2.2)
+flutter build apk --debug
 ```
 
 Seeding (`db/seeds/demo.sql`) arrives with M7.
