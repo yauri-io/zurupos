@@ -146,3 +146,33 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 ## D-033: Option order for recipe resolution follows the item's group order
 **Context:** SPEC §7.1 orders selected options by "(group sort, option sort)". A group has its own `sort`, and the item→group link (`item_modifier_groups.sort`) also has one.
 **Decision:** Groups are ordered by the item's link sort (the order set with `PUT /items/:id/modifier-groups`, which is also the modifier sheet order), then the group's own `sort`, then group id; options by `sort`. Selected options must belong to a group attached to the item; otherwise the request is rejected (`option_not_on_item`).
+
+---
+
+## Decisions made during M3 (2026-11-17)
+
+## D-034: M3 order endpoints; the filtered order list is M6
+**Context:** §9 lists `GET /orders` (filters), `GET /orders/:id`, `GET /orders/today`, `POST /orders/:id/void`. M3 is about the order transaction; the filtered list serves the M6 dashboard orders page.
+**Decision:** M3 builds `POST /orders`, `GET /orders/today`, `GET /orders/:id` and `POST /orders/:id/void`. `GET /orders` with date/status/method/user/q filters ships with the M6 orders page.
+- `GET /orders/:id`: the owner reads any order; managers and cashiers only orders of the current business day (for reprint and void). Employees use `GET /orders/today`, which gives them items and the total but no payment details (PRD §6 "view only").
+- Cost fields (`cogs`, `cogs_total`, `avg_cost`, movement costs) only for `costs.view` (owner).
+
+## D-035: `order_line_modifiers.seq`
+**Context:** A line's modifiers are inserted in one transaction, so `created_at` can't order them, and receipts need a stable order.
+**Decision:** New column `seq` (1-based), filled in modifier-sheet order (D-033). Reads order by it.
+
+## D-036: Void approval failures and custom-discount snapshots
+**Decision:**
+- A wrong approval PIN returns `403 FORBIDDEN` with `details.reason = 'approval_invalid_pin'` (not 401, which the app treats as "your own session ended"). A locked approver returns `423 PIN_LOCKED`. The failure is committed so it counts towards the approver's 5-failure lockout on that device, like PIN login.
+- The approver must be an active owner/manager of the same shop and not the requester. Owners/managers void without approval; an `approval` they send is ignored.
+- Custom discounts are stored with `discount_id = null` and `name = null` (kind and value are kept); the app labels them at print time. Each order with a custom discount writes an `order.custom_discount` audit entry.
+
+## D-037: Order validation errors
+**Decision:** Unknown ids (or another shop's) → `404 NOT_FOUND`. Sold-out, inactive or archived items and options → `422 ITEM_UNAVAILABLE` with the id, so the app can refresh its menu. Modifier counts, options not on the item, discount scope and payment shape → `400 VALIDATION` with a `problem` code. `PRICE_CHANGED` (409) carries the server's full breakdown. Cash lines can't carry provider/reference.
+
+## D-038: Waste note and reason share `stock_movements.reason`
+**Context:** §7.4 waste takes a reason code and an optional note; the movement has one `reason` column.
+**Decision:** Stored as `"<code>"` or `"<code>: <note>"`, so reports can group by the code prefix.
+
+## D-039: Outbox worker
+**Decision:** A separate process (`node dist/worker/worker.js`, Compose service `worker`) connects as `zuru_worker` and runs the same startup role guard as the API. Each pass claims up to 10 due rows with `for update skip locked`, sends them, and sets `sent`, or a retry after 1 m, 5 m, 30 m, 2 h, 6 h, or `failed` after 6 attempts. Only the error message is stored in `last_error`, never the email body. `EMAIL_PROVIDER=resend` uses Resend's HTTP API (not exercised locally; no network calls are made in dev or tests).

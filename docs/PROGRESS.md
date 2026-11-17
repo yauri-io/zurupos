@@ -7,7 +7,7 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M0 | Repo scaffold, Docker Compose, skeletons, CI | ✅ Done | |
 | M1 | DB roles, migrations, RLS, auth, permissions | ✅ Done (reviewed) | **User review required** |
 | M2 | Menu, modifiers, ingredients, recipes, discounts, settings | ✅ Done | |
-| M3 | Pricing engine, orders, void, stock ops, low-stock email | 🟡 In progress | **User review required** |
+| M3 | Pricing engine, orders, void, stock ops, low-stock email | 🔍 Awaiting review | **User review required** |
 | M4 | Flutter cashier app | ⬜ Not started | |
 | M5 | Printing (Bluetooth + network) | ⬜ Not started | Manual printer test by user |
 | M6 | Dashboard reports and remaining pages | ⬜ Not started | |
@@ -64,3 +64,19 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Run: `docker compose up -d --build --wait && pnpm --filter @zurupos/dashboard test:e2e` (uses the installed Google Chrome).
 - Fixed along the way: CORS only allowed GET/HEAD/POST (found by the e2e test, now covered by `test/cors.test.ts`).
 - Known issues / notes: owner home with today's numbers, inventory pages, users/devices pages and the settings tax example are M6. `GET /device/bootstrap` is M4 (D-031). The e2e test needs the full stack running; it isn't in CI yet.
+
+### M3 — 2026-11-17
+- Done:
+  - `src/domain/pricing.ts` (SPEC §6, bigint only) + `test/fixtures/pricing-cases.json` (53 cases incl. payments). Expected values come from an independent Python implementation (`apps/api/scripts/pricing-cases.py`).
+  - `src/domain/avg-cost.ts` (weighted average, 4 dp half-up), `src/stock/ledger.ts` (the only writer of `stock_qty`: row + movement together, locks in id order), `src/stock/low-stock.ts` (§8).
+  - `POST /orders` (§7.2: idempotent on `client_order_id`, server pricing, `PRICE_CHANGED`, payments §6.4, business date §12.1, daily numbering, snapshots, stock deduction, COGS, low-stock), `GET /orders/today`, `GET /orders/:id`, `POST /orders/:id/void` (restock at original cost, cashier approval by manager PIN with lockout), `POST /stock/in|waste|count`, `GET /admin/stock-invariant`.
+  - Outbox worker (`src/worker`, Compose service `worker`) with retry backoff; SMTP to Mailpit locally, Resend in production. Low-stock email template (id/en).
+- Tests: API 564 passing (29 files). Exit criteria:
+  - ≥ 40 pricing fixtures: 53 (`test/domain/pricing.test.ts`).
+  - Concurrency: 20 parallel orders on the same ingredients (lines in opposite orders) → exact final stock, order numbers 1–20, no deadlocks (`test/orders/concurrency.test.ts`).
+  - Idempotency: same `client_order_id` ×5 sequentially and ×5 in parallel → one order, stock deducted once (`test/orders/create.test.ts`).
+  - Stock invariant (Σ movements = stock_qty) checked after orders, voids, stock ops and concurrency.
+  - Low-stock email arrives in Mailpit exactly once per crossing, and again after re-arming (`test/worker/outbox.test.ts`).
+  - Isolation suite covers every M3 route, including B's ids in order bodies.
+- Run: `docker compose up -d --build --wait && pnpm db:migrate:test && pnpm --filter @zurupos/api test` (the worker test needs Mailpit on :8025).
+- Known issues / notes: `GET /orders` (filtered list) is M6 (D-034). Changing an ingredient's threshold doesn't send an alert by itself; the next stock change does. The Dart pricing port (same fixtures) is M4. The 20-order concurrency test uses a 20-connection pool; production uses `DATABASE_POOL_MAX` (10).
