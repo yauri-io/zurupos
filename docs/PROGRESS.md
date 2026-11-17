@@ -7,8 +7,8 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M0 | Repo scaffold, Docker Compose, skeletons, CI | ✅ Done | |
 | M1 | DB roles, migrations, RLS, auth, permissions | ✅ Done (reviewed) | **User review required** |
 | M2 | Menu, modifiers, ingredients, recipes, discounts, settings | ✅ Done | |
-| M3 | Pricing engine, orders, void, stock ops, low-stock email | 🔍 Awaiting review | **User review required** |
-| M4 | Flutter cashier app | ⬜ Not started | |
+| M3 | Pricing engine, orders, void, stock ops, low-stock email | ✅ Done (reviewed) | **User review required** |
+| M4 | Flutter cashier app | 🟡 In progress | |
 | M5 | Printing (Bluetooth + network) | ⬜ Not started | Manual printer test by user |
 | M6 | Dashboard reports and remaining pages | ⬜ Not started | |
 | M7 | Hardening, demo seed, user guide, UAT | ⬜ Not started | UAT with the shop owner |
@@ -80,3 +80,6 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
   - Isolation suite covers every M3 route, including B's ids in order bodies.
 - Run: `docker compose up -d --build --wait && pnpm db:migrate:test && pnpm --filter @zurupos/api test` (the worker test needs Mailpit on :8025).
 - Known issues / notes: `GET /orders` (filtered list) is M6 (D-034). Changing an ingredient's threshold doesn't send an alert by itself; the next stock change does. The Dart pricing port (same fixtures) is M4. The 20-order concurrency test uses a 20-connection pool; production uses `DATABASE_POOL_MAX` (10).
+
+### M3 review — 2026-11-17
+- User reviewed M3 and approved continuing. Stock-in/waste/count dashboard pages stay in M6 as planned (the API exists since M3).
