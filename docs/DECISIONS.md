@@ -82,7 +82,7 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 **Decision:** The table is named `password_resets` with `purpose in ('reset','invite')`, matching `auth.find_password_reset`. Reset tokens expire in 1 h, invites in 72 h.
 
 ## D-019: Rate limits are in memory; PIN lockout is in the database
-**Decision:** Login, signup, password-reset and per-device PIN rate limits use `@fastify/rate-limit` in memory (MVP runs one API process). The 5-failure PIN lockout (§5.3) lives in `pin_attempts`, so it survives restarts.
+**Decision:** Login, signup, password-reset and per-device PIN rate limits use a small in-memory fixed-window limiter (`src/http/rate-limit.ts`; MVP runs one API process). The 5-failure PIN lockout (§5.3) lives in `pin_attempts`, so it survives restarts.
 **Consequences:** Move the rate-limit store to Postgres or Redis if the API is ever scaled to more than one process.
 
 ## D-020: Dashboard session sliding expiry is written at most hourly
@@ -106,3 +106,8 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 **Context:** SPEC §4.1 makes `payments.tendered` nullable ("cash only, ≥ amount"), and §6.4 computes `change_due` from cash lines.
 **Decision:** `tendered` is required on cash lines (`≥ amount`) and must be null on non-cash lines, enforced by a CHECK constraint. The app's *Exact* button sends `tendered = amount`.
 **Consequences:** `change_due` is always computable from stored rows; the drawer reconciliation never meets a cash line with an unknown tendered amount.
+
+## D-026: The cashier app sends `X-Requested-With: zuru` on every request
+**Context:** The CSRF rule (SPEC §5.1) covers every state-changing request that has no device token. `POST /v1/devices/pair` comes from the app before it has a token.
+**Decision:** The rule stays as written, with no route exemptions. The Flutter client sends `X-Requested-With: zuru` on every request. Native apps send no `Origin`, so the same-origin check passes.
+**Consequences:** The M4 HTTP client must set the header globally.

@@ -9,16 +9,14 @@ import type { Config } from './config/env.js'
 import type { Database } from './db/kysely.js'
 import { errorHandler, notFoundHandler } from './http/error-handler.js'
 import type { App } from './http/types.js'
+import { registerAuth } from './auth/plugin.js'
+import { createLimiters, type Limiters } from './http/rate-limit.js'
+import { authRoutes } from './modules/auth/routes.js'
+import { deviceRoutes } from './modules/devices/routes.js'
 import { healthRoutes } from './modules/health/routes.js'
+import { userRoutes } from './modules/users/routes.js'
 
-declare module 'fastify' {
-  interface FastifyInstance {
-    config: Config
-    db: Database
-  }
-}
-
-export type AppDeps = { config: Config; db: Database }
+export type AppDeps = { config: Config; db: Database; limiters?: Limiters }
 
 // Never log secrets: PINs, passwords and tokens are redacted wherever they appear.
 const REDACT = [
@@ -28,7 +26,7 @@ const REDACT = [
   'res.headers["set-cookie"]',
 ]
 
-export const buildApp = async ({ config, db }: AppDeps): Promise<App> => {
+export const buildApp = async ({ config, db, limiters = createLimiters() }: AppDeps): Promise<App> => {
   const app = Fastify({
     logger: config.nodeEnv === 'test' ? false : { level: config.logLevel, redact: REDACT },
     trustProxy: config.trustProxy,
@@ -39,8 +37,9 @@ export const buildApp = async ({ config, db }: AppDeps): Promise<App> => {
     ajv: { customOptions: { removeAdditional: false, coerceTypes: false, allErrors: false } },
   }).withTypeProvider<TypeBoxTypeProvider>()
 
-  app.decorate('config', config)
-  app.decorate('db', db)
+  // `db` is deliberately not decorated on the app: route handlers reach the
+  // database only through request.tenantTx (SPEC §3.3). The raw handle is passed
+  // explicitly to the auth layer and the pre-tenant routes (login, pairing).
   app.setErrorHandler(errorHandler)
   app.setNotFoundHandler(notFoundHandler)
   app.addHook('onSend', async (request, reply) => {
@@ -57,10 +56,27 @@ export const buildApp = async ({ config, db }: AppDeps): Promise<App> => {
     openapi: {
       openapi: '3.1.0',
       info: { title: 'ZuruPOS API', version: '1.0.0' },
+      components: {
+        securitySchemes: {
+          dashboardSession: { type: 'apiKey', in: 'cookie', name: 'zuru_session' },
+          deviceToken: { type: 'apiKey', in: 'header', name: 'X-Device-Token' },
+          staffToken: { type: 'http', scheme: 'bearer' },
+        },
+      },
     },
   })
 
-  await app.register(healthRoutes)
+  registerAuth(app, { db, config })
+
+  await app.register(healthRoutes, { db })
+  await app.register(
+    async (v1) => {
+      await v1.register(authRoutes, { db, config, limiters })
+      await v1.register(deviceRoutes, { db, limiters })
+      await v1.register(userRoutes, { config })
+    },
+    { prefix: '/v1' },
+  )
 
   return app
 }

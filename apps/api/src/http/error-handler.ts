@@ -17,12 +17,22 @@ const send = (
     },
   })
 
+const pgConstraint = (err: unknown): string | undefined => (err as { constraint?: string }).constraint
+
 export const errorHandler = (err: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
   if (isApiError(err)) return send(request, reply, err.statusCode, err.code, err.details)
   if (err.validation) {
     return send(request, reply, 400, 'VALIDATION', {
       issues: err.validation.map((v) => ({ path: v.instancePath, message: v.message })),
     })
+  }
+  const pgCode = (err as { code?: string }).code
+  // Constraint violations that reach here are client errors (bad or foreign ids,
+  // duplicates). The transaction has already rolled back.
+  if (pgCode === '23505') return send(request, reply, 409, 'CONFLICT', { constraint: pgConstraint(err) })
+  if (pgCode === '23503') return send(request, reply, 404, 'NOT_FOUND', {})
+  if (pgCode === '23514' || pgCode === '22P02' || pgCode === '22001') {
+    return send(request, reply, 400, 'VALIDATION', { constraint: pgConstraint(err) })
   }
   if (err.statusCode === 429) return send(request, reply, 429, 'RATE_LIMITED', {})
   if (err.statusCode !== undefined && err.statusCode >= 400 && err.statusCode < 500) {
