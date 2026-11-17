@@ -5,8 +5,8 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | # | Milestone | Status | Review stop |
 |---|---|---|---|
 | M0 | Repo scaffold, Docker Compose, skeletons, CI | ✅ Done | |
-| M1 | DB roles, migrations, RLS, auth, permissions | 🔍 Awaiting review | **User review required** |
-| M2 | Menu, modifiers, ingredients, recipes, discounts, settings | ⬜ Not started | |
+| M1 | DB roles, migrations, RLS, auth, permissions | ✅ Done (reviewed) | **User review required** |
+| M2 | Menu, modifiers, ingredients, recipes, discounts, settings | 🟡 In progress | |
 | M3 | Pricing engine, orders, void, stock ops, low-stock email | ⬜ Not started | **User review required** |
 | M4 | Flutter cashier app | ⬜ Not started | |
 | M5 | Printing (Bluetooth + network) | ⬜ Not started | Manual printer test by user |
@@ -48,3 +48,8 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
   - Password-reset and invite emails are written to `outbox` but not sent until the M3 worker exists, so they don't show in Mailpit yet. Tests read them from the outbox as `zuru_worker`.
   - CI has still not run on GitHub (nothing pushed).
   - The timezone is not validated in the DB; the settings API will validate it in M2.
+
+### M1 review — 2026-11-17
+- User approved D-024 (with hardening), D-025 and D-026.
+- Hardening: `pg_temp` last in the `auth.*` functions' `search_path`; the API refuses to start if its DB role is superuser, has BYPASSRLS, is a member of `zuru_owner` or owns a table in `public`/`auth` (`src/db/role-guard.ts`, `test/db/role-guard.test.ts`); the isolation suite asserts no `CREATE` on `public`/`auth` for `zuru_app` and `zuru_worker`. SPEC §3.1/§3.4/§3.6 updated.
+- Tests: 263 passing.
