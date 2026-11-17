@@ -4,7 +4,10 @@
   "type": "module",
   "description": "TypeScript types generated from the API's OpenAPI document (SPEC §2).",
   "exports": {
-    ".": { "types": "./src/schema.d.ts", "default": "./src/index.js" }
+    ".": {
+      "types": "./src/schema.d.ts",
+      "default": "./src/index.js"
+    }
   },
   "scripts": {
     "generate": "pnpm --filter @zurupos/api openapi && openapi-typescript openapi.json -o src/schema.d.ts && prettier --write src/schema.d.ts openapi.json"
