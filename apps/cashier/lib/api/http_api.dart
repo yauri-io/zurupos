@@ -98,10 +98,10 @@ class HttpZuruApi implements ZuruApi {
   Future<void> logout() => _send('DELETE', '/device/sessions/current');
 
   @override
-  Future<Bootstrap?> bootstrap({String? since}) async {
+  Future<Json?> bootstrapJson({String? since}) async {
     final res = await _send('GET', '/device/bootstrap', query: since == null ? null : {'since': since});
     if (res.statusCode == 304) return null;
-    return Bootstrap.fromJson(res.data as Json);
+    return res.data as Json;
   }
 
   @override

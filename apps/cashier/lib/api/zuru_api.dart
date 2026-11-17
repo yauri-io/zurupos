@@ -16,8 +16,8 @@ abstract interface class ZuruApi {
   // Staff session (device + staff token).
   Future<void> logout();
 
-  /// Null when [since] is still current (304).
-  Future<Bootstrap?> bootstrap({String? since});
+  /// The raw payload (cached as-is), or null when [since] is still current (304).
+  Future<Json?> bootstrapJson({String? since});
   Future<ShopSettings> settings();
   Future<Order> createOrder(Json payload);
   Future<List<OrderSummary>> today();

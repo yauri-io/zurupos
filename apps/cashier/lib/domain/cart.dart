@@ -153,6 +153,31 @@ class Cart {
     ],
   );
 
+  /// After a menu refresh (PRICE_CHANGED): current prices and names; lines whose
+  /// item left the menu are dropped. Options that disappeared are dropped too, and
+  /// the server's validation decides whether the line is still acceptable.
+  Cart withMenu(Bootstrap menu) {
+    final items = {for (final i in menu.items) i.id: i};
+    final options = {
+      for (final g in menu.groups.values)
+        for (final o in g.options) o.id: o,
+    };
+    return copyWith(
+      lines: [
+        for (final l in lines)
+          if (items[l.item.id] case final item?)
+            CartLine(
+              key: l.key,
+              item: item,
+              options: [for (final o in l.options) ?options[o.id]],
+              qty: l.qty,
+              note: l.note,
+              discount: l.discount,
+            ),
+      ],
+    );
+  }
+
   PricedOrder price(ShopSettings s) => priceOrder(
     [for (final l in lines) l.pricing],
     orderDiscount?.pricing,
