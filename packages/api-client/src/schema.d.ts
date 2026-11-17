@@ -2476,6 +2476,887 @@ export interface paths {
     }
     trace?: never
   }
+  '/v1/stock/in': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': {
+            /** Format: uuid */
+            ingredient_id: string
+            qty?: string
+            purchase_qty?: string
+            total_cost: number
+          }
+        }
+      }
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              ingredients: {
+                /** Format: uuid */
+                id: string
+                name: string
+                /** @enum {unknown} */
+                base_unit: 'g' | 'ml' | 'pcs'
+                stock_qty: string
+                low_stock_threshold: string
+                purchase_unit_name: string | null
+                purchase_unit_size: string | null
+                is_low: boolean
+                archived: boolean
+                avg_cost?: string
+              }[]
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/stock/waste': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': {
+            /** Format: uuid */
+            ingredient_id: string
+            qty: string
+            /** @enum {unknown} */
+            reason: 'spilled' | 'expired' | 'mistake' | 'other'
+            note?: string
+          }
+        }
+      }
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              ingredients: {
+                /** Format: uuid */
+                id: string
+                name: string
+                /** @enum {unknown} */
+                base_unit: 'g' | 'ml' | 'pcs'
+                stock_qty: string
+                low_stock_threshold: string
+                purchase_unit_name: string | null
+                purchase_unit_size: string | null
+                is_low: boolean
+                archived: boolean
+                avg_cost?: string
+              }[]
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/stock/count': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': {
+            counts: {
+              /** Format: uuid */
+              ingredient_id: string
+              counted_qty: string
+            }[]
+            note?: string
+          }
+        }
+      }
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              ingredients: {
+                /** Format: uuid */
+                id: string
+                name: string
+                /** @enum {unknown} */
+                base_unit: 'g' | 'ml' | 'pcs'
+                stock_qty: string
+                low_stock_threshold: string
+                purchase_unit_name: string | null
+                purchase_unit_size: string | null
+                is_low: boolean
+                archived: boolean
+                avg_cost?: string
+              }[]
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/orders': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': {
+            /** Format: uuid */
+            client_order_id: string
+            /** Format: date-time */
+            client_created_at?: string
+            /** @enum {unknown} */
+            order_type: 'dine_in' | 'takeaway'
+            customer_name?: string | null
+            note?: string | null
+            lines: {
+              /** Format: uuid */
+              item_id: string
+              qty: number
+              option_ids?: string[]
+              note?: string | null
+              discount?:
+                | (
+                    | {
+                        /** Format: uuid */
+                        discount_id: string
+                      }
+                    | {
+                        /** @enum {string} */
+                        kind: 'percent'
+                        value: number
+                      }
+                    | {
+                        /** @enum {string} */
+                        kind: 'fixed'
+                        value: number
+                      }
+                  )
+                | null
+            }[]
+            order_discount?:
+              | (
+                  | {
+                      /** Format: uuid */
+                      discount_id: string
+                    }
+                  | {
+                      /** @enum {string} */
+                      kind: 'percent'
+                      value: number
+                    }
+                  | {
+                      /** @enum {string} */
+                      kind: 'fixed'
+                      value: number
+                    }
+                )
+              | null
+            payments: {
+              method: 'cash' | 'qris' | 'debit' | 'credit' | 'transfer' | 'other'
+              amount: number
+              tendered?: number | null
+              provider?: string | null
+              reference?: string | null
+            }[]
+            expected_total?: number
+          }
+        }
+      }
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              /** Format: uuid */
+              id: string
+              /** Format: uuid */
+              client_order_id: string
+              order_number: number
+              /** Format: date */
+              business_date: string
+              /** @enum {unknown} */
+              status: 'paid' | 'voided'
+              source: string
+              /** @enum {unknown} */
+              order_type: 'dine_in' | 'takeaway'
+              customer_name: string | null
+              note: string | null
+              subtotal: number
+              item_discount_total: number
+              order_discount: {
+                id: string | null
+                name: string | null
+                /** @enum {unknown} */
+                kind: 'percent' | 'fixed'
+                value: number
+                amount: number
+              } | null
+              net_sales: number
+              service_charge_bps: number
+              service_charge_amount: number
+              tax_name: string | null
+              tax_bps: number
+              tax_on_service_charge: boolean
+              tax_amount: number
+              total: number
+              paid_total: number
+              change_due: number
+              created_by: {
+                /** Format: uuid */
+                id: string
+                name: string
+              }
+              device_id: string | null
+              client_created_at: string | null
+              /** Format: date-time */
+              paid_at: string
+              void: {
+                /** Format: date-time */
+                voided_at: string
+                voided_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                }
+                approved_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                } | null
+                reason: string
+                restock: boolean
+              } | null
+              lines: {
+                /** Format: uuid */
+                id: string
+                line_no: number
+                /** Format: uuid */
+                item_id: string
+                item_name: string
+                category_name: string
+                unit_price: number
+                modifiers_unit_total: number
+                qty: number
+                line_gross: number
+                discount: {
+                  id: string | null
+                  name: string | null
+                  /** @enum {unknown} */
+                  kind: 'percent' | 'fixed'
+                  value: number
+                  amount: number
+                } | null
+                line_net: number
+                note: string | null
+                modifiers: {
+                  /** Format: uuid */
+                  option_id: string
+                  group_name: string
+                  option_name: string
+                  price_delta: number
+                }[]
+                cogs?: string
+              }[]
+              payments: {
+                seq: number
+                method: 'cash' | 'qris' | 'debit' | 'credit' | 'transfer' | 'other'
+                amount: number
+                tendered: number | null
+                provider: string | null
+                reference: string | null
+              }[]
+              cogs_total?: number
+            }
+          }
+        }
+        /** @description Default Response */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              /** Format: uuid */
+              id: string
+              /** Format: uuid */
+              client_order_id: string
+              order_number: number
+              /** Format: date */
+              business_date: string
+              /** @enum {unknown} */
+              status: 'paid' | 'voided'
+              source: string
+              /** @enum {unknown} */
+              order_type: 'dine_in' | 'takeaway'
+              customer_name: string | null
+              note: string | null
+              subtotal: number
+              item_discount_total: number
+              order_discount: {
+                id: string | null
+                name: string | null
+                /** @enum {unknown} */
+                kind: 'percent' | 'fixed'
+                value: number
+                amount: number
+              } | null
+              net_sales: number
+              service_charge_bps: number
+              service_charge_amount: number
+              tax_name: string | null
+              tax_bps: number
+              tax_on_service_charge: boolean
+              tax_amount: number
+              total: number
+              paid_total: number
+              change_due: number
+              created_by: {
+                /** Format: uuid */
+                id: string
+                name: string
+              }
+              device_id: string | null
+              client_created_at: string | null
+              /** Format: date-time */
+              paid_at: string
+              void: {
+                /** Format: date-time */
+                voided_at: string
+                voided_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                }
+                approved_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                } | null
+                reason: string
+                restock: boolean
+              } | null
+              lines: {
+                /** Format: uuid */
+                id: string
+                line_no: number
+                /** Format: uuid */
+                item_id: string
+                item_name: string
+                category_name: string
+                unit_price: number
+                modifiers_unit_total: number
+                qty: number
+                line_gross: number
+                discount: {
+                  id: string | null
+                  name: string | null
+                  /** @enum {unknown} */
+                  kind: 'percent' | 'fixed'
+                  value: number
+                  amount: number
+                } | null
+                line_net: number
+                note: string | null
+                modifiers: {
+                  /** Format: uuid */
+                  option_id: string
+                  group_name: string
+                  option_name: string
+                  price_delta: number
+                }[]
+                cogs?: string
+              }[]
+              payments: {
+                seq: number
+                method: 'cash' | 'qris' | 'debit' | 'credit' | 'transfer' | 'other'
+                amount: number
+                tendered: number | null
+                provider: string | null
+                reference: string | null
+              }[]
+              cogs_total?: number
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/orders/today': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              /** Format: date */
+              business_date: string
+              orders: {
+                /** Format: uuid */
+                id: string
+                order_number: number
+                /** @enum {unknown} */
+                status: 'paid' | 'voided'
+                /** @enum {unknown} */
+                order_type: 'dine_in' | 'takeaway'
+                customer_name: string | null
+                total: number
+                /** Format: date-time */
+                paid_at: string
+                created_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                }
+                items: {
+                  name: string
+                  qty: number
+                  modifiers: string[]
+                }[]
+                payment_methods?: ('cash' | 'qris' | 'debit' | 'credit' | 'transfer' | 'other')[]
+              }[]
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/orders/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              /** Format: uuid */
+              id: string
+              /** Format: uuid */
+              client_order_id: string
+              order_number: number
+              /** Format: date */
+              business_date: string
+              /** @enum {unknown} */
+              status: 'paid' | 'voided'
+              source: string
+              /** @enum {unknown} */
+              order_type: 'dine_in' | 'takeaway'
+              customer_name: string | null
+              note: string | null
+              subtotal: number
+              item_discount_total: number
+              order_discount: {
+                id: string | null
+                name: string | null
+                /** @enum {unknown} */
+                kind: 'percent' | 'fixed'
+                value: number
+                amount: number
+              } | null
+              net_sales: number
+              service_charge_bps: number
+              service_charge_amount: number
+              tax_name: string | null
+              tax_bps: number
+              tax_on_service_charge: boolean
+              tax_amount: number
+              total: number
+              paid_total: number
+              change_due: number
+              created_by: {
+                /** Format: uuid */
+                id: string
+                name: string
+              }
+              device_id: string | null
+              client_created_at: string | null
+              /** Format: date-time */
+              paid_at: string
+              void: {
+                /** Format: date-time */
+                voided_at: string
+                voided_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                }
+                approved_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                } | null
+                reason: string
+                restock: boolean
+              } | null
+              lines: {
+                /** Format: uuid */
+                id: string
+                line_no: number
+                /** Format: uuid */
+                item_id: string
+                item_name: string
+                category_name: string
+                unit_price: number
+                modifiers_unit_total: number
+                qty: number
+                line_gross: number
+                discount: {
+                  id: string | null
+                  name: string | null
+                  /** @enum {unknown} */
+                  kind: 'percent' | 'fixed'
+                  value: number
+                  amount: number
+                } | null
+                line_net: number
+                note: string | null
+                modifiers: {
+                  /** Format: uuid */
+                  option_id: string
+                  group_name: string
+                  option_name: string
+                  price_delta: number
+                }[]
+                cogs?: string
+              }[]
+              payments: {
+                seq: number
+                method: 'cash' | 'qris' | 'debit' | 'credit' | 'transfer' | 'other'
+                amount: number
+                tendered: number | null
+                provider: string | null
+                reference: string | null
+              }[]
+              cogs_total?: number
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/orders/{id}/void': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': {
+            reason: string
+            restock: boolean
+            approval?: {
+              /** Format: uuid */
+              user_id: string
+              pin: string
+            }
+          }
+        }
+      }
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              /** Format: uuid */
+              id: string
+              /** Format: uuid */
+              client_order_id: string
+              order_number: number
+              /** Format: date */
+              business_date: string
+              /** @enum {unknown} */
+              status: 'paid' | 'voided'
+              source: string
+              /** @enum {unknown} */
+              order_type: 'dine_in' | 'takeaway'
+              customer_name: string | null
+              note: string | null
+              subtotal: number
+              item_discount_total: number
+              order_discount: {
+                id: string | null
+                name: string | null
+                /** @enum {unknown} */
+                kind: 'percent' | 'fixed'
+                value: number
+                amount: number
+              } | null
+              net_sales: number
+              service_charge_bps: number
+              service_charge_amount: number
+              tax_name: string | null
+              tax_bps: number
+              tax_on_service_charge: boolean
+              tax_amount: number
+              total: number
+              paid_total: number
+              change_due: number
+              created_by: {
+                /** Format: uuid */
+                id: string
+                name: string
+              }
+              device_id: string | null
+              client_created_at: string | null
+              /** Format: date-time */
+              paid_at: string
+              void: {
+                /** Format: date-time */
+                voided_at: string
+                voided_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                }
+                approved_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                } | null
+                reason: string
+                restock: boolean
+              } | null
+              lines: {
+                /** Format: uuid */
+                id: string
+                line_no: number
+                /** Format: uuid */
+                item_id: string
+                item_name: string
+                category_name: string
+                unit_price: number
+                modifiers_unit_total: number
+                qty: number
+                line_gross: number
+                discount: {
+                  id: string | null
+                  name: string | null
+                  /** @enum {unknown} */
+                  kind: 'percent' | 'fixed'
+                  value: number
+                  amount: number
+                } | null
+                line_net: number
+                note: string | null
+                modifiers: {
+                  /** Format: uuid */
+                  option_id: string
+                  group_name: string
+                  option_name: string
+                  price_delta: number
+                }[]
+                cogs?: string
+              }[]
+              payments: {
+                seq: number
+                method: 'cash' | 'qris' | 'debit' | 'credit' | 'transfer' | 'other'
+                amount: number
+                tendered: number | null
+                provider: string | null
+                reference: string | null
+              }[]
+              cogs_total?: number
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/admin/stock-invariant': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              mismatches: {
+                /** Format: uuid */
+                ingredient_id: string
+                name: string
+                stock_qty: string
+                movements_total: string
+              }[]
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {

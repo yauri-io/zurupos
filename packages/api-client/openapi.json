@@ -4477,6 +4477,2822 @@
           }
         }
       }
+    },
+    "/v1/stock/in": {
+      "post": {
+        "tags": ["stock"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["ingredient_id", "total_cost"],
+                "properties": {
+                  "ingredient_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "qty": {
+                    "type": "string",
+                    "pattern": "^[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                  },
+                  "purchase_qty": {
+                    "type": "string",
+                    "pattern": "^[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                  },
+                  "total_cost": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 999999999999
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["ingredients"],
+                  "properties": {
+                    "ingredients": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "name",
+                          "base_unit",
+                          "stock_qty",
+                          "low_stock_threshold",
+                          "purchase_unit_name",
+                          "purchase_unit_size",
+                          "is_low",
+                          "archived"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "base_unit": {
+                            "enum": ["g", "ml", "pcs"]
+                          },
+                          "stock_qty": {
+                            "type": "string",
+                            "pattern": "^-?[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                          },
+                          "low_stock_threshold": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                          },
+                          "purchase_unit_name": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "purchase_unit_size": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "is_low": {
+                            "type": "boolean"
+                          },
+                          "archived": {
+                            "type": "boolean"
+                          },
+                          "avg_cost": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,12}(\\.[0-9]{1,4})?$"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stock/waste": {
+      "post": {
+        "tags": ["stock"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["ingredient_id", "qty", "reason"],
+                "properties": {
+                  "ingredient_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "qty": {
+                    "type": "string",
+                    "pattern": "^[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                  },
+                  "reason": {
+                    "enum": ["spilled", "expired", "mistake", "other"]
+                  },
+                  "note": {
+                    "type": "string",
+                    "maxLength": 150
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["ingredients"],
+                  "properties": {
+                    "ingredients": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "name",
+                          "base_unit",
+                          "stock_qty",
+                          "low_stock_threshold",
+                          "purchase_unit_name",
+                          "purchase_unit_size",
+                          "is_low",
+                          "archived"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "base_unit": {
+                            "enum": ["g", "ml", "pcs"]
+                          },
+                          "stock_qty": {
+                            "type": "string",
+                            "pattern": "^-?[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                          },
+                          "low_stock_threshold": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                          },
+                          "purchase_unit_name": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "purchase_unit_size": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "is_low": {
+                            "type": "boolean"
+                          },
+                          "archived": {
+                            "type": "boolean"
+                          },
+                          "avg_cost": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,12}(\\.[0-9]{1,4})?$"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stock/count": {
+      "post": {
+        "tags": ["stock"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["counts"],
+                "properties": {
+                  "counts": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["ingredient_id", "counted_qty"],
+                      "properties": {
+                        "ingredient_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "counted_qty": {
+                          "type": "string",
+                          "pattern": "^[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "minItems": 1,
+                    "maxItems": 500
+                  },
+                  "note": {
+                    "type": "string",
+                    "maxLength": 150
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["ingredients"],
+                  "properties": {
+                    "ingredients": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "name",
+                          "base_unit",
+                          "stock_qty",
+                          "low_stock_threshold",
+                          "purchase_unit_name",
+                          "purchase_unit_size",
+                          "is_low",
+                          "archived"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "base_unit": {
+                            "enum": ["g", "ml", "pcs"]
+                          },
+                          "stock_qty": {
+                            "type": "string",
+                            "pattern": "^-?[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                          },
+                          "low_stock_threshold": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                          },
+                          "purchase_unit_name": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "purchase_unit_size": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "is_low": {
+                            "type": "boolean"
+                          },
+                          "archived": {
+                            "type": "boolean"
+                          },
+                          "avg_cost": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,12}(\\.[0-9]{1,4})?$"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders": {
+      "post": {
+        "tags": ["orders"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["client_order_id", "order_type", "lines", "payments"],
+                "properties": {
+                  "client_order_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "client_created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "order_type": {
+                    "enum": ["dine_in", "takeaway"]
+                  },
+                  "customer_name": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 60
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "note": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 500
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "lines": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["item_id", "qty"],
+                      "properties": {
+                        "item_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "qty": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 999
+                        },
+                        "option_ids": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "maxItems": 30,
+                          "uniqueItems": true
+                        },
+                        "note": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 200
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "discount": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": ["discount_id"],
+                                  "properties": {
+                                    "discount_id": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "object",
+                                  "required": ["kind", "value"],
+                                  "properties": {
+                                    "kind": {
+                                      "type": "string",
+                                      "enum": ["percent"]
+                                    },
+                                    "value": {
+                                      "type": "integer",
+                                      "minimum": 1,
+                                      "maximum": 10000
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "object",
+                                  "required": ["kind", "value"],
+                                  "properties": {
+                                    "kind": {
+                                      "type": "string",
+                                      "enum": ["fixed"]
+                                    },
+                                    "value": {
+                                      "type": "integer",
+                                      "minimum": 1,
+                                      "maximum": 999999999999
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                }
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "minItems": 1,
+                    "maxItems": 100
+                  },
+                  "order_discount": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "required": ["discount_id"],
+                            "properties": {
+                              "discount_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "required": ["kind", "value"],
+                            "properties": {
+                              "kind": {
+                                "type": "string",
+                                "enum": ["percent"]
+                              },
+                              "value": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 10000
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "required": ["kind", "value"],
+                            "properties": {
+                              "kind": {
+                                "type": "string",
+                                "enum": ["fixed"]
+                              },
+                              "value": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 999999999999
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "payments": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["method", "amount"],
+                      "properties": {
+                        "method": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": ["cash"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["qris"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["debit"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["credit"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["transfer"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["other"]
+                            }
+                          ]
+                        },
+                        "amount": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 999999999999
+                        },
+                        "tendered": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 999999999999
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "provider": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "reference": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 60
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "maxItems": 10
+                  },
+                  "expected_total": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 999999999999
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "client_order_id",
+                    "order_number",
+                    "business_date",
+                    "status",
+                    "source",
+                    "order_type",
+                    "customer_name",
+                    "note",
+                    "subtotal",
+                    "item_discount_total",
+                    "order_discount",
+                    "net_sales",
+                    "service_charge_bps",
+                    "service_charge_amount",
+                    "tax_name",
+                    "tax_bps",
+                    "tax_on_service_charge",
+                    "tax_amount",
+                    "total",
+                    "paid_total",
+                    "change_due",
+                    "created_by",
+                    "device_id",
+                    "client_created_at",
+                    "paid_at",
+                    "void",
+                    "lines",
+                    "payments"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "client_order_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "order_number": {
+                      "type": "integer"
+                    },
+                    "business_date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "status": {
+                      "enum": ["paid", "voided"]
+                    },
+                    "source": {
+                      "type": "string"
+                    },
+                    "order_type": {
+                      "enum": ["dine_in", "takeaway"]
+                    },
+                    "customer_name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "note": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subtotal": {
+                      "type": "integer"
+                    },
+                    "item_discount_total": {
+                      "type": "integer"
+                    },
+                    "order_discount": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["id", "name", "kind", "value", "amount"],
+                          "properties": {
+                            "id": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "name": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "kind": {
+                              "enum": ["percent", "fixed"]
+                            },
+                            "value": {
+                              "type": "integer"
+                            },
+                            "amount": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "net_sales": {
+                      "type": "integer"
+                    },
+                    "service_charge_bps": {
+                      "type": "integer"
+                    },
+                    "service_charge_amount": {
+                      "type": "integer"
+                    },
+                    "tax_name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "tax_bps": {
+                      "type": "integer"
+                    },
+                    "tax_on_service_charge": {
+                      "type": "boolean"
+                    },
+                    "tax_amount": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "paid_total": {
+                      "type": "integer"
+                    },
+                    "change_due": {
+                      "type": "integer"
+                    },
+                    "created_by": {
+                      "type": "object",
+                      "required": ["id", "name"],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "device_id": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "client_created_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "paid_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "void": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["voided_at", "voided_by", "approved_by", "reason", "restock"],
+                          "properties": {
+                            "voided_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "voided_by": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "name": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "approved_by": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": ["id", "name"],
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reason": {
+                              "type": "string"
+                            },
+                            "restock": {
+                              "type": "boolean"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "lines": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "line_no",
+                          "item_id",
+                          "item_name",
+                          "category_name",
+                          "unit_price",
+                          "modifiers_unit_total",
+                          "qty",
+                          "line_gross",
+                          "discount",
+                          "line_net",
+                          "note",
+                          "modifiers"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "line_no": {
+                            "type": "integer"
+                          },
+                          "item_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "item_name": {
+                            "type": "string"
+                          },
+                          "category_name": {
+                            "type": "string"
+                          },
+                          "unit_price": {
+                            "type": "integer"
+                          },
+                          "modifiers_unit_total": {
+                            "type": "integer"
+                          },
+                          "qty": {
+                            "type": "integer"
+                          },
+                          "line_gross": {
+                            "type": "integer"
+                          },
+                          "discount": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": ["id", "name", "kind", "value", "amount"],
+                                "properties": {
+                                  "id": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "format": "uuid"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "name": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "kind": {
+                                    "enum": ["percent", "fixed"]
+                                  },
+                                  "value": {
+                                    "type": "integer"
+                                  },
+                                  "amount": {
+                                    "type": "integer"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "line_net": {
+                            "type": "integer"
+                          },
+                          "note": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "modifiers": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": ["option_id", "group_name", "option_name", "price_delta"],
+                              "properties": {
+                                "option_id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "group_name": {
+                                  "type": "string"
+                                },
+                                "option_name": {
+                                  "type": "string"
+                                },
+                                "price_delta": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          },
+                          "cogs": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,12}(\\.[0-9]{1,4})?$"
+                          }
+                        }
+                      }
+                    },
+                    "payments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["seq", "method", "amount", "tendered", "provider", "reference"],
+                        "properties": {
+                          "seq": {
+                            "type": "integer"
+                          },
+                          "method": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": ["cash"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["qris"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["debit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["credit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["transfer"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["other"]
+                              }
+                            ]
+                          },
+                          "amount": {
+                            "type": "integer"
+                          },
+                          "tendered": {
+                            "anyOf": [
+                              {
+                                "type": "integer"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "provider": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "reference": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "cogs_total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "client_order_id",
+                    "order_number",
+                    "business_date",
+                    "status",
+                    "source",
+                    "order_type",
+                    "customer_name",
+                    "note",
+                    "subtotal",
+                    "item_discount_total",
+                    "order_discount",
+                    "net_sales",
+                    "service_charge_bps",
+                    "service_charge_amount",
+                    "tax_name",
+                    "tax_bps",
+                    "tax_on_service_charge",
+                    "tax_amount",
+                    "total",
+                    "paid_total",
+                    "change_due",
+                    "created_by",
+                    "device_id",
+                    "client_created_at",
+                    "paid_at",
+                    "void",
+                    "lines",
+                    "payments"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "client_order_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "order_number": {
+                      "type": "integer"
+                    },
+                    "business_date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "status": {
+                      "enum": ["paid", "voided"]
+                    },
+                    "source": {
+                      "type": "string"
+                    },
+                    "order_type": {
+                      "enum": ["dine_in", "takeaway"]
+                    },
+                    "customer_name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "note": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subtotal": {
+                      "type": "integer"
+                    },
+                    "item_discount_total": {
+                      "type": "integer"
+                    },
+                    "order_discount": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["id", "name", "kind", "value", "amount"],
+                          "properties": {
+                            "id": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "name": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "kind": {
+                              "enum": ["percent", "fixed"]
+                            },
+                            "value": {
+                              "type": "integer"
+                            },
+                            "amount": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "net_sales": {
+                      "type": "integer"
+                    },
+                    "service_charge_bps": {
+                      "type": "integer"
+                    },
+                    "service_charge_amount": {
+                      "type": "integer"
+                    },
+                    "tax_name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "tax_bps": {
+                      "type": "integer"
+                    },
+                    "tax_on_service_charge": {
+                      "type": "boolean"
+                    },
+                    "tax_amount": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "paid_total": {
+                      "type": "integer"
+                    },
+                    "change_due": {
+                      "type": "integer"
+                    },
+                    "created_by": {
+                      "type": "object",
+                      "required": ["id", "name"],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "device_id": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "client_created_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "paid_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "void": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["voided_at", "voided_by", "approved_by", "reason", "restock"],
+                          "properties": {
+                            "voided_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "voided_by": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "name": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "approved_by": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": ["id", "name"],
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reason": {
+                              "type": "string"
+                            },
+                            "restock": {
+                              "type": "boolean"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "lines": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "line_no",
+                          "item_id",
+                          "item_name",
+                          "category_name",
+                          "unit_price",
+                          "modifiers_unit_total",
+                          "qty",
+                          "line_gross",
+                          "discount",
+                          "line_net",
+                          "note",
+                          "modifiers"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "line_no": {
+                            "type": "integer"
+                          },
+                          "item_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "item_name": {
+                            "type": "string"
+                          },
+                          "category_name": {
+                            "type": "string"
+                          },
+                          "unit_price": {
+                            "type": "integer"
+                          },
+                          "modifiers_unit_total": {
+                            "type": "integer"
+                          },
+                          "qty": {
+                            "type": "integer"
+                          },
+                          "line_gross": {
+                            "type": "integer"
+                          },
+                          "discount": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": ["id", "name", "kind", "value", "amount"],
+                                "properties": {
+                                  "id": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "format": "uuid"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "name": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "kind": {
+                                    "enum": ["percent", "fixed"]
+                                  },
+                                  "value": {
+                                    "type": "integer"
+                                  },
+                                  "amount": {
+                                    "type": "integer"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "line_net": {
+                            "type": "integer"
+                          },
+                          "note": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "modifiers": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": ["option_id", "group_name", "option_name", "price_delta"],
+                              "properties": {
+                                "option_id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "group_name": {
+                                  "type": "string"
+                                },
+                                "option_name": {
+                                  "type": "string"
+                                },
+                                "price_delta": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          },
+                          "cogs": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,12}(\\.[0-9]{1,4})?$"
+                          }
+                        }
+                      }
+                    },
+                    "payments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["seq", "method", "amount", "tendered", "provider", "reference"],
+                        "properties": {
+                          "seq": {
+                            "type": "integer"
+                          },
+                          "method": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": ["cash"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["qris"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["debit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["credit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["transfer"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["other"]
+                              }
+                            ]
+                          },
+                          "amount": {
+                            "type": "integer"
+                          },
+                          "tendered": {
+                            "anyOf": [
+                              {
+                                "type": "integer"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "provider": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "reference": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "cogs_total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders/today": {
+      "get": {
+        "tags": ["orders"],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["business_date", "orders"],
+                  "properties": {
+                    "business_date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "orders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "order_number",
+                          "status",
+                          "order_type",
+                          "customer_name",
+                          "total",
+                          "paid_at",
+                          "created_by",
+                          "items"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "order_number": {
+                            "type": "integer"
+                          },
+                          "status": {
+                            "enum": ["paid", "voided"]
+                          },
+                          "order_type": {
+                            "enum": ["dine_in", "takeaway"]
+                          },
+                          "customer_name": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "total": {
+                            "type": "integer"
+                          },
+                          "paid_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "created_by": {
+                            "type": "object",
+                            "required": ["id", "name"],
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "items": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": ["name", "qty", "modifiers"],
+                              "properties": {
+                                "name": {
+                                  "type": "string"
+                                },
+                                "qty": {
+                                  "type": "integer"
+                                },
+                                "modifiers": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "payment_methods": {
+                            "type": "array",
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": ["cash"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["qris"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["debit"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["credit"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["transfer"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["other"]
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders/{id}": {
+      "get": {
+        "tags": ["orders"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "client_order_id",
+                    "order_number",
+                    "business_date",
+                    "status",
+                    "source",
+                    "order_type",
+                    "customer_name",
+                    "note",
+                    "subtotal",
+                    "item_discount_total",
+                    "order_discount",
+                    "net_sales",
+                    "service_charge_bps",
+                    "service_charge_amount",
+                    "tax_name",
+                    "tax_bps",
+                    "tax_on_service_charge",
+                    "tax_amount",
+                    "total",
+                    "paid_total",
+                    "change_due",
+                    "created_by",
+                    "device_id",
+                    "client_created_at",
+                    "paid_at",
+                    "void",
+                    "lines",
+                    "payments"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "client_order_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "order_number": {
+                      "type": "integer"
+                    },
+                    "business_date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "status": {
+                      "enum": ["paid", "voided"]
+                    },
+                    "source": {
+                      "type": "string"
+                    },
+                    "order_type": {
+                      "enum": ["dine_in", "takeaway"]
+                    },
+                    "customer_name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "note": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subtotal": {
+                      "type": "integer"
+                    },
+                    "item_discount_total": {
+                      "type": "integer"
+                    },
+                    "order_discount": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["id", "name", "kind", "value", "amount"],
+                          "properties": {
+                            "id": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "name": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "kind": {
+                              "enum": ["percent", "fixed"]
+                            },
+                            "value": {
+                              "type": "integer"
+                            },
+                            "amount": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "net_sales": {
+                      "type": "integer"
+                    },
+                    "service_charge_bps": {
+                      "type": "integer"
+                    },
+                    "service_charge_amount": {
+                      "type": "integer"
+                    },
+                    "tax_name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "tax_bps": {
+                      "type": "integer"
+                    },
+                    "tax_on_service_charge": {
+                      "type": "boolean"
+                    },
+                    "tax_amount": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "paid_total": {
+                      "type": "integer"
+                    },
+                    "change_due": {
+                      "type": "integer"
+                    },
+                    "created_by": {
+                      "type": "object",
+                      "required": ["id", "name"],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "device_id": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "client_created_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "paid_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "void": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["voided_at", "voided_by", "approved_by", "reason", "restock"],
+                          "properties": {
+                            "voided_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "voided_by": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "name": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "approved_by": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": ["id", "name"],
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reason": {
+                              "type": "string"
+                            },
+                            "restock": {
+                              "type": "boolean"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "lines": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "line_no",
+                          "item_id",
+                          "item_name",
+                          "category_name",
+                          "unit_price",
+                          "modifiers_unit_total",
+                          "qty",
+                          "line_gross",
+                          "discount",
+                          "line_net",
+                          "note",
+                          "modifiers"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "line_no": {
+                            "type": "integer"
+                          },
+                          "item_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "item_name": {
+                            "type": "string"
+                          },
+                          "category_name": {
+                            "type": "string"
+                          },
+                          "unit_price": {
+                            "type": "integer"
+                          },
+                          "modifiers_unit_total": {
+                            "type": "integer"
+                          },
+                          "qty": {
+                            "type": "integer"
+                          },
+                          "line_gross": {
+                            "type": "integer"
+                          },
+                          "discount": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": ["id", "name", "kind", "value", "amount"],
+                                "properties": {
+                                  "id": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "format": "uuid"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "name": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "kind": {
+                                    "enum": ["percent", "fixed"]
+                                  },
+                                  "value": {
+                                    "type": "integer"
+                                  },
+                                  "amount": {
+                                    "type": "integer"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "line_net": {
+                            "type": "integer"
+                          },
+                          "note": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "modifiers": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": ["option_id", "group_name", "option_name", "price_delta"],
+                              "properties": {
+                                "option_id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "group_name": {
+                                  "type": "string"
+                                },
+                                "option_name": {
+                                  "type": "string"
+                                },
+                                "price_delta": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          },
+                          "cogs": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,12}(\\.[0-9]{1,4})?$"
+                          }
+                        }
+                      }
+                    },
+                    "payments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["seq", "method", "amount", "tendered", "provider", "reference"],
+                        "properties": {
+                          "seq": {
+                            "type": "integer"
+                          },
+                          "method": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": ["cash"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["qris"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["debit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["credit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["transfer"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["other"]
+                              }
+                            ]
+                          },
+                          "amount": {
+                            "type": "integer"
+                          },
+                          "tendered": {
+                            "anyOf": [
+                              {
+                                "type": "integer"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "provider": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "reference": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "cogs_total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders/{id}/void": {
+      "post": {
+        "tags": ["orders"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["reason", "restock"],
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500,
+                    "pattern": "\\S"
+                  },
+                  "restock": {
+                    "type": "boolean"
+                  },
+                  "approval": {
+                    "type": "object",
+                    "required": ["user_id", "pin"],
+                    "properties": {
+                      "user_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "pin": {
+                        "type": "string",
+                        "pattern": "^[0-9]{4,6}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "client_order_id",
+                    "order_number",
+                    "business_date",
+                    "status",
+                    "source",
+                    "order_type",
+                    "customer_name",
+                    "note",
+                    "subtotal",
+                    "item_discount_total",
+                    "order_discount",
+                    "net_sales",
+                    "service_charge_bps",
+                    "service_charge_amount",
+                    "tax_name",
+                    "tax_bps",
+                    "tax_on_service_charge",
+                    "tax_amount",
+                    "total",
+                    "paid_total",
+                    "change_due",
+                    "created_by",
+                    "device_id",
+                    "client_created_at",
+                    "paid_at",
+                    "void",
+                    "lines",
+                    "payments"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "client_order_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "order_number": {
+                      "type": "integer"
+                    },
+                    "business_date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "status": {
+                      "enum": ["paid", "voided"]
+                    },
+                    "source": {
+                      "type": "string"
+                    },
+                    "order_type": {
+                      "enum": ["dine_in", "takeaway"]
+                    },
+                    "customer_name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "note": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subtotal": {
+                      "type": "integer"
+                    },
+                    "item_discount_total": {
+                      "type": "integer"
+                    },
+                    "order_discount": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["id", "name", "kind", "value", "amount"],
+                          "properties": {
+                            "id": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "name": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "kind": {
+                              "enum": ["percent", "fixed"]
+                            },
+                            "value": {
+                              "type": "integer"
+                            },
+                            "amount": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "net_sales": {
+                      "type": "integer"
+                    },
+                    "service_charge_bps": {
+                      "type": "integer"
+                    },
+                    "service_charge_amount": {
+                      "type": "integer"
+                    },
+                    "tax_name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "tax_bps": {
+                      "type": "integer"
+                    },
+                    "tax_on_service_charge": {
+                      "type": "boolean"
+                    },
+                    "tax_amount": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "paid_total": {
+                      "type": "integer"
+                    },
+                    "change_due": {
+                      "type": "integer"
+                    },
+                    "created_by": {
+                      "type": "object",
+                      "required": ["id", "name"],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "device_id": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "client_created_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "paid_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "void": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["voided_at", "voided_by", "approved_by", "reason", "restock"],
+                          "properties": {
+                            "voided_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "voided_by": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "name": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "approved_by": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": ["id", "name"],
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reason": {
+                              "type": "string"
+                            },
+                            "restock": {
+                              "type": "boolean"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "lines": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "line_no",
+                          "item_id",
+                          "item_name",
+                          "category_name",
+                          "unit_price",
+                          "modifiers_unit_total",
+                          "qty",
+                          "line_gross",
+                          "discount",
+                          "line_net",
+                          "note",
+                          "modifiers"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "line_no": {
+                            "type": "integer"
+                          },
+                          "item_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "item_name": {
+                            "type": "string"
+                          },
+                          "category_name": {
+                            "type": "string"
+                          },
+                          "unit_price": {
+                            "type": "integer"
+                          },
+                          "modifiers_unit_total": {
+                            "type": "integer"
+                          },
+                          "qty": {
+                            "type": "integer"
+                          },
+                          "line_gross": {
+                            "type": "integer"
+                          },
+                          "discount": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": ["id", "name", "kind", "value", "amount"],
+                                "properties": {
+                                  "id": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "format": "uuid"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "name": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "kind": {
+                                    "enum": ["percent", "fixed"]
+                                  },
+                                  "value": {
+                                    "type": "integer"
+                                  },
+                                  "amount": {
+                                    "type": "integer"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "line_net": {
+                            "type": "integer"
+                          },
+                          "note": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "modifiers": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": ["option_id", "group_name", "option_name", "price_delta"],
+                              "properties": {
+                                "option_id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "group_name": {
+                                  "type": "string"
+                                },
+                                "option_name": {
+                                  "type": "string"
+                                },
+                                "price_delta": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          },
+                          "cogs": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,12}(\\.[0-9]{1,4})?$"
+                          }
+                        }
+                      }
+                    },
+                    "payments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["seq", "method", "amount", "tendered", "provider", "reference"],
+                        "properties": {
+                          "seq": {
+                            "type": "integer"
+                          },
+                          "method": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": ["cash"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["qris"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["debit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["credit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["transfer"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["other"]
+                              }
+                            ]
+                          },
+                          "amount": {
+                            "type": "integer"
+                          },
+                          "tendered": {
+                            "anyOf": [
+                              {
+                                "type": "integer"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "provider": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "reference": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "cogs_total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/stock-invariant": {
+      "get": {
+        "tags": ["admin"],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["mismatches"],
+                  "properties": {
+                    "mismatches": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["ingredient_id", "name", "stock_qty", "movements_total"],
+                        "properties": {
+                          "ingredient_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "stock_qty": {
+                            "type": "string",
+                            "pattern": "^-?[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                          },
+                          "movements_total": {
+                            "type": "string",
+                            "pattern": "^-?[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
