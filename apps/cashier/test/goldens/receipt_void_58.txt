@@ -1,0 +1,38 @@
+[INIT][CP 0][CENTER][B][DOUBLE]|Kopi Senja|
+[NORMAL][/B][LEFT][CENTER]|Jl. Merdeka No. 12, Bandung|
+[LEFT][CENTER]|0812-3456-7890|
+[LEFT][CENTER]|Buka 07.00-22.00|
+[LEFT]|--------------------------------|
+[CENTER][B][QUAD]|*** BATAL ***|
+[NORMAL][/B][LEFT]|--------------------------------|
+[B]|No. 17          28/11/2026 08:15|
+[/B]|Kasir: Budi|
+|Makan di sini - Dina|
+|--------------------------------|
+|2 x Kopi Susu Gula|
+|Aren                   Rp 72.000|
+|  Large                +Rp 5.000|
+|  Less sugar                    |
+|  Oat milk             +Rp 6.000|
+|  * es dikit, jangan terlalu|
+|  manis ya kak                  |
+|  Diskon 10%           -Rp 8.200|
+|1 x Croissant Almond|
+|Butter Extra Panjang|
+|Sekali Namanya         Rp 22.000|
+|--------------------------------|
+|Subtotal              Rp 104.000|
+|Diskon                 -Rp 8.200|
+|Diskon pesanan|
+|(Diskon)               -Rp 5.000|
+|Biaya layanan 5%        Rp 4.540|
+|PB1 10%                 Rp 9.534|
+[DOUBLE][B]|TOTAL                 Rp 104.874|
+[/B][NORMAL]|--------------------------------|
+|QRIS GoPay 8821        Rp 50.000|
+|Tunai                  Rp 54.874|
+|  Tunai diterima       Rp 70.000|
+[B]|Kembalian              Rp 15.126|
+[/B]|--------------------------------|
+[CENTER]|Terima kasih! Sampai jumpa lagi.|
+[LEFT][FEED 3][CUT]

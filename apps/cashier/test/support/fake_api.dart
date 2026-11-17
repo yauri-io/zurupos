@@ -171,7 +171,7 @@ class FakeApi implements ZuruApi {
           ...o,
           'items': [
             for (final l in (o['lines'] as List<dynamic>).cast<Json>())
-              {'name': l['item_name'], 'qty': l['qty'], 'modifiers': <String>[]},
+              {'name': l['item_name'], 'qty': l['qty'], 'modifiers': <String>[], 'note': l['note']},
           ],
         }),
     ];

@@ -1,0 +1,14 @@
+[INIT][CP 0][CENTER][B][QUAD]|No. 17|
+[NORMAL][/B][LEFT][CENTER][B][DOUBLE]|Dina|
+[NORMAL][/B][LEFT][CENTER]|Makan di sini - 08:15|
+[LEFT]|--------------------------------|
+[DOUBLE]|2 x Kopi Susu Gula Aren|
+[NORMAL]|  - Large|
+|  - Less sugar|
+|  - Oat milk|
+[B]|  ! es dikit, jangan terlalu|
+|  manis ya kak|
+[/B][DOUBLE]|1 x Croissant Almond Butter|
+|Extra Panjang Sekali Namanya|
+[NORMAL]|--------------------------------|
+[FEED 3][CUT]

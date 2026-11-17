@@ -1,0 +1,14 @@
+[INIT][CP 0][CENTER][B][DOUBLE]|Tes cetak|
+[NORMAL][/B][LEFT][CENTER]|Kopi Senja|
+[LEFT]|Printer: Kasir BT (58 mm, 32)|
+|28/11/2026 08:15|
+|--------------------------------|
+|12345678901234567890123456789012|
+|         1         2         3  |
+|--------------------------------|
+|1 x Kopi Susu Gula|
+|Aren                   Rp 25.000|
+|  Large                +Rp 5.000|
+[B]|TOTAL                  Rp 30.000|
+[/B]|================================|
+[FEED 3][CUT]

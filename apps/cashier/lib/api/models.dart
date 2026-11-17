@@ -439,6 +439,7 @@ class OrderSummary {
         name: i['name'] as String,
         qty: i['qty'] as int,
         modifiers: (i['modifiers'] as List<dynamic>).cast<String>(),
+        note: i['note'] as String?,
       );
     }),
     paymentMethods: (j['payment_methods'] as List<dynamic>?)?.cast<String>(),
@@ -452,7 +453,7 @@ class OrderSummary {
   final int total;
   final DateTime paidAt;
   final UserRef createdBy;
-  final List<({String name, int qty, List<String> modifiers})> items;
+  final List<({String name, int qty, List<String> modifiers, String? note})> items;
   final List<String>? paymentMethods;
 }
 
