@@ -114,3 +114,27 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 **Decision:** The rule stays as written, with no route exemptions. The Flutter client sends `X-Requested-With: zuru` on every request. Native apps send no `Origin`, so the same-origin check passes.
 **Consequences:** The M4 HTTP client must set the header globally.
 **Approved by the user (2026-11-17).**
+
+---
+
+## Decisions made during M2 (2026-11-17)
+
+## D-027: A `replace` effect may keep the same ingredient when it sets a quantity
+**Context:** SPEC §7.1's *Less sugar* example is `replace aren → aren, qty 10`. The M1 CHECK on `modifier_option_effects` required `target_ingredient_id <> ingredient_id`, which rejects it.
+**Decision:** Same-ingredient replace is allowed when `qty` is set (it changes the quantity). Without `qty` it would be a no-op and stays rejected.
+
+## D-028: Quantities and unit costs are decimal strings in JSON; money is an integer
+**Context:** `numeric(14,3)` quantities and `numeric(16,4)` costs must never pass through a float, and JSON numbers are floats in JS clients.
+**Decision:** The API sends and accepts quantities and costs as decimal strings (`"150"`, `"7.5"`, at most 3 / 4 decimals). The domain parses them into scaled `bigint`s (`src/domain/decimal.ts`). Money (whole rupiah) is a JSON integer, capped at 999 999 999 999 (well inside 2^53), and converted to `bigint` at the API boundary.
+
+## D-029: "CRUD" for menu entities means archive, not delete
+**Context:** SPEC §4 says never hard-delete rows referenced by history; §9 lists CRUD.
+**Decision:** `DELETE /categories/:id` (and items, modifier groups, modifier options, ingredients, discounts) sets `archived_at` and returns 204. Archived rows disappear from lists and can't be referenced by new menu links, recipes or effects. There is no unarchive in the MVP. Archiving a category with non-archived items is rejected (`CONFLICT`) so no item is orphaned from the POS grid. Archiving a modifier group also detaches it from items.
+
+## D-030: Catalogue lists are not paginated
+**Context:** §9 says list endpoints use cursor pagination. Menu, ingredient and discount lists are small per-shop configuration that the dashboard and the app need whole.
+**Decision:** `GET /categories`, `/items`, `/modifier-groups`, `/ingredients`, `/discounts` return every non-archived row. Unbounded history lists (`/ingredients/:id/movements`, `/orders`) use cursor pagination (`?cursor=&limit=`, max 100).
+
+## D-031: `GET /device/bootstrap` is built in M4
+**Context:** §9 lists bootstrap; M2 builds the menu APIs and dashboard pages, M4 builds the app that consumes bootstrap.
+**Decision:** Bootstrap ships with M4 together with its only consumer, so its payload is shaped by the real client. M3's `POST /orders` doesn't need it.
