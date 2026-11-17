@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "test": "dotenv -e ../../.env -- vitest run",
     "test:rls": "dotenv -e ../../.env -- vitest run test/rls",
-    "db:types": "dotenv -e ../../.env -- sh -c 'kysely-codegen --dialect postgres --url \"$MIGRATION_DATABASE_URL\" --out-file src/db/types.ts --exclude-pattern schema_migrations'"
+    "db:types": "dotenv -e ../../.env -- sh -c 'kysely-codegen --dialect postgres --url \"$MIGRATION_DATABASE_URL\" --out-file src/db/types.ts --exclude-pattern schema_migrations --date-parser string --type-mapping \"{\\\"int8\\\":\\\"bigint\\\"}\" && prettier --write src/db/types.ts'"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.5",

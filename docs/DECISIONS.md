@@ -96,3 +96,13 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 
 ## D-023: How the DB-level insert test (§3.6 #1–2) avoids false passes
 **Decision:** Each tenant table has a factory that builds a fully valid row, so an insert can only fail because of RLS. The test asserts SQLSTATE `42501` (RLS violation), not just "an error". A meta-test fails if any RLS table has no factory.
+
+## D-024: The `auth.*` lookup functions need a `zuru_owner`-only SELECT policy (spec conflict)
+**Context:** SPEC §3.4 says the four `auth.*` SECURITY DEFINER functions are owned by `zuru_owner`. SPEC §3.2 sets `FORCE ROW LEVEL SECURITY` on every tenant table. FORCE makes RLS apply to the table owner as well, and these lookups run with no tenant set, so as specified they would always return zero rows.
+**Decision:** Keep `zuru_owner` as the function owner and keep FORCE RLS. Add one extra permissive policy per looked-up table (`users`, `sessions`, `devices`, `password_resets`): `create policy auth_definer_lookup on <t> for select to zuru_owner using (true)`. It grants SELECT only, and only to `zuru_owner`, which cannot log in. The only `zuru_owner` sessions are the four definer functions and migrations, which own the schema anyway.
+**Consequences:** `zuru_app`'s isolation is unchanged. The isolation suite asserts that `zuru_app` is not a member of `zuru_owner` and that `auth_definer_lookup` policies exist only on those four tables, only for SELECT and only `TO zuru_owner`. Rejected alternative: a separate BYPASSRLS role owning the functions. It contradicts §3.4 and adds a role that bypasses RLS on whole tables.
+
+## D-025: Cash payment lines must record `tendered`
+**Context:** SPEC §4.1 makes `payments.tendered` nullable ("cash only, ≥ amount"), and §6.4 computes `change_due` from cash lines.
+**Decision:** `tendered` is required on cash lines (`≥ amount`) and must be null on non-cash lines, enforced by a CHECK constraint. The app's *Exact* button sends `tendered = amount`.
+**Consequences:** `change_due` is always computable from stored rows; the drawer reconciliation never meets a cash line with an unknown tendered amount.
