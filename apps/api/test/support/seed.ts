@@ -19,3 +19,22 @@ export const seedTenant = async (pool: pg.Pool, label: string): Promise<SeededTe
   })
   return refs
 }
+
+// Adds one row to every tenant table (except `tenants`) for an existing tenant,
+// e.g. a shop created through the API, so leak checks cover every table.
+export const seedRowsForTenant = async (
+  pool: pg.Pool,
+  tenant: string,
+  marker: string,
+): Promise<SeededTenant> => {
+  const refs: SeededTenant = { tenant, marker, tenants: tenant }
+  await inTx(pool, tenant, async (client) => {
+    for (const table of TENANT_TABLES) {
+      if (table === 'tenants') continue
+      const row = FACTORIES[table](refs)
+      await insertRow(client, table, row)
+      refs[table] = rowKey(table, row)
+    }
+  })
+  return refs
+}
