@@ -34,5 +34,6 @@ const submit = async () => {
     </UFormField>
     <UButton type="submit" block :loading="busy" :label="t('auth.login')" />
     <ULink to="/forgot" class="text-sm text-center">{{ t('auth.forgot_link') }}</ULink>
+    <ULink to="/signup" class="text-sm text-center">{{ t('auth.signup_link') }}</ULink>
   </UForm>
 </template>

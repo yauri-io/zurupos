@@ -60,7 +60,14 @@
     "confirm_password": "Repeat password",
     "password_rules": "At least 8 characters, not a common password.",
     "password_mismatch": "Passwords don't match.",
-    "password_set": "Password saved. Please sign in."
+    "password_set": "Password saved. Please sign in.",
+    "signup_title": "Register your shop",
+    "signup": "Register",
+    "signup_link": "No account yet? Register your shop",
+    "have_account": "Already have an account? Sign in",
+    "your_name": "Your name",
+    "owner_pin_help": "4–6 digits, to sign in on the cashier app.",
+    "signup_closed": "New shop registration is closed. Contact ZuruPOS."
   },
   "home": {
     "welcome": "Hello, {name}!",

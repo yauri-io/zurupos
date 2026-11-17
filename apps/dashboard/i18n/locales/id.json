@@ -60,7 +60,14 @@
     "confirm_password": "Ulangi kata sandi",
     "password_rules": "Minimal 8 karakter, bukan kata sandi umum.",
     "password_mismatch": "Kata sandi tidak sama.",
-    "password_set": "Kata sandi tersimpan. Silakan masuk."
+    "password_set": "Kata sandi tersimpan. Silakan masuk.",
+    "signup_title": "Daftarkan toko",
+    "signup": "Daftar",
+    "signup_link": "Belum punya akun? Daftarkan toko",
+    "have_account": "Sudah punya akun? Masuk",
+    "your_name": "Nama Anda",
+    "owner_pin_help": "4–6 angka, untuk masuk di aplikasi kasir.",
+    "signup_closed": "Pendaftaran toko baru sedang ditutup. Hubungi ZuruPOS."
   },
   "home": {
     "welcome": "Halo, {name}!",
