@@ -6080,6 +6080,260 @@
             }
           }
         }
+      },
+      "get": {
+        "tags": ["orders"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^(100|[1-9][0-9]?)$"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true
+          },
+          {
+            "schema": {
+              "enum": ["paid", "voided"]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": ["cash"]
+                },
+                {
+                  "type": "string",
+                  "enum": ["qris"]
+                },
+                {
+                  "type": "string",
+                  "enum": ["debit"]
+                },
+                {
+                  "type": "string",
+                  "enum": ["credit"]
+                },
+                {
+                  "type": "string",
+                  "enum": ["transfer"]
+                },
+                {
+                  "type": "string",
+                  "enum": ["other"]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "method",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "query",
+            "name": "user_id",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 60
+            },
+            "in": "query",
+            "name": "q",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["orders", "next_cursor"],
+                  "properties": {
+                    "orders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "order_number",
+                          "status",
+                          "order_type",
+                          "customer_name",
+                          "total",
+                          "paid_at",
+                          "created_by",
+                          "items",
+                          "business_date"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "order_number": {
+                            "type": "integer"
+                          },
+                          "status": {
+                            "enum": ["paid", "voided"]
+                          },
+                          "order_type": {
+                            "enum": ["dine_in", "takeaway"]
+                          },
+                          "customer_name": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "total": {
+                            "type": "integer"
+                          },
+                          "paid_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "created_by": {
+                            "type": "object",
+                            "required": ["id", "name"],
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "items": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": ["name", "qty", "modifiers", "note"],
+                              "properties": {
+                                "name": {
+                                  "type": "string"
+                                },
+                                "qty": {
+                                  "type": "integer"
+                                },
+                                "modifiers": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "note": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          "payment_methods": {
+                            "type": "array",
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": ["cash"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["qris"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["debit"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["credit"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["transfer"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["other"]
+                                }
+                              ]
+                            }
+                          },
+                          "business_date": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          }
+                        }
+                      }
+                    },
+                    "next_cursor": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/v1/orders/today": {
@@ -7599,6 +7853,757 @@
           },
           "304": {
             "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/v1/reports/summary": {
+      "get": {
+        "tags": ["reports"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "from",
+                    "to",
+                    "gross_sales",
+                    "discounts",
+                    "net_sales",
+                    "service_charge",
+                    "tax",
+                    "total_collected",
+                    "orders",
+                    "average_order_value",
+                    "cogs",
+                    "gross_margin",
+                    "margin_bps"
+                  ],
+                  "properties": {
+                    "from": {
+                      "type": "string",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    },
+                    "to": {
+                      "type": "string",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    },
+                    "gross_sales": {
+                      "type": "integer"
+                    },
+                    "discounts": {
+                      "type": "integer"
+                    },
+                    "net_sales": {
+                      "type": "integer"
+                    },
+                    "service_charge": {
+                      "type": "integer"
+                    },
+                    "tax": {
+                      "type": "integer"
+                    },
+                    "total_collected": {
+                      "type": "integer"
+                    },
+                    "orders": {
+                      "type": "integer"
+                    },
+                    "average_order_value": {
+                      "type": "integer"
+                    },
+                    "cogs": {
+                      "type": "integer"
+                    },
+                    "gross_margin": {
+                      "type": "integer"
+                    },
+                    "margin_bps": {
+                      "anyOf": [
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/daily": {
+      "get": {
+        "tags": ["reports"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["days"],
+                  "properties": {
+                    "days": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "business_date",
+                          "gross_sales",
+                          "discounts",
+                          "net_sales",
+                          "service_charge",
+                          "tax",
+                          "total_collected",
+                          "orders"
+                        ],
+                        "properties": {
+                          "business_date": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "gross_sales": {
+                            "type": "integer"
+                          },
+                          "discounts": {
+                            "type": "integer"
+                          },
+                          "net_sales": {
+                            "type": "integer"
+                          },
+                          "service_charge": {
+                            "type": "integer"
+                          },
+                          "tax": {
+                            "type": "integer"
+                          },
+                          "total_collected": {
+                            "type": "integer"
+                          },
+                          "orders": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/hourly": {
+      "get": {
+        "tags": ["reports"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["hours"],
+                  "properties": {
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["hour", "orders", "net_sales"],
+                        "properties": {
+                          "hour": {
+                            "type": "integer"
+                          },
+                          "orders": {
+                            "type": "integer"
+                          },
+                          "net_sales": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/items": {
+      "get": {
+        "tags": ["reports"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["items"],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "item_id",
+                          "name",
+                          "category_name",
+                          "qty",
+                          "net_sales",
+                          "net_after_order_discount"
+                        ],
+                        "properties": {
+                          "item_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "category_name": {
+                            "type": "string"
+                          },
+                          "qty": {
+                            "type": "integer"
+                          },
+                          "net_sales": {
+                            "type": "integer"
+                          },
+                          "net_after_order_discount": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/categories": {
+      "get": {
+        "tags": ["reports"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["categories"],
+                  "properties": {
+                    "categories": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["name", "qty", "net_sales", "net_after_order_discount"],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "qty": {
+                            "type": "integer"
+                          },
+                          "net_sales": {
+                            "type": "integer"
+                          },
+                          "net_after_order_discount": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/payments": {
+      "get": {
+        "tags": ["reports"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["total", "methods"],
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    },
+                    "methods": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["method", "provider", "count", "amount"],
+                        "properties": {
+                          "method": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": ["cash"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["qris"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["debit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["credit"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["transfer"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["other"]
+                              }
+                            ]
+                          },
+                          "provider": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "count": {
+                            "type": "integer"
+                          },
+                          "amount": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/margin": {
+      "get": {
+        "tags": ["reports"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["net_sales", "cogs", "gross_margin", "margin_bps", "items"],
+                  "properties": {
+                    "net_sales": {
+                      "type": "integer"
+                    },
+                    "cogs": {
+                      "type": "integer"
+                    },
+                    "gross_margin": {
+                      "type": "integer"
+                    },
+                    "margin_bps": {
+                      "anyOf": [
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "item_id",
+                          "name",
+                          "net_after_order_discount",
+                          "cogs",
+                          "gross_margin",
+                          "margin_bps"
+                        ],
+                        "properties": {
+                          "item_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "net_after_order_discount": {
+                            "type": "integer"
+                          },
+                          "cogs": {
+                            "type": "integer"
+                          },
+                          "gross_margin": {
+                            "type": "integer"
+                          },
+                          "margin_bps": {
+                            "anyOf": [
+                              {
+                                "type": "integer"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/voids": {
+      "get": {
+        "tags": ["reports"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["count", "total", "orders"],
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "orders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "order_number",
+                          "business_date",
+                          "total",
+                          "reason",
+                          "restock",
+                          "voided_at",
+                          "voided_by",
+                          "approved_by"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "order_number": {
+                            "type": "integer"
+                          },
+                          "business_date": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "total": {
+                            "type": "integer"
+                          },
+                          "reason": {
+                            "type": "string"
+                          },
+                          "restock": {
+                            "type": "boolean"
+                          },
+                          "voided_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "voided_by": {
+                            "type": "object",
+                            "required": ["id", "name"],
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "approved_by": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": ["id", "name"],
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/stock-value": {
+      "get": {
+        "tags": ["reports"],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["total", "ingredients"],
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    },
+                    "ingredients": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "name", "base_unit", "stock_qty", "avg_cost", "value"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "base_unit": {
+                            "type": "string"
+                          },
+                          "stock_qty": {
+                            "type": "string",
+                            "pattern": "^-?[0-9]{1,11}(\\.[0-9]{1,3})?$"
+                          },
+                          "avg_cost": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,12}(\\.[0-9]{1,4})?$"
+                          },
+                          "value": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

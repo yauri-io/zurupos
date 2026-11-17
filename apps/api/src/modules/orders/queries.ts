@@ -1,3 +1,4 @@
+import { cursorTimestamp, type Cursor } from '../../http/cursor.js'
 import { sql } from 'kysely'
 import type { Tx } from '../../db/with-tenant.js'
 
@@ -375,3 +376,80 @@ export const saleMovementsOf = (trx: Tx, tenantId: string, orderId: string) =>
     .where('order_id', '=', orderId)
     .where('type', '=', 'sale')
     .execute()
+
+export type OrderFilter = {
+  from: string
+  to: string
+  status?: 'paid' | 'voided'
+  method?: string
+  userId?: string
+  q?: string
+}
+
+// Escape LIKE wildcards so a search for "50%" matches literally.
+const likePattern = (q: string) => `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`
+
+// GET /orders (owner): newest first, keyset cursor over (paid_at, id).
+export const listOrders = (
+  trx: Tx,
+  tenantId: string,
+  f: OrderFilter,
+  cursor: Cursor | null,
+  limit: number,
+) => {
+  let query = trx
+    .selectFrom('orders as o')
+    .select([...ORDER_COLUMNS, cursorTimestamp('o.paid_at').as('cursor_at')])
+    .where('o.tenant_id', '=', tenantId)
+    .where('o.business_date', '>=', f.from)
+    .where('o.business_date', '<=', f.to)
+  if (f.status) query = query.where('o.status', '=', f.status)
+  if (f.userId) query = query.where('o.created_by_user_id', '=', f.userId)
+  if (f.method) {
+    const method = f.method
+    query = query.where((eb) =>
+      eb.exists(
+        eb
+          .selectFrom('payments as p')
+          .select('p.id')
+          .whereRef('p.tenant_id', '=', 'o.tenant_id')
+          .whereRef('p.order_id', '=', 'o.id')
+          .where('p.method', '=', method),
+      ),
+    )
+  }
+  const text = f.q?.trim()
+  if (text) {
+    const pattern = likePattern(text)
+    query = query.where((eb) =>
+      eb.or([
+        ...(/^\d{1,9}$/.test(text) ? [eb('o.order_number', '=', Number(text))] : []),
+        eb('o.customer_name', 'ilike', pattern),
+        eb.exists(
+          eb
+            .selectFrom('order_lines as l')
+            .select('l.id')
+            .whereRef('l.tenant_id', '=', 'o.tenant_id')
+            .whereRef('l.order_id', '=', 'o.id')
+            .where('l.item_name', 'ilike', pattern),
+        ),
+      ]),
+    )
+  }
+  if (cursor) {
+    query = query.where((eb) =>
+      eb.or([
+        eb('o.paid_at', '<', sql<Date>`${cursor.createdAt}::timestamptz`),
+        eb.and([
+          eb('o.paid_at', '=', sql<Date>`${cursor.createdAt}::timestamptz`),
+          eb('o.id', '<', cursor.id),
+        ]),
+      ]),
+    )
+  }
+  return query
+    .orderBy('o.paid_at', 'desc')
+    .orderBy('o.id', 'desc')
+    .limit(limit + 1)
+    .execute()
+}

@@ -4,6 +4,8 @@ import type { AuthContext } from '../../auth/context.js'
 import { can } from '../../auth/permissions.js'
 import type { Tx } from '../../db/with-tenant.js'
 import { formatCost, parseCost } from '../../domain/decimal.js'
+import { decodeCursor, encodeCursor, pageLimit } from '../../http/cursor.js'
+import { checkRange } from '../../http/date-range.js'
 import { apiError } from '../../http/errors.js'
 import { iso, isoOrNull, money } from '../../http/serialize.js'
 import * as q from './queries.js'
@@ -154,6 +156,66 @@ export const getOrder = async (trx: Tx, auth: AuthContext, id: string) => {
   return order
 }
 
+type Loaded = Awaited<ReturnType<typeof loadOrders>>[number]
+
+const summarize = (o: Loaded, seesPayments: boolean) => ({
+  id: o.id,
+  order_number: o.order_number,
+  status: o.status,
+  order_type: o.order_type,
+  customer_name: o.customer_name,
+  total: o.total,
+  paid_at: o.paid_at,
+  created_by: o.created_by,
+  items: o.lines.map((l) => ({
+    name: l.item_name,
+    qty: l.qty,
+    modifiers: l.modifiers.map((m) => m.option_name),
+    note: l.note,
+  })),
+  ...(seesPayments ? { payment_methods: [...new Set(o.payments.map((p) => p.method))] } : {}),
+})
+
+// GET /orders (owner): filtered history, newest first.
+export const listOrders = async (
+  trx: Tx,
+  auth: AuthContext,
+  query: {
+    from: string
+    to: string
+    status?: 'paid' | 'voided'
+    method?: string
+    user_id?: string
+    q?: string
+    cursor?: string
+    limit?: string
+  },
+) => {
+  const range = checkRange(query)
+  const limit = pageLimit(query.limit)
+  const rows = await q.listOrders(
+    trx,
+    auth.tenantId,
+    {
+      ...range,
+      ...(query.status ? { status: query.status } : {}),
+      ...(query.method ? { method: query.method } : {}),
+      ...(query.user_id ? { userId: query.user_id } : {}),
+      ...(query.q ? { q: query.q } : {}),
+    },
+    decodeCursor(query.cursor),
+    limit,
+  )
+  const page = rows.slice(0, limit)
+  const last = page.at(-1)
+  const orders = await loadOrders(trx, auth, page)
+  return {
+    orders: orders.map((o) => ({ ...summarize(o, true), business_date: o.business_date })),
+    next_cursor:
+      rows.length > limit && last ? encodeCursor({ createdAt: last.cursor_at, id: last.id }) : null,
+  }
+}
+
 export const today = async (trx: Tx, auth: AuthContext) => {
   const businessDate = await currentBusinessDate(trx, auth.tenantId)
   const orders = await loadOrders(trx, auth, await q.ordersOfDay(trx, auth.tenantId, businessDate))
@@ -161,22 +223,6 @@ export const today = async (trx: Tx, auth: AuthContext) => {
   const seesPayments = can(auth.role, 'orders.reprint_receipt')
   return {
     business_date: businessDate,
-    orders: orders.map((o) => ({
-      id: o.id,
-      order_number: o.order_number,
-      status: o.status,
-      order_type: o.order_type,
-      customer_name: o.customer_name,
-      total: o.total,
-      paid_at: o.paid_at,
-      created_by: o.created_by,
-      items: o.lines.map((l) => ({
-        name: l.item_name,
-        qty: l.qty,
-        modifiers: l.modifiers.map((m) => m.option_name),
-        note: l.note,
-      })),
-      ...(seesPayments ? { payment_methods: [...new Set(o.payments.map((p) => p.method))] } : {}),
-    })),
+    orders: orders.map((o) => summarize(o, seesPayments)),
   }
 }

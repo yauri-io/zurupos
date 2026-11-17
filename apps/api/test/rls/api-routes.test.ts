@@ -146,7 +146,38 @@ const SCAN_ROUTES: Record<string, Caller[]> = {
   'GET /v1/orders/today': ['dashboard', 'staff'],
   'GET /v1/admin/stock-invariant': ['dashboard', 'staff'],
   'GET /v1/device/bootstrap': ['dashboard', 'staff'],
+  // Reports with names or ids in them (owner only; queried for today's business date).
+  'GET /v1/reports/items': ['dashboard'],
+  'GET /v1/reports/categories': ['dashboard'],
+  'GET /v1/reports/margin': ['dashboard'],
+  'GET /v1/reports/stock-value': ['dashboard'],
+  'GET /v1/orders': ['dashboard'],
 }
+
+// Reports that are only numbers: nothing to scan for, so each must equal A's own
+// figures computed with an explicit `tenant_id = A` (B's seeded order would add to them).
+const NUMERIC_REPORTS: Record<string, (r: Json, own: OwnFigures) => unknown[]> = {
+  'GET /v1/reports/summary': (r, own) => [r['orders'], own.orders, r['total_collected'], own.total],
+  'GET /v1/reports/daily': (r, own) => {
+    const day = (r['days'] as Json[])[0] ?? {}
+    return [day['orders'], own.orders, day['total_collected'], own.total]
+  },
+  'GET /v1/reports/hourly': (r, own) => {
+    const hours = r['hours'] as Json[]
+    return [hours.reduce((n, h) => n + (h['orders'] as number), 0), own.orders]
+  },
+  'GET /v1/reports/payments': (r, own) => [r['total'], own.payments],
+  'GET /v1/reports/voids': (r, own) => [r['count'], own.voids],
+}
+
+type Json = Record<string, unknown>
+type OwnFigures = { orders: number; total: number; payments: number; voids: number }
+
+// Reports take a date range; the scans use today's business date (seeded orders live there).
+const RANGED = (key: string) =>
+  (key.startsWith('GET /v1/reports/') && key !== 'GET /v1/reports/stock-value') || key === 'GET /v1/orders'
+let today = ''
+const withRange = (key: string, path: string) => (RANGED(key) ? `${path}?from=${today}&to=${today}` : path)
 
 // Routes that take no tenant resource id at all, with the reason.
 const NO_TENANT_INPUT: Record<string, string> = {
@@ -178,6 +209,12 @@ beforeAll(async () => {
   a = await buildFullShop(t.app, pool, 'A')
   b = await buildFullShop(t.app, pool, 'B')
   for (const shop of [a, b]) await giveReadsSomethingToShow(shop)
+  today = await inTx(pool, null, async (c) => {
+    const { rows } = await c.query<{ d: string }>(
+      `select ((now() at time zone 'Asia/Jakarta'))::date::text as d`,
+    )
+    return rows[0]?.d ?? ''
+  })
   const spec = t.app.swagger() as { paths: Record<string, Record<string, unknown>> }
   operations = Object.entries(spec.paths).flatMap(([path, ops]) =>
     Object.keys(ops).map((method) => `${method.toUpperCase()} ${path}`),
@@ -294,7 +331,9 @@ describe('OpenAPI coverage', () => {
   })
 
   it('classifies every operation exactly once', () => {
-    const registries = [ID_ROUTES, BODY_ID_ROUTES, SCAN_ROUTES, NO_TENANT_INPUT].map((r) => Object.keys(r))
+    const registries = [ID_ROUTES, BODY_ID_ROUTES, SCAN_ROUTES, NUMERIC_REPORTS, NO_TENANT_INPUT].map((r) =>
+      Object.keys(r),
+    )
     const unclassified = operations.filter((op) => !registries.some((keys) => keys.includes(op)))
     const duplicated = operations.filter((op) => registries.filter((keys) => keys.includes(op)).length > 1)
     const stale = registries.flat().filter((key) => !operations.includes(key))
@@ -350,11 +389,44 @@ describe("A's credentials + B's ids → 404", () => {
 describe("reads as A never contain B's data", () => {
   const cases = Object.entries(SCAN_ROUTES).flatMap(([key, callers]) => callers.map((c) => [key, c] as const))
   it.each(cases)('%s as %s', async (key, caller) => {
-    const path = key.split(' ')[1] ?? ''
+    const path = withRange(key, key.split(' ')[1] ?? '')
     const res = expectStatus(await call(key, credsOf(a, caller), path), 200)
     expect(leakedSecrets(res.body, b)).toEqual([])
     // Sanity: the scan would notice A's own data, so it is not vacuous.
     expect(leakedSecrets(res.body, a).length).toBeGreaterThan(0)
+  })
+})
+
+describe("number-only reports as A count only A's orders", () => {
+  // Explicit tenant filter, independent of RLS, so a leak can't hide in both sides.
+  const ownFigures = () =>
+    inTx(pool, a.tenantId, async (c) => {
+      const q = async (text: string) =>
+        Number((await c.query<{ n: string }>(text, [a.tenantId, today])).rows[0]?.n ?? 0)
+      return {
+        orders: await q(
+          `select count(*) n from orders where tenant_id = $1 and status = 'paid' and business_date = $2`,
+        ),
+        total: await q(
+          `select coalesce(sum(total), 0) n from orders where tenant_id = $1 and status = 'paid' and business_date = $2`,
+        ),
+        payments: await q(
+          `select coalesce(sum(p.amount), 0) n from payments p join orders o on o.id = p.order_id
+           where o.tenant_id = $1 and o.status = 'paid' and o.business_date = $2`,
+        ),
+        voids: await q(
+          `select count(*) n from orders where tenant_id = $1 and status = 'voided' and business_date = $2`,
+        ),
+      }
+    })
+
+  it.each(Object.keys(NUMERIC_REPORTS))('%s', async (key) => {
+    const own = await ownFigures()
+    expect(own.orders, 'A has an order today, so the check is not vacuous').toBeGreaterThan(0)
+    const res = expectStatus(await call(key, a.dashboard, withRange(key, key.split(' ')[1] ?? '')), 200)
+    const [actual, expected, ...more] = NUMERIC_REPORTS[key]?.(res.json<Json>(), own) ?? []
+    expect(actual).toBe(expected)
+    for (let i = 0; i < more.length; i += 2) expect(more[i]).toBe(more[i + 1])
   })
 })
 

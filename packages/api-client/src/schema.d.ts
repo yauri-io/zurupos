@@ -2665,7 +2665,63 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    get: {
+      parameters: {
+        query: {
+          cursor?: string
+          limit?: string
+          from: string
+          to: string
+          status?: 'paid' | 'voided'
+          method?: 'cash' | 'qris' | 'debit' | 'credit' | 'transfer' | 'other'
+          user_id?: string
+          q?: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              orders: {
+                /** Format: uuid */
+                id: string
+                order_number: number
+                /** @enum {unknown} */
+                status: 'paid' | 'voided'
+                /** @enum {unknown} */
+                order_type: 'dine_in' | 'takeaway'
+                customer_name: string | null
+                total: number
+                /** Format: date-time */
+                paid_at: string
+                created_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                }
+                items: {
+                  name: string
+                  qty: number
+                  modifiers: string[]
+                  note: string | null
+                }[]
+                payment_methods?: ('cash' | 'qris' | 'debit' | 'credit' | 'transfer' | 'other')[]
+                business_date: string
+              }[]
+              next_cursor: string | null
+            }
+          }
+        }
+      }
+    }
     put?: never
     post: {
       parameters: {
@@ -3452,6 +3508,450 @@ export interface paths {
             [name: string]: unknown
           }
           content?: never
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/reports/summary': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query: {
+          from: string
+          to: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              from: string
+              to: string
+              gross_sales: number
+              discounts: number
+              net_sales: number
+              service_charge: number
+              tax: number
+              total_collected: number
+              orders: number
+              average_order_value: number
+              cogs: number
+              gross_margin: number
+              margin_bps: number | null
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/reports/daily': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query: {
+          from: string
+          to: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              days: {
+                business_date: string
+                gross_sales: number
+                discounts: number
+                net_sales: number
+                service_charge: number
+                tax: number
+                total_collected: number
+                orders: number
+              }[]
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/reports/hourly': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query: {
+          from: string
+          to: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              hours: {
+                hour: number
+                orders: number
+                net_sales: number
+              }[]
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/reports/items': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query: {
+          from: string
+          to: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              items: {
+                /** Format: uuid */
+                item_id: string
+                name: string
+                category_name: string
+                qty: number
+                net_sales: number
+                net_after_order_discount: number
+              }[]
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/reports/categories': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query: {
+          from: string
+          to: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              categories: {
+                name: string
+                qty: number
+                net_sales: number
+                net_after_order_discount: number
+              }[]
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/reports/payments': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query: {
+          from: string
+          to: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              total: number
+              methods: {
+                method: 'cash' | 'qris' | 'debit' | 'credit' | 'transfer' | 'other'
+                provider: string | null
+                count: number
+                amount: number
+              }[]
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/reports/margin': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query: {
+          from: string
+          to: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              net_sales: number
+              cogs: number
+              gross_margin: number
+              margin_bps: number | null
+              items: {
+                /** Format: uuid */
+                item_id: string
+                name: string
+                net_after_order_discount: number
+                cogs: number
+                gross_margin: number
+                margin_bps: number | null
+              }[]
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/reports/voids': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query: {
+          from: string
+          to: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              count: number
+              total: number
+              orders: {
+                /** Format: uuid */
+                id: string
+                order_number: number
+                business_date: string
+                total: number
+                reason: string
+                restock: boolean
+                /** Format: date-time */
+                voided_at: string
+                voided_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                }
+                approved_by: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                } | null
+              }[]
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/reports/stock-value': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              total: number
+              ingredients: {
+                /** Format: uuid */
+                id: string
+                name: string
+                base_unit: string
+                stock_qty: string
+                avg_cost: string
+                value: number
+              }[]
+            }
+          }
         }
       }
     }

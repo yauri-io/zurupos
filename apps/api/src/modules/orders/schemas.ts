@@ -1,5 +1,5 @@
 import { Type } from 'typebox'
-import { Body, Cost, DateTime, Money, Name, Nullable, Pin, Uuid } from '../../http/schemas.js'
+import { Body, Cost, DateTime, Money, Name, Nullable, PageQuery, Pin, Uuid } from '../../http/schemas.js'
 import { PaymentMethod } from '../settings/schemas.js'
 
 const Bps = Type.Integer({ minimum: 1, maximum: 10_000 })
@@ -163,4 +163,22 @@ export const VoidBody = Body({
   restock: Type.Boolean(),
   // Cashiers need an owner/manager to approve with their PIN on this device (SPEC §5.4).
   approval: Type.Optional(Body({ user_id: Uuid, pin: Pin })),
+})
+
+const Day = Type.String({ pattern: '^\\d{4}-\\d{2}-\\d{2}$' })
+
+// GET /orders (owner, SPEC §9): business-date range plus optional filters.
+export const OrderListQuery = Body({
+  ...PageQuery.properties,
+  from: Day,
+  to: Day,
+  status: Type.Optional(Type.Enum(['paid', 'voided'])),
+  method: Type.Optional(PaymentMethod),
+  user_id: Type.Optional(Uuid),
+  q: Type.Optional(Type.String({ maxLength: 60 })),
+})
+
+export const OrderListResponse = Type.Object({
+  orders: Type.Array(Type.Object({ ...OrderSummary.properties, business_date: Day })),
+  next_cursor: Nullable(Type.String()),
 })

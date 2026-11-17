@@ -3,8 +3,15 @@ import { apiError } from '../../http/errors.js'
 import { requireAuth } from '../../http/require-auth.js'
 import { IdParams } from '../../http/schemas.js'
 import type { App } from '../../http/types.js'
-import { getOrder, loadOrder, today } from './present.js'
-import { CreateOrderBody, OrderResponse, TodayResponse, VoidBody } from './schemas.js'
+import { getOrder, listOrders, loadOrder, today } from './present.js'
+import {
+  CreateOrderBody,
+  OrderListQuery,
+  OrderListResponse,
+  OrderResponse,
+  TodayResponse,
+  VoidBody,
+} from './schemas.js'
 import { createOrder, DuplicateOrder } from './service.js'
 import * as q from './queries.js'
 import { voidOrder } from './void.js'
@@ -34,6 +41,15 @@ export const orderRoutes = async (app: App, { config }: { config: Config }) => {
         })
       return reply.status(result.created ? 201 : 200).send(result.order)
     },
+  )
+
+  app.get(
+    '/orders',
+    {
+      config: { auth: 'user', permission: 'orders.view_all' },
+      schema: { tags, querystring: OrderListQuery, response: { 200: OrderListResponse } },
+    },
+    async (request) => request.tenantTx((trx) => listOrders(trx, requireAuth(request.auth), request.query)),
   )
 
   app.get(
