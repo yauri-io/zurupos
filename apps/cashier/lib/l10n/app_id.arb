@@ -1,5 +1,318 @@
 {
   "@@locale": "id",
   "appName": "ZuruPOS",
-  "placeholderHome": "Aplikasi kasir. Segera hadir."
+  "commonCancel": "Batal",
+  "commonSave": "Simpan",
+  "commonRetry": "Coba lagi",
+  "commonClose": "Tutup",
+  "commonRemove": "Hapus",
+  "commonLoading": "Memuat…",
+  "commonRequired": "Wajib diisi",
+  "commonNote": "Catatan",
+  "language": "Bahasa",
+  "languageId": "Bahasa Indonesia",
+  "languageEn": "English",
+  "roleOwner": "Pemilik",
+  "roleManager": "Manajer",
+  "roleCashier": "Kasir",
+  "roleEmployee": "Karyawan",
+  "errorNetwork": "Tidak bisa terhubung ke server. Periksa koneksi internet.",
+  "errorGeneric": "Terjadi kesalahan. Coba lagi.",
+  "errorForbidden": "Anda tidak punya akses untuk ini.",
+  "errorRateLimited": "Terlalu banyak percobaan. Tunggu sebentar.",
+  "errorValidation": "Data tidak valid. Periksa isian.",
+  "errorItemUnavailable": "Ada menu yang habis atau tidak aktif. Menu sudah diperbarui; periksa keranjang.",
+  "errorPriceChanged": "Harga berubah. Menu sudah diperbarui; periksa total lalu bayar lagi.",
+  "errorPaymentMismatch": "Jumlah pembayaran tidak sama dengan total.",
+  "offlineBanner": "Offline — pembayaran dinonaktifkan sampai koneksi kembali.",
+  "pairTitle": "Pasangkan perangkat ini",
+  "pairSubtitle": "Pemilik atau manajer masuk sekali untuk menghubungkan tablet ini ke toko.",
+  "pairEmail": "Email",
+  "pairPassword": "Kata sandi",
+  "pairDeviceName": "Nama perangkat",
+  "pairDeviceNameHint": "mis. Kasir depan",
+  "pairSubmit": "Pasangkan",
+  "pairInvalid": "Email atau kata sandi salah, atau akun bukan pemilik/manajer.",
+  "pairDone": "Terhubung ke {shop}",
+  "@pairDone": {
+    "placeholders": {
+      "shop": {
+        "type": "String"
+      }
+    }
+  },
+  "staffTitle": "Siapa yang bertugas?",
+  "staffEmpty": "Belum ada staf aktif. Tambahkan staf di dashboard.",
+  "pinTitle": "Masukkan PIN",
+  "pinWrong": "PIN salah.",
+  "pinLocked": "Terlalu banyak PIN salah. Coba lagi dalam {seconds} detik.",
+  "@pinLocked": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "deviceRevoked": "Perangkat ini sudah dicabut. Pasangkan ulang.",
+  "navOrder": "Kasir",
+  "navOrdersToday": "Pesanan hari ini",
+  "navStock": "Stok",
+  "navSettings": "Pengaturan",
+  "navSwitchUser": "Ganti pengguna",
+  "categoryAll": "Semua",
+  "itemSoldOut": "Habis",
+  "itemMarkSoldOut": "Tandai habis",
+  "itemMarkAvailable": "Tandai tersedia",
+  "menuEmpty": "Menu kosong. Tambahkan menu di dashboard.",
+  "menuNotLoaded": "Menu belum dimuat.",
+  "cartTitle": "Pesanan",
+  "cartEmpty": "Keranjang kosong. Ketuk menu untuk menambah.",
+  "orderTakeaway": "Bawa pulang",
+  "orderDineIn": "Makan di sini",
+  "customerName": "Nama pelanggan",
+  "subtotal": "Subtotal",
+  "itemDiscounts": "Diskon item",
+  "orderDiscount": "Diskon pesanan",
+  "serviceCharge": "Biaya layanan ({rate})",
+  "@serviceCharge": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "taxLine": "{name} ({rate})",
+  "@taxLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "total": "Total",
+  "payButton": "Bayar {amount}",
+  "@payButton": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "itemsCount": "{count, plural, =1{1 item} other{{count} item}}",
+  "@itemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "discountAdd": "Diskon",
+  "discountNone": "Tanpa diskon",
+  "discountCustomPercent": "Diskon % lain",
+  "discountCustomFixed": "Potongan Rp lain",
+  "discountCustomLabel": "Diskon khusus",
+  "discountPercentHint": "Persen, mis. 10",
+  "discountFixedHint": "Rupiah, mis. 5000",
+  "lineEdit": "Ubah item",
+  "modRequired": "Wajib",
+  "modPickUpTo": "Pilih maks. {max}",
+  "@modPickUpTo": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "modPickBetween": "Pilih {min}–{max}",
+  "@modPickBetween": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "modAdd": "Tambah — {amount}",
+  "@modAdd": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "modUpdate": "Simpan — {amount}",
+  "@modUpdate": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "qty": "Jumlah",
+  "payTitle": "Pembayaran",
+  "payRemaining": "Sisa {amount}",
+  "@payRemaining": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payPaidInFull": "Lunas",
+  "payTendered": "Uang diterima",
+  "payExact": "Uang pas",
+  "payAddCash": "Tambah tunai {amount}",
+  "@payAddCash": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payAmount": "Jumlah",
+  "payProvider": "Penyedia",
+  "payReference": "No. referensi",
+  "payAddLine": "Tambah pembayaran",
+  "payChange": "Kembalian {amount}",
+  "@payChange": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payComplete": "Selesai",
+  "payNoPaymentNeeded": "Total Rp 0 — tidak perlu pembayaran.",
+  "methodCash": "Tunai",
+  "methodQris": "QRIS",
+  "methodDebit": "Debit",
+  "methodCredit": "Kartu kredit",
+  "methodTransfer": "Transfer",
+  "methodOther": "Lainnya",
+  "pendingTitle": "Pesanan belum terkirim",
+  "pendingWaiting": "Menunggu koneksi… Pesanan {amount} tersimpan di perangkat dan akan dikirim ulang dengan nomor yang sama.",
+  "@pendingWaiting": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pendingBlocks": "Selesaikan pesanan yang tertunda sebelum menerima pembayaran baru.",
+  "doneOrderNumber": "No. {number}",
+  "@doneOrderNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "doneChange": "Kembalian",
+  "doneNoChange": "Tanpa kembalian",
+  "doneNewOrder": "Pesanan baru",
+  "doneAutoReturn": "Kembali otomatis dalam {seconds} detik",
+  "@doneAutoReturn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "todayEmpty": "Belum ada pesanan hari ini.",
+  "todaySearch": "Cari nomor, nama, atau menu",
+  "orderVoided": "BATAL",
+  "orderBy": "oleh {name}",
+  "@orderBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "orderPayments": "Pembayaran",
+  "orderVoidedBy": "Dibatalkan oleh {name}: {reason}",
+  "@orderVoidedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "voidButton": "Batalkan pesanan",
+  "voidTitle": "Batalkan pesanan No. {number}?",
+  "@voidTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "voidReason": "Alasan",
+  "voidRestock": "Kembalikan stok bahan",
+  "voidApprover": "Disetujui oleh",
+  "voidApproverPin": "PIN penyetuju",
+  "voidApprovalNeeded": "Kasir perlu persetujuan pemilik atau manajer.",
+  "voidApprovalWrong": "PIN penyetuju salah.",
+  "voidDone": "Pesanan dibatalkan.",
+  "stockTitle": "Stok",
+  "stockLow": "Menipis",
+  "stockNegative": "Minus",
+  "stockIn": "Stok masuk",
+  "stockWaste": "Terbuang",
+  "stockCount": "Stok opname",
+  "stockIngredient": "Bahan",
+  "stockQtyIn": "Jumlah ({unit})",
+  "@stockQtyIn": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "stockUsePurchaseUnit": "Pakai satuan beli ({name} = {size} {unit})",
+  "@stockUsePurchaseUnit": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "stockTotalCost": "Total harga beli",
+  "stockReason": "Alasan",
+  "wasteSpilled": "Tumpah",
+  "wasteExpired": "Kedaluwarsa",
+  "wasteMistake": "Salah buat",
+  "wasteOther": "Lainnya",
+  "stockCountHint": "Isi hanya bahan yang dihitung. Yang kosong tidak berubah.",
+  "stockCounted": "Hasil hitung",
+  "stockSaved": "Stok tersimpan.",
+  "stockQtyInvalid": "Angka tidak valid (maks. 3 desimal).",
+  "stockEmpty": "Belum ada bahan.",
+  "settingsTitle": "Pengaturan",
+  "settingsAvailability": "Ketersediaan menu",
+  "settingsPrinters": "Printer",
+  "settingsPrintersLater": "Pengaturan printer tersedia di versi berikutnya.",
+  "settingsDevice": "Perangkat",
+  "settingsServer": "Server: {url}",
+  "@settingsServer": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  }
 }

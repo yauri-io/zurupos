@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'l10n/generated/app_localizations.dart';
+import 'state/auth.dart';
+import 'state/locale.dart';
+import 'ui/home_shell.dart';
+import 'ui/screens/pair_screen.dart';
+import 'ui/screens/staff_screen.dart';
 
-class ZuruApp extends StatelessWidget {
-  const ZuruApp({super.key, this.locale = const Locale('id')});
-
-  final Locale locale;
+class ZuruApp extends ConsumerWidget {
+  const ZuruApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(authProvider);
     return MaterialApp(
       onGenerateTitle: (context) => AppLocalizations.of(context).appName,
-      locale: locale,
+      locale: ref.watch(localeProvider),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -21,20 +26,13 @@ class ZuruApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       theme: ThemeData(colorSchemeSeed: const Color(0xFF6B4226), useMaterial3: true),
-      home: const _PlaceholderHome(),
-    );
-  }
-}
-
-class _PlaceholderHome extends StatelessWidget {
-  const _PlaceholderHome();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.appName)),
-      body: Center(child: Text(l10n.placeholderHome)),
+      // Keyed by state so signing out drops every pushed route.
+      home: switch (auth) {
+        AuthLoading() => const Scaffold(body: Center(child: CircularProgressIndicator())),
+        Unpaired() => const PairScreen(key: ValueKey('pair')),
+        Paired() => const StaffScreen(key: ValueKey('staff')),
+        SignedIn(:final user) => HomeShell(key: ValueKey('home-${user.id}'), user: user),
+      },
     );
   }
 }
