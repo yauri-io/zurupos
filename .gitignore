@@ -1,0 +1,54 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.iml
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.jks
+*.keystore
+key.properties
+
+# Node
+node_modules/
+dist/
+coverage/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+.pnpm-store/
+.turbo/
+
+# Nuxt
+.nuxt/
+.output/
+.data/
+.nitro/
+.cache/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+apps/cashier/android/local.properties
+apps/cashier/android/.gradle/
+apps/cashier/ios/Pods/
+*.apk
+*.aab
+
+# Database
+*.dump
+*.sql.gz
+pgdata/
+
+# Stray tool output (safe to delete)
+Claude outputs/
