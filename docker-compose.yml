@@ -65,6 +65,26 @@ services:
       mailpit:
         condition: service_started
 
+  # Outbox worker (SPEC §10): sends queued emails to Mailpit, as zuru_worker.
+  worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ['node', 'dist/worker/worker.js']
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      WORKER_DATABASE_URL: postgres://zuru_worker:${ZURU_WORKER_PASSWORD:-dev_worker}@postgres:5432/zuru
+      WORKER_POLL_MS: ${WORKER_POLL_MS:-5000}
+      EMAIL_PROVIDER: smtp
+      EMAIL_FROM: ${EMAIL_FROM:-ZuruPOS <no-reply@zurupos.local>}
+      SMTP_URL: smtp://mailpit:1025
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      mailpit:
+        condition: service_started
+
   dashboard:
     build:
       context: .

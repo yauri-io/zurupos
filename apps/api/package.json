@@ -11,7 +11,8 @@
     "test": "dotenv -e ../../.env -- vitest run",
     "test:rls": "dotenv -e ../../.env -- vitest run test/rls",
     "db:types": "dotenv -e ../../.env -- sh -c 'kysely-codegen --dialect postgres --url \"$MIGRATION_DATABASE_URL\" --out-file src/db/types.ts --exclude-pattern schema_migrations --date-parser string --type-mapping \"{\\\"int8\\\":\\\"bigint\\\"}\" && prettier --write src/db/types.ts'",
-    "openapi": "dotenv -e ../../.env -- tsx scripts/openapi.ts"
+    "openapi": "dotenv -e ../../.env -- tsx scripts/openapi.ts",
+    "worker": "dotenv -e ../../.env -- tsx watch src/worker/worker.ts"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.5",
@@ -23,6 +24,7 @@
     "argon2": "^0.45.2",
     "fastify": "^5.12.8",
     "kysely": "^0.29.9",
+    "nodemailer": "^10.6.0",
     "pg": "^8.23.1",
     "pino": "^10.4.0",
     "typebox": "^1.4.7"
@@ -30,6 +32,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^22.20.5",
+    "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.23.1",
     "dotenv-cli": "^11.1.0",
     "eslint": "^10.15.0",

@@ -58,8 +58,37 @@ const oneOf = <T extends string>(env: Env, key: string, allowed: readonly T[], f
   return value as T
 }
 
-export const loadConfig = (env: Env = process.env): Config => {
+const loadEmail = (env: Env): Config['email'] => {
   const provider = oneOf(env, 'EMAIL_PROVIDER', ['smtp', 'resend'] as const, 'smtp')
+  const email = {
+    provider,
+    from: required(env, 'EMAIL_FROM'),
+    smtpUrl: env['SMTP_URL'] || undefined,
+    resendApiKey: env['RESEND_API_KEY'] || undefined,
+  }
+  if (provider === 'smtp' && !email.smtpUrl) throw new Error('SMTP_URL is required when EMAIL_PROVIDER=smtp')
+  if (provider === 'resend' && !email.resendApiKey) {
+    throw new Error('RESEND_API_KEY is required when EMAIL_PROVIDER=resend')
+  }
+  return email
+}
+
+// The outbox worker (SPEC §10) connects as zuru_worker and only needs email settings.
+export type WorkerConfig = {
+  logLevel: string
+  databaseUrl: string
+  pollIntervalMs: number
+  email: Config['email']
+}
+
+export const loadWorkerConfig = (env: Env = process.env): WorkerConfig => ({
+  logLevel: optional(env, 'LOG_LEVEL', 'info'),
+  databaseUrl: required(env, 'WORKER_DATABASE_URL'),
+  pollIntervalMs: int(env, 'WORKER_POLL_MS', 5000),
+  email: loadEmail(env),
+})
+
+export const loadConfig = (env: Env = process.env): Config => {
   const config: Config = {
     nodeEnv: oneOf(env, 'NODE_ENV', ['development', 'test', 'production'] as const, 'development'),
     host: optional(env, 'API_HOST', '0.0.0.0'),
@@ -72,17 +101,7 @@ export const loadConfig = (env: Env = process.env): Config => {
     dashboardUrl: required(env, 'DASHBOARD_URL'),
     cookieSecure: bool(env, 'COOKIE_SECURE', true),
     signupEnabled: bool(env, 'SIGNUP_ENABLED', false),
-    email: {
-      provider,
-      from: required(env, 'EMAIL_FROM'),
-      smtpUrl: env['SMTP_URL'] || undefined,
-      resendApiKey: env['RESEND_API_KEY'] || undefined,
-    },
-  }
-  if (provider === 'smtp' && !config.email.smtpUrl)
-    throw new Error('SMTP_URL is required when EMAIL_PROVIDER=smtp')
-  if (provider === 'resend' && !config.email.resendApiKey) {
-    throw new Error('RESEND_API_KEY is required when EMAIL_PROVIDER=resend')
+    email: loadEmail(env),
   }
   return config
 }
