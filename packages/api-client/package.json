@@ -1,0 +1,15 @@
+{
+  "name": "@zurupos/api-client",
+  "private": true,
+  "type": "module",
+  "description": "TypeScript types generated from the API's OpenAPI document (SPEC §2).",
+  "exports": {
+    ".": { "types": "./src/schema.d.ts", "default": "./src/index.js" }
+  },
+  "scripts": {
+    "generate": "pnpm --filter @zurupos/api openapi && openapi-typescript openapi.json -o src/schema.d.ts && prettier --write src/schema.d.ts openapi.json"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.0.0"
+  }
+}
