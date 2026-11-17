@@ -6161,7 +6161,7 @@
                             "type": "array",
                             "items": {
                               "type": "object",
-                              "required": ["name", "qty", "modifiers"],
+                              "required": ["name", "qty", "modifiers", "note"],
                               "properties": {
                                 "name": {
                                   "type": "string"
@@ -6174,6 +6174,16 @@
                                   "items": {
                                     "type": "string"
                                   }
+                                },
+                                "note": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               }
                             }

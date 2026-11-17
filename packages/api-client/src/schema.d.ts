@@ -3012,6 +3012,7 @@ export interface paths {
                   name: string
                   qty: number
                   modifiers: string[]
+                  note: string | null
                 }[]
                 payment_methods?: ('cash' | 'qris' | 'debit' | 'credit' | 'transfer' | 'other')[]
               }[]

@@ -18,7 +18,7 @@ beforeAll(async () => {
     client_order_id: randomUUID(),
     order_type: 'dine_in',
     customer_name: 'Budi',
-    lines: [{ item_id: s.item.kopiSusu, qty: 1, option_ids: plainKopi(s) }],
+    lines: [{ item_id: s.item.kopiSusu, qty: 1, option_ids: plainKopi(s), note: 'less ice' }],
     payments: [{ method: 'cash', amount: 27500, tendered: 30000 }],
   })
   orderId = res.json<{ id: string }>().id
@@ -38,7 +38,14 @@ describe('GET /orders/today', () => {
           id: orderId,
           customer_name: 'Budi',
           total: 27500,
-          items: [{ name: 'Kopi Susu Gula Aren', qty: 1, modifiers: ['Regular', 'Normal', 'Susu segar'] }],
+          items: [
+            {
+              name: 'Kopi Susu Gula Aren',
+              qty: 1,
+              modifiers: ['Regular', 'Normal', 'Susu segar'],
+              note: 'less ice',
+            },
+          ],
           payment_methods: ['cash'],
         },
       ],
@@ -51,6 +58,8 @@ describe('GET /orders/today', () => {
     expect(res.json<{ orders: { total: number }[] }>().orders[0]?.total).toBe(27500)
     expect(res.body).not.toContain('payment_methods')
     expect(res.body).not.toContain('tendered')
+    // The ticket reprint needs the line note (SPEC §11.1 #10).
+    expect(res.json<{ orders: { items: { note: string }[] }[] }>().orders[0]?.items[0]?.note).toBe('less ice')
   })
 })
 

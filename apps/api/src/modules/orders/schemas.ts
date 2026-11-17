@@ -141,8 +141,14 @@ export const OrderSummary = Type.Object({
   total: Type.Integer(),
   paid_at: DateTime,
   created_by: UserRef,
+  // Enough for a barista ticket reprint (SPEC §11.1 #10); no prices.
   items: Type.Array(
-    Type.Object({ name: Type.String(), qty: Type.Integer(), modifiers: Type.Array(Type.String()) }),
+    Type.Object({
+      name: Type.String(),
+      qty: Type.Integer(),
+      modifiers: Type.Array(Type.String()),
+      note: Nullable(Type.String()),
+    }),
   ),
   payment_methods: Type.Optional(Type.Array(PaymentMethod)),
 })

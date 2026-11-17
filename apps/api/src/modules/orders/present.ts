@@ -174,6 +174,7 @@ export const today = async (trx: Tx, auth: AuthContext) => {
         name: l.item_name,
         qty: l.qty,
         modifiers: l.modifiers.map((m) => m.option_name),
+        note: l.note,
       })),
       ...(seesPayments ? { payment_methods: [...new Set(o.payments.map((p) => p.method))] } : {}),
     })),
