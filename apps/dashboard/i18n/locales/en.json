@@ -1,14 +1,31 @@
 {
-  "app": { "name": "ZuruPOS" },
+  "app": {
+    "name": "ZuruPOS"
+  },
   "nav": {
     "home": "Home",
     "menu": "Menu",
     "modifiers": "Modifiers",
     "ingredients": "Ingredients",
     "discounts": "Discounts",
-    "settings": "Settings"
+    "settings": "Settings",
+    "orders": "Orders",
+    "inventory": "Inventory",
+    "users": "Staff",
+    "devices": "Devices",
+    "reports": "Reports",
+    "sales": "Sales",
+    "payments": "Payments",
+    "items": "Item sales",
+    "margin": "Margin",
+    "voids": "Voids"
   },
-  "roles": { "owner": "Owner", "manager": "Manager", "cashier": "Cashier", "employee": "Employee" },
+  "roles": {
+    "owner": "Owner",
+    "manager": "Manager",
+    "cashier": "Cashier",
+    "employee": "Employee"
+  },
   "common": {
     "save": "Save",
     "saved": "Saved",
@@ -47,7 +64,9 @@
   },
   "home": {
     "welcome": "Hello, {name}!",
-    "reports_soon": "Today's sales summary will appear here. For now, set up your menu, ingredients and shop settings."
+    "net_today": "Net sales today",
+    "refresh_note": "Refreshes every minute.",
+    "top_items": "Top items"
   },
   "menu": {
     "add_category": "Add category",
@@ -136,7 +155,11 @@
     "stock_note": "Stock changes through stock-in, waste, stock counts and sales.",
     "confirm_archive": "Archive ingredient \"{name}\"? Recipes that use it keep working."
   },
-  "units": { "g": "grams (g)", "ml": "millilitres (ml)", "pcs": "pieces (pcs)" },
+  "units": {
+    "g": "grams (g)",
+    "ml": "millilitres (ml)",
+    "pcs": "pieces (pcs)"
+  },
   "discounts": {
     "add": "Add discount",
     "edit": "Edit discount",
@@ -178,7 +201,9 @@
     "extra_emails": "Extra emails",
     "extra_emails_help": "Comma separated. The owner always gets them.",
     "idle_lock": "Counter auto-lock (minutes)",
-    "idle_lock_help": "0 = never lock."
+    "idle_lock_help": "0 = never lock.",
+    "example": "Example: an order of {net}",
+    "example_total": "Customer pays"
   },
   "payment_methods": {
     "cash": "Cash",
@@ -215,5 +240,130 @@
     "unknown_timezone": "Unknown time zone.",
     "percent_max_10000_bps": "Percent can be at most 100%.",
     "replace_same_ingredient_needs_qty": "Replacing with the same ingredient needs a new amount."
+  },
+  "range": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "last7": "7 days",
+    "this_month": "This month",
+    "last_month": "Last month",
+    "from": "From",
+    "to": "To"
+  },
+  "reports": {
+    "sales": "Sales report",
+    "payments": "Payments",
+    "items": "Item sales",
+    "margin": "Margin & stock value",
+    "voids": "Voids",
+    "gross_sales": "Gross sales",
+    "discounts": "Discounts",
+    "net_sales": "Net sales",
+    "service_charge": "Service charge",
+    "tax": "Tax",
+    "total_collected": "Total collected",
+    "orders": "Orders",
+    "aov": "Average order",
+    "daily": "By day",
+    "hourly": "By hour (net sales)",
+    "n_orders": "{n} orders",
+    "n_payments": "{n} payments",
+    "qty_sold": "{n} sold",
+    "net_note": "Net sales = after discounts, before tax and service charge. Voided orders are excluded.",
+    "empty": "No data for this period.",
+    "by_item": "By item",
+    "by_category": "By category",
+    "before_order_discount": "before order discount",
+    "allocation_note": "Order discounts are split across lines by value; the rounding remainder goes to the largest line.",
+    "cogs": "COGS",
+    "gross_margin": "Gross margin",
+    "margin_pct": "Margin %",
+    "stock_value": "Stock value",
+    "stock_value_note": "Stock × current average cost; negative stock counts as zero.",
+    "void_count": "Voids",
+    "void_total": "Voided total",
+    "voided_by": "Voided by {name}, {at}",
+    "approved_by": "approved by {name}",
+    "restocked": "restocked",
+    "not_restocked": "not restocked"
+  },
+  "orders": {
+    "status_all": "All statuses",
+    "status_paid": "Paid",
+    "status_voided": "Voided",
+    "all_methods": "All methods",
+    "search": "Search no., name, item",
+    "empty": "No orders.",
+    "voided": "Voided",
+    "load_more": "Load more",
+    "type_dine_in": "Dine in",
+    "type_takeaway": "Takeaway",
+    "by": "by {name}",
+    "custom_discount": "Custom discount",
+    "item_discounts": "Item discounts",
+    "total": "Total",
+    "payments": "Payments",
+    "tendered": "received {amount}",
+    "change": "Change {amount}"
+  },
+  "inventory": {
+    "all": "All ingredients",
+    "low_or_negative": "Low or negative",
+    "negative": "Negative",
+    "stock_in": "Stock in",
+    "waste": "Waste",
+    "count": "Stock count",
+    "ingredient": "Ingredient",
+    "qty": "Quantity",
+    "total_cost": "Total cost",
+    "total_cost_help": "What you paid for the whole quantity; the average cost is recalculated.",
+    "use_purchase_unit": "Use purchase unit ({name} = {size})",
+    "reason": "Reason",
+    "note": "Note",
+    "reason_spilled": "Spilled",
+    "reason_expired": "Expired",
+    "reason_mistake": "Mistake",
+    "reason_other": "Other",
+    "count_help": "Fill in only what you counted. Empty rows don't change.",
+    "system": "In system",
+    "save_count": "Save {n} counts",
+    "on_hand": "On hand",
+    "no_movements": "No stock movements yet.",
+    "view_order": "view order",
+    "counted": "counted {qty}",
+    "balance": "balance",
+    "type_sale": "Sale",
+    "type_void_return": "Void return",
+    "type_stock_in": "Stock in",
+    "type_waste": "Waste",
+    "type_count_adjust": "Count adjustment"
+  },
+  "users": {
+    "add": "Add staff",
+    "edit": "Edit staff",
+    "role": "Role",
+    "email": "Email",
+    "email_manager_help": "Managers get an email invite to set a password.",
+    "email_optional": "Optional; cashiers and employees sign in with a PIN.",
+    "pin": "PIN",
+    "pin_help": "4–6 digits; avoid 1234, 0000 and the like.",
+    "language": "Language",
+    "inactive": "Inactive",
+    "invite_pending": "Invite pending",
+    "last_login": "Last signed in {at}",
+    "never": "Never signed in",
+    "reset_pin": "Reset PIN",
+    "reset_pin_for": "New PIN for {name}",
+    "deactivate": "Deactivate",
+    "confirm_deactivate": "Deactivate {name}? Their sessions end immediately."
+  },
+  "devices": {
+    "help": "Cashier devices paired by an owner or manager.",
+    "empty": "No devices yet.",
+    "revoked": "Revoked",
+    "revoke": "Revoke",
+    "paired_by": "Paired by {name}, {at}",
+    "last_seen": "last seen {at}",
+    "confirm_revoke": "Revoke {name}? Staff on it are signed out immediately."
   }
 }

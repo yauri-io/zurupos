@@ -29,6 +29,17 @@ const form = reactive({
 
 const serviceBps = computed(() => parsePercentToBps(form.service_charge))
 const taxBps = computed(() => parsePercentToBps(form.tax))
+// Live example (SPEC §12.3) for a Rp 100.000 order, same formula as the server.
+const EXAMPLE_NET = 100000
+const example = computed(() =>
+  exampleTotals(EXAMPLE_NET, {
+    service_charge_enabled: form.service_charge_enabled,
+    service_charge_bps: serviceBps.value ?? 0,
+    tax_enabled: form.tax_enabled,
+    tax_bps: taxBps.value ?? 0,
+    tax_on_service_charge: form.tax_on_service_charge,
+  }),
+)
 const emails = computed(() =>
   form.alert_extra_emails
     .split(/[,\s]+/)
@@ -151,6 +162,24 @@ const save = async () => {
             :label="t('settings.tax_on_service')"
           />
           <p class="text-xs text-muted">{{ t('settings.prices_exclude_tax') }}</p>
+          <dl
+            class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 text-sm rounded-md bg-elevated p-3 max-w-sm"
+            data-testid="tax-example"
+          >
+            <dt class="col-span-2 font-medium">
+              {{ t('settings.example', { net: formatIdr(example.net) }) }}
+            </dt>
+            <template v-if="form.service_charge_enabled">
+              <dt>{{ t('reports.service_charge') }} {{ formatBps(serviceBps ?? 0) }}</dt>
+              <dd class="tabular-nums text-right">{{ formatIdr(example.service) }}</dd>
+            </template>
+            <template v-if="form.tax_enabled">
+              <dt>{{ form.tax_name }} {{ formatBps(taxBps ?? 0) }}</dt>
+              <dd class="tabular-nums text-right">{{ formatIdr(example.tax) }}</dd>
+            </template>
+            <dt class="font-semibold">{{ t('settings.example_total') }}</dt>
+            <dd class="tabular-nums text-right font-semibold">{{ formatIdr(example.total) }}</dd>
+          </dl>
         </div>
       </UCard>
 

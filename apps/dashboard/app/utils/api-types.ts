@@ -55,3 +55,18 @@ export const COLOR_SWATCH: Record<ItemColor, string> = {
   pink: '#ec4899',
   brown: '#92400e',
 }
+
+export type Summary = Ok<'/v1/reports/summary', 'get'>
+export type Daily = Ok<'/v1/reports/daily', 'get'>['days'][number]
+export type Hourly = Ok<'/v1/reports/hourly', 'get'>['hours'][number]
+export type ItemSales = Ok<'/v1/reports/items', 'get'>['items'][number]
+export type CategorySales = Ok<'/v1/reports/categories', 'get'>['categories'][number]
+export type PaymentSales = Ok<'/v1/reports/payments', 'get'>
+export type Margin = Ok<'/v1/reports/margin', 'get'>
+export type Voids = Ok<'/v1/reports/voids', 'get'>
+export type StockValue = Ok<'/v1/reports/stock-value', 'get'>
+export type OrderListItem = Ok<'/v1/orders', 'get'>['orders'][number]
+export type Order = Ok<'/v1/orders/{id}', 'get'>
+export type Movement = Ok<'/v1/ingredients/{id}/movements', 'get'>['movements'][number]
+export type User = Ok<'/v1/users', 'get'>['users'][number]
+export type Device = Ok<'/v1/devices', 'get'>['devices'][number]

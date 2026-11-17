@@ -1,14 +1,31 @@
 {
-  "app": { "name": "ZuruPOS" },
+  "app": {
+    "name": "ZuruPOS"
+  },
   "nav": {
     "home": "Beranda",
     "menu": "Menu",
     "modifiers": "Pilihan Menu",
     "ingredients": "Bahan",
     "discounts": "Diskon",
-    "settings": "Pengaturan"
+    "settings": "Pengaturan",
+    "orders": "Pesanan",
+    "inventory": "Stok",
+    "users": "Staf",
+    "devices": "Perangkat",
+    "reports": "Laporan",
+    "sales": "Penjualan",
+    "payments": "Pembayaran",
+    "items": "Menu terjual",
+    "margin": "Margin",
+    "voids": "Pembatalan"
   },
-  "roles": { "owner": "Pemilik", "manager": "Manajer", "cashier": "Kasir", "employee": "Karyawan" },
+  "roles": {
+    "owner": "Pemilik",
+    "manager": "Manajer",
+    "cashier": "Kasir",
+    "employee": "Karyawan"
+  },
   "common": {
     "save": "Simpan",
     "saved": "Tersimpan",
@@ -47,7 +64,9 @@
   },
   "home": {
     "welcome": "Halo, {name}!",
-    "reports_soon": "Ringkasan penjualan hari ini akan tampil di sini. Untuk sekarang, siapkan menu, bahan dan pengaturan toko."
+    "net_today": "Penjualan bersih hari ini",
+    "refresh_note": "Diperbarui otomatis setiap menit.",
+    "top_items": "Menu terlaris"
   },
   "menu": {
     "add_category": "Tambah kategori",
@@ -136,7 +155,11 @@
     "stock_note": "Stok berubah lewat stok masuk, pemakaian (waste), stok opname dan penjualan.",
     "confirm_archive": "Arsipkan bahan \"{name}\"? Resep yang sudah memakainya tetap berjalan."
   },
-  "units": { "g": "gram (g)", "ml": "mililiter (ml)", "pcs": "buah (pcs)" },
+  "units": {
+    "g": "gram (g)",
+    "ml": "mililiter (ml)",
+    "pcs": "buah (pcs)"
+  },
   "discounts": {
     "add": "Tambah diskon",
     "edit": "Ubah diskon",
@@ -178,7 +201,9 @@
     "extra_emails": "Email tambahan",
     "extra_emails_help": "Pisahkan dengan koma. Email pemilik selalu dikirimi.",
     "idle_lock": "Kunci otomatis kasir (menit)",
-    "idle_lock_help": "0 = tidak dikunci."
+    "idle_lock_help": "0 = tidak dikunci.",
+    "example": "Contoh: pesanan {net}",
+    "example_total": "Total dibayar pelanggan"
   },
   "payment_methods": {
     "cash": "Tunai",
@@ -215,5 +240,130 @@
     "unknown_timezone": "Zona waktu tidak dikenal.",
     "percent_max_10000_bps": "Persen maksimal 100%.",
     "replace_same_ingredient_needs_qty": "Mengganti dengan bahan yang sama butuh jumlah baru."
+  },
+  "range": {
+    "today": "Hari ini",
+    "yesterday": "Kemarin",
+    "last7": "7 hari",
+    "this_month": "Bulan ini",
+    "last_month": "Bulan lalu",
+    "from": "Dari tanggal",
+    "to": "Sampai tanggal"
+  },
+  "reports": {
+    "sales": "Laporan penjualan",
+    "payments": "Pembayaran",
+    "items": "Menu terjual",
+    "margin": "Margin & nilai stok",
+    "voids": "Pembatalan",
+    "gross_sales": "Penjualan kotor",
+    "discounts": "Diskon",
+    "net_sales": "Penjualan bersih",
+    "service_charge": "Biaya layanan",
+    "tax": "Pajak",
+    "total_collected": "Total diterima",
+    "orders": "Pesanan",
+    "aov": "Rata-rata per pesanan",
+    "daily": "Per hari",
+    "hourly": "Per jam (penjualan bersih)",
+    "n_orders": "{n} pesanan",
+    "n_payments": "{n} pembayaran",
+    "qty_sold": "{n} terjual",
+    "net_note": "Penjualan bersih = setelah diskon, sebelum pajak dan biaya layanan. Pesanan batal tidak dihitung.",
+    "empty": "Belum ada data untuk periode ini.",
+    "by_item": "Per menu",
+    "by_category": "Per kategori",
+    "before_order_discount": "sebelum diskon pesanan",
+    "allocation_note": "Diskon pesanan dibagi ke tiap baris sesuai nilainya; sisa pembulatan ke baris terbesar.",
+    "cogs": "HPP",
+    "gross_margin": "Laba kotor",
+    "margin_pct": "Margin %",
+    "stock_value": "Nilai stok",
+    "stock_value_note": "Stok × biaya rata-rata saat ini; stok minus dihitung nol.",
+    "void_count": "Jumlah pembatalan",
+    "void_total": "Total dibatalkan",
+    "voided_by": "Dibatalkan oleh {name}, {at}",
+    "approved_by": "disetujui {name}",
+    "restocked": "stok dikembalikan",
+    "not_restocked": "stok tidak dikembalikan"
+  },
+  "orders": {
+    "status_all": "Semua status",
+    "status_paid": "Lunas",
+    "status_voided": "Batal",
+    "all_methods": "Semua metode",
+    "search": "Cari no., nama, menu",
+    "empty": "Tidak ada pesanan.",
+    "voided": "Batal",
+    "load_more": "Muat lagi",
+    "type_dine_in": "Makan di sini",
+    "type_takeaway": "Bawa pulang",
+    "by": "oleh {name}",
+    "custom_discount": "Diskon khusus",
+    "item_discounts": "Diskon item",
+    "total": "Total",
+    "payments": "Pembayaran",
+    "tendered": "diterima {amount}",
+    "change": "Kembalian {amount}"
+  },
+  "inventory": {
+    "all": "Semua bahan",
+    "low_or_negative": "Menipis atau minus",
+    "negative": "Minus",
+    "stock_in": "Stok masuk",
+    "waste": "Terbuang",
+    "count": "Stok opname",
+    "ingredient": "Bahan",
+    "qty": "Jumlah",
+    "total_cost": "Total harga beli",
+    "total_cost_help": "Harga untuk seluruh jumlah ini; biaya rata-rata dihitung ulang.",
+    "use_purchase_unit": "Pakai satuan beli ({name} = {size})",
+    "reason": "Alasan",
+    "note": "Catatan",
+    "reason_spilled": "Tumpah",
+    "reason_expired": "Kedaluwarsa",
+    "reason_mistake": "Salah buat",
+    "reason_other": "Lainnya",
+    "count_help": "Isi hanya bahan yang dihitung. Baris kosong tidak berubah.",
+    "system": "Di sistem",
+    "save_count": "Simpan {n} hasil hitung",
+    "on_hand": "Stok sekarang",
+    "no_movements": "Belum ada pergerakan stok.",
+    "view_order": "lihat pesanan",
+    "counted": "dihitung {qty}",
+    "balance": "saldo",
+    "type_sale": "Terjual",
+    "type_void_return": "Kembali dari pembatalan",
+    "type_stock_in": "Stok masuk",
+    "type_waste": "Terbuang",
+    "type_count_adjust": "Penyesuaian opname"
+  },
+  "users": {
+    "add": "Tambah staf",
+    "edit": "Ubah staf",
+    "role": "Peran",
+    "email": "Email",
+    "email_manager_help": "Manajer menerima undangan lewat email untuk membuat kata sandi.",
+    "email_optional": "Opsional; kasir dan karyawan masuk dengan PIN.",
+    "pin": "PIN",
+    "pin_help": "4–6 angka; hindari 1234, 0000 dan sejenisnya.",
+    "language": "Bahasa",
+    "inactive": "Nonaktif",
+    "invite_pending": "Undangan belum diterima",
+    "last_login": "Terakhir masuk {at}",
+    "never": "Belum pernah masuk",
+    "reset_pin": "Atur ulang PIN",
+    "reset_pin_for": "PIN baru untuk {name}",
+    "deactivate": "Nonaktifkan",
+    "confirm_deactivate": "Nonaktifkan {name}? Sesi aktifnya langsung berakhir."
+  },
+  "devices": {
+    "help": "Perangkat kasir yang dipasangkan oleh pemilik atau manajer.",
+    "empty": "Belum ada perangkat.",
+    "revoked": "Dicabut",
+    "revoke": "Cabut",
+    "paired_by": "Dipasangkan oleh {name}, {at}",
+    "last_seen": "terakhir aktif {at}",
+    "confirm_revoke": "Cabut {name}? Staf di perangkat ini langsung keluar."
   }
 }

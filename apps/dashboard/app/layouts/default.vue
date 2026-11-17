@@ -7,6 +7,21 @@ const { me, can, logout } = useAuth()
 const items = computed<NavigationMenuItem[]>(() =>
   [
     { label: t('nav.home'), icon: 'i-lucide-house', to: '/', show: can('reports.view') },
+    {
+      label: t('nav.reports'),
+      icon: 'i-lucide-chart-column',
+      show: can('reports.view'),
+      defaultOpen: true,
+      children: [
+        { label: t('nav.sales'), to: '/reports/sales' },
+        { label: t('nav.payments'), to: '/reports/payments' },
+        { label: t('nav.items'), to: '/reports/items' },
+        ...(can('costs.view') ? [{ label: t('nav.margin'), to: '/reports/margin' }] : []),
+        { label: t('nav.voids'), to: '/reports/voids' },
+      ],
+    },
+    { label: t('nav.orders'), icon: 'i-lucide-receipt', to: '/orders', show: can('orders.view_all') },
+    { label: t('nav.inventory'), icon: 'i-lucide-warehouse', to: '/inventory', show: can('stock.adjust') },
     { label: t('nav.menu'), icon: 'i-lucide-coffee', to: '/menu', show: can('menu.manage') },
     {
       label: t('nav.modifiers'),
@@ -16,6 +31,13 @@ const items = computed<NavigationMenuItem[]>(() =>
     },
     { label: t('nav.ingredients'), icon: 'i-lucide-package', to: '/ingredients', show: can('menu.manage') },
     { label: t('nav.discounts'), icon: 'i-lucide-percent', to: '/discounts', show: can('menu.manage') },
+    { label: t('nav.users'), icon: 'i-lucide-users', to: '/users', show: can('users.manage') },
+    {
+      label: t('nav.devices'),
+      icon: 'i-lucide-tablet-smartphone',
+      to: '/devices',
+      show: can('devices.manage'),
+    },
     { label: t('nav.settings'), icon: 'i-lucide-settings', to: '/settings', show: can('settings.manage') },
   ]
     .filter((i) => i.show)
