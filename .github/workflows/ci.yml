@@ -16,8 +16,8 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: cp .env.example .env
-      - name: Start Postgres (roles bootstrapped by db/init)
-        run: docker compose up -d --wait postgres
+      - name: Start Postgres (roles bootstrapped by db/init) and Mailpit (worker test)
+        run: docker compose up -d --wait postgres mailpit
       - run: pnpm install --frozen-lockfile
       - name: Migrate test database
         run: pnpm db:migrate:test
@@ -43,6 +43,23 @@ jobs:
       - run: pnpm --filter @zurupos/dashboard run typecheck
       - run: pnpm --filter @zurupos/dashboard run test
       - run: pnpm --filter @zurupos/dashboard run build
+
+  # Playwright against the whole Docker stack, using the runner's Google Chrome.
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: cp .env.example .env
+      - run: docker compose up -d --build --wait
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @zurupos/dashboard run test:e2e
+      - if: failure()
+        run: docker compose logs api dashboard
 
   cashier:
     runs-on: ubuntu-latest
