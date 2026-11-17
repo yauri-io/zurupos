@@ -22,6 +22,7 @@ import { itemRoutes } from './modules/items/routes.js'
 import { modifierRoutes } from './modules/modifiers/routes.js'
 import { recipeRoutes } from './modules/recipes/routes.js'
 import { settingsRoutes } from './modules/settings/routes.js'
+import { stockRoutes } from './modules/stock/routes.js'
 
 export type AppDeps = { config: Config; db: Database; limiters?: Limiters }
 
@@ -57,7 +58,11 @@ export const buildApp = async ({ config, db, limiters = createLimiters() }: AppD
     hsts: config.nodeEnv === 'production',
     contentSecurityPolicy: false,
   })
-  await app.register(cors, { origin: config.dashboardOrigin, credentials: true })
+  await app.register(cors, {
+    origin: config.dashboardOrigin,
+    credentials: true,
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  })
   await app.register(cookie)
   await app.register(swagger, {
     openapi: {
@@ -88,6 +93,7 @@ export const buildApp = async ({ config, db, limiters = createLimiters() }: AppD
       await v1.register(ingredientRoutes)
       await v1.register(recipeRoutes)
       await v1.register(discountRoutes)
+      await v1.register(stockRoutes, { config })
     },
     { prefix: '/v1' },
   )
