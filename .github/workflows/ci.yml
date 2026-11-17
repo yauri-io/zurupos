@@ -26,6 +26,8 @@ jobs:
       - name: API tests (incl. RLS isolation suite, as zuru_app)
         run: pnpm --filter @zurupos/api run test
       - run: pnpm format:check
+      - name: Generated API client is up to date
+        run: pnpm api:client && git diff --exit-code packages/api-client
 
   dashboard:
     runs-on: ubuntu-latest
@@ -39,6 +41,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @zurupos/dashboard run lint
       - run: pnpm --filter @zurupos/dashboard run typecheck
+      - run: pnpm --filter @zurupos/dashboard run test
       - run: pnpm --filter @zurupos/dashboard run build
 
   cashier:

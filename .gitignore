@@ -52,3 +52,5 @@ pgdata/
 
 # Stray tool output (safe to delete)
 Claude outputs/
+test-results/
+playwright-report/

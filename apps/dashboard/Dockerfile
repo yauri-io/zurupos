@@ -4,6 +4,7 @@ RUN corepack enable
 WORKDIR /repo
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY apps/dashboard/package.json apps/dashboard/
+COPY packages/api-client packages/api-client
 RUN pnpm install --frozen-lockfile --ignore-scripts --filter @zurupos/dashboard...
 COPY apps/dashboard apps/dashboard
 RUN pnpm --filter @zurupos/dashboard run build

@@ -1,11 +1,21 @@
 <script setup lang="ts">
+// Owner home with today's numbers arrives in M6 (SPEC §12.3). Managers land on /menu.
 const { t } = useI18n()
-useHead({ title: () => t('app.name') })
+const { can, me } = useAuth()
+if (!can('reports.view')) await navigateTo('/menu', { replace: true })
+useHead({ title: () => t('nav.home') })
 </script>
 
 <template>
-  <UContainer class="py-10">
-    <h1 class="text-2xl font-semibold">{{ t('app.name') }}</h1>
-    <p class="text-muted mt-2">{{ t('home.placeholder') }}</p>
-  </UContainer>
+  <PagePanel :title="t('nav.home')">
+    <div class="flex flex-col gap-4 max-w-xl">
+      <p class="text-lg">{{ t('home.welcome', { name: me?.user.name ?? '' }) }}</p>
+      <p class="text-muted">{{ t('home.reports_soon') }}</p>
+      <div class="flex flex-wrap gap-2">
+        <UButton to="/menu" icon="i-lucide-coffee" :label="t('nav.menu')" variant="soft" />
+        <UButton to="/ingredients" icon="i-lucide-package" :label="t('nav.ingredients')" variant="soft" />
+        <UButton to="/settings" icon="i-lucide-settings" :label="t('nav.settings')" variant="soft" />
+      </div>
+    </div>
+  </PagePanel>
 </template>
