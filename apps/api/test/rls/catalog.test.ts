@@ -124,6 +124,20 @@ describe('§3.6 #4 — zuru_app cannot bypass RLS', () => {
     expect(rows[0]).toEqual({ owner: false, memberships: 0n })
   })
 
+  it('zuru_app and zuru_worker cannot CREATE in schemas public or auth', async () => {
+    const { rows } = await pool.query<{ role: string; schema: string; create: boolean }>(`
+      select r.role, s.schema, has_schema_privilege(r.role, s.schema, 'CREATE') as create
+      from (values ('zuru_app'), ('zuru_worker')) r(role),
+           (values ('auth'), ('public')) s(schema)
+      order by 1, 2`)
+    expect(rows).toEqual([
+      { role: 'zuru_app', schema: 'auth', create: false },
+      { role: 'zuru_app', schema: 'public', create: false },
+      { role: 'zuru_worker', schema: 'auth', create: false },
+      { role: 'zuru_worker', schema: 'public', create: false },
+    ])
+  })
+
   it('every table is owned by zuru_owner', async () => {
     const owners = new Set((await publicTables()).map((t) => t.owner))
     expect([...owners]).toEqual(['zuru_owner'])
@@ -200,14 +214,14 @@ describe('§3.6 #5 — SECURITY DEFINER functions are exactly the four in §3.4'
     expect(rows.map((r) => r.fn)).toEqual(DEFINER_FUNCTIONS)
   })
 
-  it('each pins search_path, is owned by zuru_owner and is executable only by zuru_app', async () => {
+  it('each pins search_path (pg_temp last), is owned by zuru_owner and is executable only by zuru_app', async () => {
     const { rows } = await pool.query<{ fn: string; config: string[] | null; owner: string; acl: string[] }>(`
       select n.nspname || '.' || p.proname as fn, p.proconfig as config,
              pg_get_userbyid(p.proowner) as owner, p.proacl::text[] as acl
       from pg_proc p join pg_namespace n on n.oid = p.pronamespace
       where p.prosecdef and n.nspname = 'auth' order by 1`)
     for (const r of rows) {
-      expect(r.config, r.fn).toEqual(['search_path=pg_catalog, public'])
+      expect(r.config, r.fn).toEqual(['search_path=pg_catalog, public, pg_temp'])
       expect(r.owner, r.fn).toBe('zuru_owner')
       expect([...r.acl].sort(), r.fn).toEqual(['zuru_app=X/zuru_owner', 'zuru_owner=X/zuru_owner'])
     }
