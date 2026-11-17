@@ -27,4 +27,5 @@ export const decodeCursor = (value: string | undefined): Cursor | null => {
 
 export const DEFAULT_PAGE = 50
 
-export const pageLimit = (limit: string | undefined): number => (limit === undefined ? DEFAULT_PAGE : Number(limit))
+export const pageLimit = (limit: string | undefined): number =>
+  limit === undefined ? DEFAULT_PAGE : Number(limit)

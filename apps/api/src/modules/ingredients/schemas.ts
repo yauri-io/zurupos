@@ -1,5 +1,16 @@
 import { Type } from 'typebox'
-import { Body, Cost, PageQuery, DateTime, Money, Name, Nullable, Qty, SignedQty, Uuid } from '../../http/schemas.js'
+import {
+  Body,
+  Cost,
+  PageQuery,
+  DateTime,
+  Money,
+  Name,
+  Nullable,
+  Qty,
+  SignedQty,
+  Uuid,
+} from '../../http/schemas.js'
 
 export const BaseUnit = Type.Enum(['g', 'ml', 'pcs'])
 
