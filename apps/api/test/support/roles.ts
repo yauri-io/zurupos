@@ -9,12 +9,14 @@ import {
   staffLogin,
   type Creds,
   type Shop,
+  type StaffUser,
 } from './app.js'
 import { inTx } from './pg.js'
 
 export type RoleShop = Shop & {
   owner: Shop['owner']
   as: { owner: Creds; manager: Creds; cashier: Creds; employee: Creds; ownerStaff: Creds }
+  users: { manager: StaffUser; cashier: StaffUser; employee: StaffUser }
 }
 
 // A shop with one user per role and the credentials each would really use.
@@ -31,6 +33,7 @@ export const roleShop = async (app: App, label: string): Promise<RoleShop> => {
   })
   return {
     ...shop,
+    users: { manager, cashier, employee },
     as: {
       owner: { kind: 'dashboard', cookie: shop.ownerCookie },
       manager: {

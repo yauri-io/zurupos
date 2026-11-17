@@ -15,12 +15,20 @@ import {
 } from '../support/app.js'
 import { createTestApp } from '../support/app.js'
 import * as menu from '../support/menu.js'
-import { appPool } from '../support/pg.js'
+import { appPool, inTx } from '../support/pg.js'
 import { buildFullShop, leakedSecrets, type FullShop } from '../support/shops.js'
 
 type Caller = 'dashboard' | 'staff' | 'device'
 type Resource =
-  'user' | 'device' | 'category' | 'item' | 'modifier_group' | 'modifier_option' | 'ingredient' | 'discount'
+  | 'user'
+  | 'device'
+  | 'category'
+  | 'item'
+  | 'modifier_group'
+  | 'modifier_option'
+  | 'ingredient'
+  | 'discount'
+  | 'order'
 
 // Routes with path params. Each param names the kind of resource it addresses.
 const ID_ROUTES: Record<string, { caller: Caller; params: Record<string, Resource>; body?: unknown }> = {
@@ -77,6 +85,12 @@ const ID_ROUTES: Record<string, { caller: Caller; params: Record<string, Resourc
   'GET /v1/ingredients/{id}/movements': { caller: 'staff', params: { id: 'ingredient' } },
   'PATCH /v1/discounts/{id}': { caller: 'dashboard', params: { id: 'discount' }, body: { value: 1 } },
   'DELETE /v1/discounts/{id}': { caller: 'dashboard', params: { id: 'discount' } },
+  'GET /v1/orders/{id}': { caller: 'dashboard', params: { id: 'order' } },
+  'POST /v1/orders/{id}/void': {
+    caller: 'dashboard',
+    params: { id: 'order' },
+    body: { reason: 'Hijack', restock: false },
+  },
 }
 
 // Routes that take resource ids in the body.
@@ -89,6 +103,27 @@ const BODY_ID_ROUTES: Record<string, { caller: Caller; body: (b: FullShop) => un
   'POST /v1/modifier-options': {
     caller: 'dashboard',
     body: (b) => ({ group_id: b.seeded.modifier_groups, name: 'Hijack' }),
+  },
+  'POST /v1/stock/in': {
+    caller: 'staff',
+    body: (b) => ({ ingredient_id: b.seeded.ingredients, qty: '1', total_cost: 1 }),
+  },
+  'POST /v1/stock/waste': {
+    caller: 'staff',
+    body: (b) => ({ ingredient_id: b.seeded.ingredients, qty: '1', reason: 'spilled' }),
+  },
+  'POST /v1/stock/count': {
+    caller: 'staff',
+    body: (b) => ({ counts: [{ ingredient_id: b.seeded.ingredients, counted_qty: '0' }] }),
+  },
+  'POST /v1/orders': {
+    caller: 'staff',
+    body: (b) => ({
+      client_order_id: randomUUID(),
+      order_type: 'takeaway',
+      lines: [{ item_id: b.seeded.items, qty: 1 }],
+      payments: [{ method: 'qris', amount: 25000 }],
+    }),
   },
   'POST /v1/recipes/preview': {
     caller: 'dashboard',
@@ -108,6 +143,8 @@ const SCAN_ROUTES: Record<string, Caller[]> = {
   'GET /v1/modifier-groups': ['dashboard', 'staff'],
   'GET /v1/ingredients': ['dashboard', 'staff'],
   'GET /v1/discounts': ['dashboard', 'staff'],
+  'GET /v1/orders/today': ['dashboard', 'staff'],
+  'GET /v1/admin/stock-invariant': ['dashboard', 'staff'],
 }
 
 // Routes that take no tenant resource id at all, with the reason.
@@ -139,6 +176,7 @@ beforeAll(async () => {
   t = await createTestApp()
   a = await buildFullShop(t.app, pool, 'A')
   b = await buildFullShop(t.app, pool, 'B')
+  for (const shop of [a, b]) await giveReadsSomethingToShow(shop)
   const spec = t.app.swagger() as { paths: Record<string, Record<string, unknown>> }
   operations = Object.entries(spec.paths).flatMap(([path, ops]) =>
     Object.keys(ops).map((method) => `${method.toUpperCase()} ${path}`),
@@ -150,6 +188,21 @@ afterAll(async () => {
 })
 
 const credsOf = (shop: FullShop, caller: Caller): Creds => shop[caller]
+
+// The seeded order moves to "today" (GET /orders/today) and an ingredient whose
+// stock has no movements shows up in GET /admin/stock-invariant, so the scans
+// below have each shop's data to find.
+const giveReadsSomethingToShow = (shop: FullShop) =>
+  inTx(pool, shop.tenantId, async (c) => {
+    await c.query(
+      `update orders set business_date = ((now() at time zone 'Asia/Jakarta'))::date where id = $1`,
+      [shop.seeded.orders],
+    )
+    await c.query(`insert into ingredients (tenant_id, name, base_unit, stock_qty) values ($1, $2, 'g', 5)`, [
+      shop.tenantId,
+      `${shop.marker} unbalanced`,
+    ])
+  })
 
 const required = (id: string | undefined): string => {
   if (!id) throw new Error('seeded id missing')
@@ -174,6 +227,8 @@ const idOf = (shop: FullShop, resource: Resource): string => {
       return required(shop.seeded.ingredients)
     case 'discount':
       return required(shop.seeded.discounts)
+    case 'order':
+      return required(shop.seeded.orders)
   }
 }
 
@@ -198,6 +253,23 @@ const freshA = async (resource: Resource): Promise<string> => {
       return (await menu.createIngredient(t.app, d, `Control ${unique}`)).id
     case 'discount':
       return (await menu.createDiscount(t.app, d, `Control ${unique}`)).id
+    case 'order': {
+      const res = expectStatus(
+        await t.app.inject({
+          method: 'POST',
+          url: '/v1/orders',
+          headers: { ...APP_HEADERS, ...headersFor(a.staff) },
+          payload: {
+            client_order_id: randomUUID(),
+            order_type: 'takeaway',
+            lines: [{ item_id: required(a.seeded.items), qty: 1 }],
+            payments: [{ method: 'qris', amount: 25000 }],
+          },
+        }),
+        201,
+      )
+      return res.json<{ id: string }>().id
+    }
   }
 }
 

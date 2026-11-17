@@ -22,7 +22,9 @@ declare module 'fastify' {
   interface FastifyContextConfig {
     // Routes without `auth` are treated as 'user' (deny by default).
     auth?: AuthMode
-    permission?: Permission
+    // One permission, or a list meaning "any of these" (the service then decides
+    // what each one allows, e.g. void directly vs. void with approval).
+    permission?: Permission | readonly Permission[]
   }
   interface FastifyRequest {
     auth: AuthContext | null

@@ -16,6 +16,9 @@ export type AuditAction =
   | 'menu.price_change'
   | 'recipe.change'
   | 'option_effects.change'
+  | 'stock.count'
+  | 'order.void'
+  | 'order.custom_discount'
 
 export const writeAudit = (
   trx: Tx,

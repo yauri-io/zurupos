@@ -171,6 +171,7 @@ export interface OrderLineModifiers {
   option_name: string
   order_line_id: string
   price_delta: bigint
+  seq: Generated<number>
   tenant_id: string
   updated_at: Generated<Timestamp>
 }

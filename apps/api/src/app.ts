@@ -23,6 +23,8 @@ import { modifierRoutes } from './modules/modifiers/routes.js'
 import { recipeRoutes } from './modules/recipes/routes.js'
 import { settingsRoutes } from './modules/settings/routes.js'
 import { stockRoutes } from './modules/stock/routes.js'
+import { orderRoutes } from './modules/orders/routes.js'
+import { adminRoutes } from './modules/admin/routes.js'
 
 export type AppDeps = { config: Config; db: Database; limiters?: Limiters }
 
@@ -94,6 +96,8 @@ export const buildApp = async ({ config, db, limiters = createLimiters() }: AppD
       await v1.register(recipeRoutes)
       await v1.register(discountRoutes)
       await v1.register(stockRoutes, { config })
+      await v1.register(orderRoutes, { config })
+      await v1.register(adminRoutes)
     },
     { prefix: '/v1' },
   )

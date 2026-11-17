@@ -7,7 +7,7 @@ import { apiError } from '../http/errors.js'
 import type { App } from '../http/types.js'
 import { DEVICE_TOKEN_HEADER, SESSION_COOKIE } from './constants.js'
 import type { AuthMode } from './context.js'
-import { can } from './permissions.js'
+import { can, type Permission } from './permissions.js'
 import { bearerToken, resolveDashboardSession, resolveDevice, resolveStaffSession } from './resolve.js'
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
@@ -61,7 +61,9 @@ export const registerAuth = (app: App, { db, config }: { db: Database; config: C
     const permission = request.routeOptions.config.permission
     if (permission !== undefined) {
       if (!request.auth) throw apiError('FORBIDDEN')
-      if (!can(request.auth.role, permission)) throw apiError('FORBIDDEN')
+      const anyOf: readonly Permission[] = typeof permission === 'string' ? [permission] : permission
+      const role = request.auth.role
+      if (!anyOf.some((p) => can(role, p))) throw apiError('FORBIDDEN')
     }
   })
 }
