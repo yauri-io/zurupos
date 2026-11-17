@@ -17,7 +17,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:types": "pnpm --filter @zurupos/api run db:types",
-    "api:client": "pnpm --filter @zurupos/api-client generate"
+    "api:client": "pnpm --filter @zurupos/api-client generate",
+    "cashier:fixtures": "cp apps/api/test/fixtures/pricing-cases.json apps/cashier/test/fixtures/pricing-cases.json"
   },
   "devDependencies": {
     "dbmate": "^2.38.1",

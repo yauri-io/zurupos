@@ -14,3 +14,6 @@ linter:
   rules:
     - prefer_single_quotes
     - always_declare_return_types
+
+formatter:
+  page_width: 110
