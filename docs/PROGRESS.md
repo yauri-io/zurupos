@@ -11,7 +11,7 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M4 | Flutter cashier app | ✅ Done | |
 | M5 | Printing (Bluetooth + network) | ✅ Done (manual printer test pending) | Manual printer test by user |
 | M6 | Dashboard reports and remaining pages | ✅ Done | |
-| M7 | Hardening, demo seed, user guide, UAT | ⬜ Not started | UAT with the shop owner |
+| M7 | Hardening, demo seed, user guide, UAT | 🔍 Awaiting UAT with the owner | UAT with the shop owner |
 
 Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · ✅ Done
 
@@ -128,3 +128,26 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
   - Dashboard: 32 unit tests and 2 Playwright tests. The new one visits all 16 owner pages at 375 px, checks there is no horizontal scroll and checks the figures, then does a stock-in through the form.
 - Run: `docker compose up -d --build --wait && pnpm --filter @zurupos/dashboard test:e2e`.
 - Known issues / notes: the e2e tests still aren't in CI (they need the whole stack).
+
+### M7 — 2026-11-18
+- Done:
+  - Dashboard signup page (linked from login), with an e2e test.
+  - Demo seed `pnpm db:seed` (D-046): "Kopi Demo" with 15 ingredients, 10 items, 5 modifier groups with §7.1 effects, 2 presets, owner/manager/cashier/employee, a paired tablet, and 207 orders over 14 days. Stock matches its movement history afterwards; the orders are numbered 1..n per day.
+  - `docs/USER_GUIDE.id.md`: owner setup guide in Bahasa Indonesia.
+  - `docs/UAT.md`: the §17 checklist, with the automated evidence and what remains manual for each item.
+  - Hardening:
+    - CI now starts Mailpit for the worker test; without it the API job would have failed on GitHub.
+    - New CI job runs the Playwright tests against the Docker stack.
+    - No stray logging or TODOs in app code.
+- Full regression (2026-11-18):
+  - API 612 tests from a fresh test database.
+  - Flutter 133, plus 2 against the live API.
+  - Dashboard: 32 unit tests and 3 Playwright tests.
+  - Lint, typecheck and formatting clean.
+  - The debug APK builds.
+- Known issues / notes:
+  - The §17 UAT must be run on the real tablet and printers with the owner; the results table is in `docs/UAT.md`.
+  - CI has still never run on GitHub (nothing pushed).
+  - The Resend email provider has never sent a real email.
+  - Deployment (`docs/DEPLOY.md`) is a later task and was not started.
+  - Two local e2e runs within an hour hit the signup rate limit (`docker compose restart api` clears it).

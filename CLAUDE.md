@@ -112,6 +112,9 @@ pnpm cashier:fixtures          # copy pricing-cases.json into the app after rege
 dart run build_runner build    # regenerate drift code after changing lib/data/database.dart
 flutter run --dart-define=API_BASE_URL=http://<host-ip>:4000      # on a tablet (emulator default: 10.0.2.2)
 flutter build apk --debug
+
+# Demo shop (dev database only; prints the logins and PINs; D-046)
+pnpm db:seed
 ```
 
-Seeding (`db/seeds/demo.sql`) arrives with M7.
+Note: signup is rate-limited to 5 per IP per hour in the running API, and the e2e and cashier integration tests each sign up a shop. If they fail with 429, run `docker compose restart api`.
