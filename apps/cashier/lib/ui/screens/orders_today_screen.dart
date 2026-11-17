@@ -8,10 +8,13 @@ import '../../api/api_error.dart';
 import '../../api/models.dart';
 import '../../domain/money.dart';
 import '../../domain/permissions.dart';
+import '../../printing/render.dart';
 import '../../state/auth.dart';
+import '../../state/printing.dart';
 import '../../state/providers.dart';
 import '../common.dart';
 import '../widgets/controls.dart';
+import '../widgets/print_status.dart';
 import 'staff_screen.dart' show staffListProvider;
 
 final todayProvider = FutureProvider.autoDispose<List<OrderSummary>>((ref) => ref.read(apiProvider).today());
@@ -89,7 +92,24 @@ class _OrdersTodayScreenState extends ConsumerState<OrdersTodayScreen> {
                         style: o.voided ? const TextStyle(decoration: TextDecoration.lineThrough) : null,
                       ),
                       subtitle: Text(items, maxLines: 2, overflow: TextOverflow.ellipsis),
-                      trailing: Text(formatIdr(o.total), style: Theme.of(context).textTheme.titleMedium),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(formatIdr(o.total), style: Theme.of(context).textTheme.titleMedium),
+                          if (!canOpen)
+                            IconButton(
+                              key: Key('ticket-${o.orderNumber}'),
+                              tooltip: l.printReprintTicket,
+                              icon: const Icon(Icons.print_outlined),
+                              onPressed: () => _reportQueued(
+                                context,
+                                ref
+                                    .read(printQueueProvider.notifier)
+                                    .reprintTicket(TicketData.fromSummary(o), o.id, o.paidAt),
+                              ),
+                            ),
+                        ],
+                      ),
                       onTap: canOpen
                           ? () async {
                               await Navigator.of(context).push(
@@ -108,6 +128,11 @@ class _OrdersTodayScreenState extends ConsumerState<OrdersTodayScreen> {
       ],
     );
   }
+}
+
+void _reportQueued(BuildContext context, int jobs) {
+  final l = context.l10n;
+  showMessage(context, jobs == 0 ? l.printNoPrinters : l.printSent, error: jobs == 0);
 }
 
 class OrderDetailScreen extends ConsumerWidget {
@@ -176,6 +201,33 @@ class OrderDetailScreen extends ConsumerWidget {
             for (final p in o.payments)
               _row([methodLabel(l, p.method), ?p.provider, ?p.reference].join(' · '), p.amount),
             if (o.changeDue > 0) _row(l.doneChange, o.changeDue),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (user != null && can(user.role, 'orders.reprint_receipt'))
+                  OutlinedButton.icon(
+                    key: const Key('reprint-receipt'),
+                    onPressed: () =>
+                        _reportQueued(context, ref.read(printQueueProvider.notifier).reprintReceipt(o)),
+                    icon: const Icon(Icons.receipt_long),
+                    label: Text(l.printReprintReceipt),
+                  ),
+                OutlinedButton.icon(
+                  key: const Key('reprint-ticket'),
+                  onPressed: () => _reportQueued(
+                    context,
+                    ref
+                        .read(printQueueProvider.notifier)
+                        .reprintTicket(TicketData.fromOrder(o), o.id, o.paidAt),
+                  ),
+                  icon: const Icon(Icons.local_cafe_outlined),
+                  label: Text(l.printReprintTicket),
+                ),
+              ],
+            ),
+            PrintStatusList(orderId: o.id),
             const SizedBox(height: 24),
             if (canVoid && !o.voided)
               OutlinedButton.icon(

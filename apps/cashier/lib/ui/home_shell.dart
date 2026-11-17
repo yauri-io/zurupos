@@ -11,6 +11,7 @@ import '../state/auth.dart';
 import '../state/checkout.dart';
 import '../state/connection.dart';
 import '../state/menu.dart';
+import '../state/printing.dart';
 import '../state/providers.dart';
 import 'common.dart';
 import 'screens/done_screen.dart';
@@ -52,6 +53,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   }
 
   Future<void> _start() async {
+    // Load device printer settings now, so the first order's auto-print sees them.
+    ref
+      ..read(printersProvider)
+      ..read(autoReturnProvider);
     ref.read(onlineProvider.notifier).start();
     if (widget.user.takesOrders) {
       // On staff login, then every 5 min (SPEC §11.2).

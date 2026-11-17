@@ -10,6 +10,7 @@ const _matrix = <String, Set<Role>>{
   'orders.void': {_o, _m},
   'orders.void_with_approval': {_c},
   'orders.view_detail': {_o, _m, _c},
+  'orders.reprint_receipt': {_o, _m, _c},
   'stock.adjust': {_o, _m, _e},
   'menu.availability': {_o, _m, _c},
   'device.settings': {_o, _m},

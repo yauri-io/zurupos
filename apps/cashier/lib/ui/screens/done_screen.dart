@@ -1,35 +1,33 @@
-// SPEC §11.1 #6: order number huge, change due huge, New order (auto-return).
-// Print status per printer arrives with M5.
+// SPEC §11.1 #6: order number huge, change due huge, print status per printer
+// with Retry, New order (auto-return after the device's setting, default 5 s).
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/models.dart';
 import '../../domain/money.dart';
+import '../../state/printing.dart';
 import '../common.dart';
+import '../widgets/print_status.dart';
 
-const autoReturnSeconds = 5;
-
-class DoneScreen extends StatefulWidget {
-  const DoneScreen({super.key, required this.order, this.autoReturn = autoReturnSeconds});
+class DoneScreen extends ConsumerStatefulWidget {
+  const DoneScreen({super.key, required this.order});
 
   final Order order;
 
-  /// Seconds before returning to a new order; 0 disables it.
-  final int autoReturn;
-
   @override
-  State<DoneScreen> createState() => _DoneScreenState();
+  ConsumerState<DoneScreen> createState() => _DoneScreenState();
 }
 
-class _DoneScreenState extends State<DoneScreen> {
-  late int _left = widget.autoReturn;
+class _DoneScreenState extends ConsumerState<DoneScreen> {
+  late int _left = ref.read(autoReturnProvider);
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    if (widget.autoReturn > 0) {
+    if (_left > 0) {
       _timer = Timer.periodic(const Duration(seconds: 1), (_) {
         setState(() => _left--);
         if (_left <= 0) _close();
@@ -77,7 +75,12 @@ class _DoneScreenState extends State<DoneScreen> {
                     key: const Key('done-change'),
                     style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  child: PrintStatusList(orderId: o.id),
+                ),
+                const SizedBox(height: 16),
                 FilledButton(
                   key: const Key('done-new'),
                   style: FilledButton.styleFrom(minimumSize: const Size(280, 64)),

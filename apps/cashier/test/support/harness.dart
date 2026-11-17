@@ -4,9 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zurupos_cashier/app.dart';
 import 'package:zurupos_cashier/data/local_store.dart';
 import 'package:zurupos_cashier/data/token_store.dart';
+import 'package:zurupos_cashier/printing/printer_config.dart';
+import 'package:zurupos_cashier/state/printing.dart';
 import 'package:zurupos_cashier/state/providers.dart';
+import 'package:zurupos_cashier/ui/screens/printer_page.dart';
 
 import 'fake_api.dart';
+import 'fake_printer.dart';
 
 class Harness {
   Harness({FakeApi? api, String? deviceToken = 'device-token'})
@@ -17,7 +21,11 @@ class Harness {
   final FakeApi api;
   final MemoryLocalStore store;
   final MemoryTokenStore tokens;
+  final printers = FakePrinters();
   int _ids = 0;
+
+  /// Printers configured on the device before the app starts.
+  Future<void> setPrinters(List<PrinterConfig> list) => store.setSetting('printers', encodePrinters(list));
 
   /// Tablet landscape unless [size] says otherwise.
   Future<void> pump(WidgetTester tester, {Size size = const Size(1280, 800)}) async {
@@ -31,6 +39,10 @@ class Harness {
           localStoreProvider.overrideWithValue(store),
           tokenStoreProvider.overrideWithValue(tokens),
           newIdProvider.overrideWithValue(() => 'id-${++_ids}'),
+          transportFactoryProvider.overrideWithValue(printers.transport),
+          bondedPrintersProvider.overrideWith(
+            (ref) async => [(name: 'RPP02N', address: 'AA:BB:CC:DD:EE:FF')],
+          ),
         ],
         child: const ZuruApp(),
       ),
