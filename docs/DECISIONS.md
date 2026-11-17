@@ -101,13 +101,16 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 **Context:** SPEC §3.4 says the four `auth.*` SECURITY DEFINER functions are owned by `zuru_owner`. SPEC §3.2 sets `FORCE ROW LEVEL SECURITY` on every tenant table. FORCE makes RLS apply to the table owner as well, and these lookups run with no tenant set, so as specified they would always return zero rows.
 **Decision:** Keep `zuru_owner` as the function owner and keep FORCE RLS. Add one extra permissive policy per looked-up table (`users`, `sessions`, `devices`, `password_resets`): `create policy auth_definer_lookup on <t> for select to zuru_owner using (true)`. It grants SELECT only, and only to `zuru_owner`, which cannot log in. The only `zuru_owner` sessions are the four definer functions and migrations, which own the schema anyway.
 **Consequences:** `zuru_app`'s isolation is unchanged. The isolation suite asserts that `zuru_app` is not a member of `zuru_owner` and that `auth_definer_lookup` policies exist only on those four tables, only for SELECT and only `TO zuru_owner`. Rejected alternative: a separate BYPASSRLS role owning the functions. It contradicts §3.4 and adds a role that bypasses RLS on whole tables.
+**Approved by the user (2026-11-17) with hardening:** (1) `pg_temp` is last in each `auth.*` function's `search_path` (migration `…10_auth_functions_pg_temp`); (2) a startup guard (`apps/api/src/db/role-guard.ts`) makes the API refuse to boot when its DB role is superuser, has BYPASSRLS, is a member of `zuru_owner`, or owns any table in `public`/`auth`; (3) the isolation suite asserts `zuru_app` and `zuru_worker` have no CREATE on `public` and `auth`. SPEC §3.1, §3.4 and §3.6 #4 now reference this decision.
 
 ## D-025: Cash payment lines must record `tendered`
 **Context:** SPEC §4.1 makes `payments.tendered` nullable ("cash only, ≥ amount"), and §6.4 computes `change_due` from cash lines.
 **Decision:** `tendered` is required on cash lines (`≥ amount`) and must be null on non-cash lines, enforced by a CHECK constraint. The app's *Exact* button sends `tendered = amount`.
 **Consequences:** `change_due` is always computable from stored rows; the drawer reconciliation never meets a cash line with an unknown tendered amount.
+**Approved by the user (2026-11-17).**
 
 ## D-026: The cashier app sends `X-Requested-With: zuru` on every request
 **Context:** The CSRF rule (SPEC §5.1) covers every state-changing request that has no device token. `POST /v1/devices/pair` comes from the app before it has a token.
 **Decision:** The rule stays as written, with no route exemptions. The Flutter client sends `X-Requested-With: zuru` on every request. Native apps send no `Origin`, so the same-origin check passes.
 **Consequences:** The M4 HTTP client must set the header globally.
+**Approved by the user (2026-11-17).**

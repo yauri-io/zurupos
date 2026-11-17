@@ -132,6 +132,7 @@ Every shop is a **tenant**. Every tenant-owned row has `tenant_id uuid not null`
 
 - `zuru_app` gets only `SELECT, INSERT, UPDATE` (and `DELETE` only where explicitly listed) on tenant tables, `USAGE` on sequences, `EXECUTE` on the `auth.*` functions in §3.4.
 - **Never** connect the API as `postgres`, as a superuser, or as the table owner. Superusers and table owners bypass RLS silently.
+- **Startup guard (D-024):** on boot the API (and the worker) checks `current_user` and refuses to start if the role is superuser, has `BYPASSRLS`, is a member of `zuru_owner`, or owns any table in `public`/`auth`. `zuru_app` and `zuru_worker` have no `CREATE` on schemas `public` and `auth`.
 
 ### 3.2 Table rules
 
@@ -181,7 +182,7 @@ export const withTenant = <T>(db: Kysely<DB>, tenantId: string, fn: (trx: Transa
 
 ### 3.4 Pre-tenant lookups (the only RLS exceptions)
 
-Login and token verification happen before a tenant is known. These use a small set of `SECURITY DEFINER` functions in a dedicated `auth` schema, owned by `zuru_owner`, with `set search_path = pg_catalog, public` pinned, each returning the minimum columns needed:
+Login and token verification happen before a tenant is known. These use a small set of `SECURITY DEFINER` functions in a dedicated `auth` schema, owned by `zuru_owner`, with `set search_path = pg_catalog, public, pg_temp` pinned (`pg_temp` last), each returning the minimum columns needed:
 
 | Function | Returns |
 |---|---|
@@ -189,6 +190,8 @@ Login and token verification happen before a tenant is known. These use a small 
 | `auth.find_session(token_hash bytea)` | `session_id, user_id, tenant_id, role, kind, device_id, expires_at, revoked_at` |
 | `auth.find_device(token_hash bytea)` | `device_id, tenant_id, revoked_at` |
 | `auth.find_password_reset(token_hash bytea)` | `user_id, tenant_id, expires_at, used_at` |
+
+Because §3.2 forces RLS on the owner too, each looked-up table (`users`, `sessions`, `devices`, `password_resets`) has one extra policy, `auth_definer_lookup`: `for select to zuru_owner using (true)`. It is SELECT-only and only for the NOLOGIN owner role; `zuru_app` is never a member of `zuru_owner` (see D-024).
 
 After the lookup, all further work (PIN check, session creation, etc.) runs inside `withTenant`. These four functions are the **complete** list of exceptions; adding one requires a `DECISIONS.md` entry and an isolation test.
 
@@ -204,7 +207,7 @@ Location: `apps/api/test/rls/`. Runs in CI against real Postgres as `zuru_app`. 
 1. **DB-level:** with no `app.tenant_id` set, `select count(*)` on every tenant table returns 0, and every `insert` fails.
 2. **DB-level:** with tenant A set, rows of tenant B are invisible; `update`/`delete` targeting B's ids affect 0 rows; `insert` with `tenant_id = B` fails the `with check`.
 3. **DB-level:** a script enumerates `pg_class` for all tables in `public` and asserts every table except the allowlist (`outbox`, `schema_migrations`) has `relrowsecurity = true` and `relforcerowsecurity = true`. New tables without RLS fail the build.
-4. **DB-level:** assert `zuru_app` is not superuser, has no `BYPASSRLS`, and owns no tables.
+4. **DB-level:** assert `zuru_app` is not superuser, has no `BYPASSRLS`, owns no tables, is not a member of `zuru_owner`, and neither `zuru_app` nor `zuru_worker` has `CREATE` on schemas `public` or `auth`.
 5. **DB-level:** assert the only `SECURITY DEFINER` functions are the four in §3.4.
 6. **API-level:** create shops A and B with full data. For **every** route in the OpenAPI document, call it with A's credentials using B's resource ids → expect 404 (never 200, never B's data). The test iterates the OpenAPI spec so new routes are covered automatically.
 7. **API-level:** a device token from shop A plus a PIN of a user from shop B → rejected.
