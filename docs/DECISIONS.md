@@ -138,3 +138,11 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 ## D-031: `GET /device/bootstrap` is built in M4
 **Context:** §9 lists bootstrap; M2 builds the menu APIs and dashboard pages, M4 builds the app that consumes bootstrap.
 **Decision:** Bootstrap ships with M4 together with its only consumer, so its payload is shaped by the real client. M3's `POST /orders` doesn't need it.
+
+## D-032: An ingredient's `base_unit` is fixed after creation
+**Context:** Recipe lines, effects, stock and movements are all expressed in the base unit. Changing `g` → `ml` would silently reinterpret every stored quantity.
+**Decision:** `PATCH /ingredients/:id` doesn't accept `base_unit`, `stock_qty` or `avg_cost`. A wrong unit is fixed by archiving and creating a new ingredient. Stock and cost change only through stock operations (M3).
+
+## D-033: Option order for recipe resolution follows the item's group order
+**Context:** SPEC §7.1 orders selected options by "(group sort, option sort)". A group has its own `sort`, and the item→group link (`item_modifier_groups.sort`) also has one.
+**Decision:** Groups are ordered by the item's link sort (the order set with `PUT /items/:id/modifier-groups`, which is also the modifier sheet order), then the group's own `sort`, then group id; options by `sort`. Selected options must belong to a group attached to the item; otherwise the request is rejected (`option_not_on_item`).

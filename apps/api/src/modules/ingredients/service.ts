@@ -2,7 +2,7 @@ import type { AuthContext } from '../../auth/context.js'
 import { can } from '../../auth/permissions.js'
 import type { Tx } from '../../db/with-tenant.js'
 import { formatCost, formatQty, parseCost, parseQty } from '../../domain/decimal.js'
-import { DEFAULT_PAGE, decodeCursor, encodeCursor } from '../../http/cursor.js'
+import { decodeCursor, encodeCursor, pageLimit } from '../../http/cursor.js'
 import { apiError } from '../../http/errors.js'
 import { iso, money } from '../../http/serialize.js'
 import * as q from './queries.js'
@@ -94,10 +94,10 @@ export const listMovements = async (
   trx: Tx,
   auth: AuthContext,
   id: string,
-  page: { cursor?: string; limit?: number },
+  page: { cursor?: string; limit?: string },
 ) => {
   await load(trx, auth, id, { live: false })
-  const limit = page.limit ?? DEFAULT_PAGE
+  const limit = pageLimit(page.limit)
   const rows = await q.listMovements(trx, auth.tenantId, id, decodeCursor(page.cursor), limit + 1)
   const withCosts = can(auth.role, 'costs.view')
   const pageRows = rows.slice(0, limit)

@@ -32,3 +32,13 @@ export const Cost = Type.String({ pattern: '^[0-9]{1,12}(\\.[0-9]{1,4})?$' })
 export const Sort = Type.Integer({ minimum: 0, maximum: 100_000 })
 export const Name = (maxLength: number) => Type.String({ minLength: 1, maxLength, pattern: '\\S' })
 export const Nullable = <T extends TSchema>(schema: T) => Type.Union([schema, Type.Null()])
+
+// Cursor pagination (SPEC §9). Query strings aren't type-coerced, so limit is a
+// digit string; pageLimit() turns it into 1..100.
+export const PageQuery = Type.Object(
+  {
+    cursor: Type.Optional(Type.String({ maxLength: 200 })),
+    limit: Type.Optional(Type.String({ pattern: '^(100|[1-9][0-9]?)$' })),
+  },
+  { additionalProperties: false },
+)

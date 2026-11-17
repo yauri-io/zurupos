@@ -1,5 +1,5 @@
 import { Type } from 'typebox'
-import { Body, Cost, DateTime, Money, Name, Nullable, Qty, SignedQty, Uuid } from '../../http/schemas.js'
+import { Body, Cost, PageQuery, DateTime, Money, Name, Nullable, Qty, SignedQty, Uuid } from '../../http/schemas.js'
 
 export const BaseUnit = Type.Enum(['g', 'ml', 'pcs'])
 
@@ -55,13 +55,7 @@ export const MovementResponse = Type.Object({
   total_cost: Type.Optional(Nullable(Money)),
 })
 
-export const MovementListQuery = Type.Object(
-  {
-    cursor: Type.Optional(Type.String({ maxLength: 200 })),
-    limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 100 })),
-  },
-  { additionalProperties: false },
-)
+export const MovementListQuery = PageQuery
 
 export const MovementListResponse = Type.Object({
   movements: Type.Array(MovementResponse),
