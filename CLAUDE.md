@@ -63,4 +63,42 @@ packages/      generated API client(s)
 
 ## Commands
 
-_To be filled in during M0. Keep this section current: how to start the stack, run migrations, seed, run each test suite, lint and typecheck._
+Keep this section current. Flutter SDK on this machine: `/Volumes/PBox/sdk/flutter/flutter/bin` (add to `PATH`).
+
+```sh
+# First time
+cp .env.example .env
+pnpm install
+
+# Whole stack (postgres :55432, migrate, mailpit :8025, api :4000, dashboard :3000)
+docker compose up -d --build --wait
+docker compose down            # stop (add -v to wipe the database volume)
+
+# Just the database + mailpit, then run the API on the host with reload
+docker compose up -d --wait postgres mailpit
+pnpm db:migrate                # dev db `zuru`, as zuru_migrator
+pnpm --filter @zurupos/api dev
+
+# Migrations (dbmate, plain SQL in db/migrations)
+pnpm db:new <name>             # new migration file
+pnpm db:migrate:test           # test db `zuru_test`
+pnpm db:reset:test             # drop everything in zuru_test and re-migrate
+pnpm db:types                  # regenerate apps/api/src/db/types.ts after a migration
+
+# API tests (real Postgres, as zuru_app; needs postgres up + test db migrated)
+pnpm --filter @zurupos/api test           # everything
+pnpm --filter @zurupos/api test:rls       # SPEC §3.6 isolation suite only
+pnpm --filter @zurupos/api test test/auth # auth tests only
+
+# Lint / typecheck / format (all JS workspaces)
+pnpm lint && pnpm typecheck && pnpm format:check
+
+# Dashboard
+pnpm --filter @zurupos/dashboard dev      # http://localhost:3000
+pnpm --filter @zurupos/dashboard build
+
+# Cashier app (apps/cashier)
+flutter pub get && flutter analyze && flutter test
+```
+
+Seeding (`db/seeds/demo.sql`) arrives with M2/M7.

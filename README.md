@@ -16,4 +16,11 @@ A simple, fairly priced POS for small counter-service F&B shops in Indonesia: co
 
 ## Getting started
 
-_Filled in during milestone M0._
+```sh
+cp .env.example .env
+pnpm install
+docker compose up -d --build --wait
+curl localhost:4000/healthz
+```
+
+Dashboard: http://localhost:3000 · Mailpit: http://localhost:8025 · All commands: see the *Commands* section of [CLAUDE.md](CLAUDE.md).
