@@ -1,0 +1,80 @@
+# Local development only. Never used for deployment.
+name: zurupos
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_superuser}
+      ZURU_MIGRATOR_PASSWORD: ${ZURU_MIGRATOR_PASSWORD:-dev_migrator}
+      ZURU_APP_PASSWORD: ${ZURU_APP_PASSWORD:-dev_app}
+      ZURU_WORKER_PASSWORD: ${ZURU_WORKER_PASSWORD:-dev_worker}
+    ports:
+      - '${POSTGRES_PORT:-55432}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d zuru_test']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migrate:
+    image: ghcr.io/amacneil/dbmate:2
+    command: ['--no-dump-schema', 'up']
+    environment:
+      DATABASE_URL: postgres://zuru_migrator:${ZURU_MIGRATOR_PASSWORD:-dev_migrator}@postgres:5432/zuru?sslmode=disable
+      DBMATE_MIGRATIONS_DIR: /db/migrations
+    volumes:
+      - ./db/migrations:/db/migrations:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: development
+      API_HOST: 0.0.0.0
+      API_PORT: 4000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgres://zuru_app:${ZURU_APP_PASSWORD:-dev_app}@postgres:5432/zuru
+      WORKER_DATABASE_URL: postgres://zuru_worker:${ZURU_WORKER_PASSWORD:-dev_worker}@postgres:5432/zuru
+      DASHBOARD_ORIGIN: ${DASHBOARD_ORIGIN:-http://localhost:3000}
+      DASHBOARD_URL: ${DASHBOARD_URL:-http://localhost:3000}
+      COOKIE_SECURE: 'false'
+      SIGNUP_ENABLED: ${SIGNUP_ENABLED:-true}
+      EMAIL_PROVIDER: smtp
+      EMAIL_FROM: ${EMAIL_FROM:-ZuruPOS <no-reply@zurupos.local>}
+      SMTP_URL: smtp://mailpit:1025
+    ports:
+      - '${API_PORT:-4000}:4000'
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      mailpit:
+        condition: service_started
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+    environment:
+      NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-http://localhost:4000}
+    ports:
+      - '3000:3000'
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

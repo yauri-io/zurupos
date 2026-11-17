@@ -1,0 +1,26 @@
+{
+  "name": "zurupos",
+  "private": true,
+  "packageManager": "pnpm@12.3.4",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "db:migrate": "dotenv -e .env -- sh -c 'dbmate --url \"$MIGRATION_DATABASE_URL\" --migrations-dir db/migrations --no-dump-schema up'",
+    "db:rollback": "dotenv -e .env -- sh -c 'dbmate --url \"$MIGRATION_DATABASE_URL\" --migrations-dir db/migrations --no-dump-schema rollback'",
+    "db:new": "dbmate --migrations-dir db/migrations new",
+    "db:migrate:test": "dotenv -e .env -- sh -c 'dbmate --url \"$TEST_MIGRATION_DATABASE_URL\" --migrations-dir db/migrations --no-dump-schema up'",
+    "db:reset:test": "docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U zuru_migrator -d zuru_test -c 'drop owned by zuru_owner cascade' && pnpm db:migrate:test",
+    "lint": "pnpm -r --parallel run lint",
+    "typecheck": "pnpm -r --parallel run typecheck",
+    "test": "pnpm -r run test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:types": "pnpm --filter @zurupos/api run db:types"
+  },
+  "devDependencies": {
+    "dbmate": "^2.38.1",
+    "dotenv-cli": "^11.1.0",
+    "prettier": "^3.10.1"
+  }
+}
