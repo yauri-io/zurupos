@@ -159,6 +159,7 @@ export interface paths {
                 id: string
                 name: string
                 timezone: string
+                business_day_cutoff_hour: number
               }
               session: {
                 kind: 'dashboard' | 'staff'

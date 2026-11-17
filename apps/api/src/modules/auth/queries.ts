@@ -31,7 +31,7 @@ export const markLoggedIn = (trx: Tx, tenantId: string, userId: string) =>
 export const findTenantSummary = (trx: Tx, tenantId: string) =>
   trx
     .selectFrom('tenants')
-    .select(['id', 'name', 'timezone'])
+    .select(['id', 'name', 'timezone', 'business_day_cutoff_hour'])
     .where('id', '=', tenantId)
     .executeTakeFirstOrThrow()
 

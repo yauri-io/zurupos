@@ -27,7 +27,13 @@ export const MeResponse = Type.Object({
     email: Type.Union([Type.String(), Type.Null()]),
     locale: Locale,
   }),
-  tenant: Type.Object({ id: Uuid, name: Type.String(), timezone: Type.String() }),
+  // The dashboard computes "today" as a business date (SPEC §12.1) from these two.
+  tenant: Type.Object({
+    id: Uuid,
+    name: Type.String(),
+    timezone: Type.String(),
+    business_day_cutoff_hour: Type.Integer(),
+  }),
   session: Type.Object({
     kind: Type.Union([Type.Literal('dashboard'), Type.Literal('staff')]),
     device_id: Type.Union([Uuid, Type.Null()]),

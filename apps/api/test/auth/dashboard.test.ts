@@ -44,12 +44,13 @@ describe('signup', () => {
     const res = expectStatus(await me(shop.ownerCookie), 200)
     const body = res.json<{
       user: { role: string; email: string }
-      tenant: { timezone: string }
+      tenant: { timezone: string; business_day_cutoff_hour: number }
       permissions: string[]
     }>()
     expect(body.user.role).toBe('owner')
     expect(body.user.email).toBe(shop.owner.email)
     expect(body.tenant.timezone).toBe('Asia/Jakarta')
+    expect(body.tenant.business_day_cutoff_hour).toBe(0)
     expect(body.permissions).toContain('users.manage')
   })
 

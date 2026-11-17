@@ -197,7 +197,7 @@
                     },
                     "tenant": {
                       "type": "object",
-                      "required": ["id", "name", "timezone"],
+                      "required": ["id", "name", "timezone", "business_day_cutoff_hour"],
                       "properties": {
                         "id": {
                           "type": "string",
@@ -208,6 +208,9 @@
                         },
                         "timezone": {
                           "type": "string"
+                        },
+                        "business_day_cutoff_hour": {
+                          "type": "integer"
                         }
                       }
                     },
