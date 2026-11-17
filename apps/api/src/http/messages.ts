@@ -8,11 +8,20 @@ const MESSAGES: Record<ErrorCode, Record<Locale, string>> = {
   FORBIDDEN: { id: 'Anda tidak memiliki akses.', en: 'You do not have permission.' },
   NOT_FOUND: { id: 'Data tidak ditemukan.', en: 'Not found.' },
   CONFLICT: { id: 'Data sudah ada atau bentrok.', en: 'Conflicts with existing data.' },
-  PIN_LOCKED: { id: 'PIN terkunci sementara. Coba lagi nanti.', en: 'PIN temporarily locked. Try again later.' },
+  PIN_LOCKED: {
+    id: 'PIN terkunci sementara. Coba lagi nanti.',
+    en: 'PIN temporarily locked. Try again later.',
+  },
   PAYMENT_MISMATCH: { id: 'Jumlah pembayaran tidak sesuai total.', en: 'Payments do not match the total.' },
-  PRICE_CHANGED: { id: 'Harga telah berubah. Periksa total baru.', en: 'Prices changed. Check the new total.' },
+  PRICE_CHANGED: {
+    id: 'Harga telah berubah. Periksa total baru.',
+    en: 'Prices changed. Check the new total.',
+  },
   ITEM_UNAVAILABLE: { id: 'Item tidak tersedia.', en: 'Item is unavailable.' },
-  RATE_LIMITED: { id: 'Terlalu banyak percobaan. Coba lagi nanti.', en: 'Too many attempts. Try again later.' },
+  RATE_LIMITED: {
+    id: 'Terlalu banyak percobaan. Coba lagi nanti.',
+    en: 'Too many attempts. Try again later.',
+  },
   INTERNAL: { id: 'Terjadi kesalahan pada server.', en: 'Something went wrong on the server.' },
 }
 

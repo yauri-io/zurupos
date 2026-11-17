@@ -79,7 +79,8 @@ export const loadConfig = (env: Env = process.env): Config => {
       resendApiKey: env['RESEND_API_KEY'] || undefined,
     },
   }
-  if (provider === 'smtp' && !config.email.smtpUrl) throw new Error('SMTP_URL is required when EMAIL_PROVIDER=smtp')
+  if (provider === 'smtp' && !config.email.smtpUrl)
+    throw new Error('SMTP_URL is required when EMAIL_PROVIDER=smtp')
   if (provider === 'resend' && !config.email.resendApiKey) {
     throw new Error('RESEND_API_KEY is required when EMAIL_PROVIDER=resend')
   }

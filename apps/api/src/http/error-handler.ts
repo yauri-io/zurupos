@@ -10,7 +10,11 @@ const send = (
   details: Record<string, unknown>,
 ) =>
   reply.status(status).send({
-    error: { code, message: errorMessage(code, localeFromHeader(request.headers['accept-language'])), details },
+    error: {
+      code,
+      message: errorMessage(code, localeFromHeader(request.headers['accept-language'])),
+      details,
+    },
   })
 
 export const errorHandler = (err: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
