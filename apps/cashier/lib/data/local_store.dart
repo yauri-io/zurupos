@@ -1,4 +1,5 @@
 import '../api/models.dart';
+import '../printing/print_job.dart';
 
 /// An order payload written before it's sent (SPEC §11.2), so a lost connection
 /// never loses a paid order. Retries reuse the same `client_order_id`.
@@ -34,6 +35,10 @@ abstract interface class LocalStore {
 
   Future<String?> setting(String key);
   Future<void> setSetting(String key, String value);
+
+  /// Print jobs are kept so a failure can be retried and reviewed.
+  Future<void> savePrintJob(PrintJob job);
+  Future<void> setPrintJobStatus(String id, JobStatus status, String? error);
 }
 
 class MemoryLocalStore implements LocalStore {
@@ -78,4 +83,15 @@ class MemoryLocalStore implements LocalStore {
 
   @override
   Future<void> setSetting(String key, String value) async => _settings[key] = value;
+
+  final printJobs = <String, PrintJob>{};
+
+  @override
+  Future<void> savePrintJob(PrintJob job) async => printJobs[job.id] = job;
+
+  @override
+  Future<void> setPrintJobStatus(String id, JobStatus status, String? error) async {
+    final j = printJobs[id];
+    if (j != null) printJobs[id] = j.withStatus(status, error: error);
+  }
 }

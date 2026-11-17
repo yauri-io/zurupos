@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
 import '../api/models.dart';
+import '../printing/print_job.dart';
 import 'local_store.dart';
 
 part 'database.g.dart';
@@ -35,7 +36,23 @@ class PendingOrders extends Table {
   Set<Column> get primaryKey => {clientOrderId};
 }
 
-/// Device-local preferences (language, …). Printers arrive with M5.
+/// Rendered ESC/POS bytes per printer (SPEC §11.2). status: queued | printing | done | failed.
+@DataClassName('PrintJobRow')
+class PrintJobs extends Table {
+  TextColumn get id => text()();
+  TextColumn get orderId => text().nullable()();
+  TextColumn get printerId => text()();
+  TextColumn get kind => text()();
+  BlobColumn get bytes => blob()();
+  TextColumn get status => text()();
+  TextColumn get error => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Device-local preferences (language, printers, …).
 @DataClassName('SettingRow')
 class Settings extends Table {
   TextColumn get key => text()();
@@ -45,12 +62,19 @@ class Settings extends Table {
   Set<Column> get primaryKey => {key};
 }
 
-@DriftDatabase(tables: [MenuCache, PendingOrders, Settings])
+@DriftDatabase(tables: [MenuCache, PendingOrders, Settings, PrintJobs])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'zurupos'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 2) await m.createTable(printJobs);
+    },
+  );
 }
 
 class DriftLocalStore implements LocalStore {
@@ -127,4 +151,25 @@ class DriftLocalStore implements LocalStore {
   @override
   Future<void> setSetting(String key, String value) =>
       db.into(db.settings).insertOnConflictUpdate(SettingsCompanion.insert(key: key, value: value));
+
+  @override
+  Future<void> savePrintJob(PrintJob job) => db
+      .into(db.printJobs)
+      .insert(
+        PrintJobsCompanion.insert(
+          id: job.id,
+          orderId: Value(job.orderId),
+          printerId: job.printerId,
+          kind: job.kind.name,
+          bytes: job.bytes,
+          status: job.status.name,
+          createdAt: job.createdAt,
+        ),
+      );
+
+  @override
+  Future<void> setPrintJobStatus(String id, JobStatus status, String? error) =>
+      (db.update(db.printJobs)..where((t) => t.id.equals(id))).write(
+        PrintJobsCompanion(status: Value(status.name), error: Value(error)),
+      );
 }

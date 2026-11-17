@@ -2,7 +2,11 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zurupos_cashier/data/database.dart';
+
+import 'dart:typed_data';
+
 import 'package:zurupos_cashier/data/local_store.dart';
+import 'package:zurupos_cashier/printing/print_job.dart';
 
 void main() {
   final stores = <String, LocalStore Function()>{
@@ -39,6 +43,36 @@ void main() {
         expect(p?.clientOrderId, 'o2');
         await s.resolvePending('o2', synced: false);
         expect(await s.pendingOrder(), isNull);
+      });
+
+      test('print jobs are stored with their bytes and status', () async {
+        final s = make();
+        await s.savePrintJob(
+          PrintJob(
+            id: 'j1',
+            orderId: 'o1',
+            printerId: 'p1',
+            printerName: 'Bar',
+            kind: PrintKind.ticket,
+            bytes: Uint8List.fromList([0x1B, 0x40]),
+            createdAt: DateTime(2026, 11, 28),
+          ),
+        );
+        await s.setPrintJobStatus('j1', JobStatus.failed, 'connect_failed');
+        if (s is DriftLocalStore) {
+          final row = await s.db.select(s.db.printJobs).getSingle();
+          expect(
+            [row.status, row.error, row.bytes, row.kind],
+            [
+              'failed',
+              'connect_failed',
+              [0x1B, 0x40],
+              'ticket',
+            ],
+          );
+        } else if (s is MemoryLocalStore) {
+          expect(s.printJobs['j1']?.status, JobStatus.failed);
+        }
       });
 
       test('settings', () async {

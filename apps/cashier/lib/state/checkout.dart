@@ -10,6 +10,7 @@ import 'auth.dart';
 import 'cart.dart';
 import 'connection.dart';
 import 'menu.dart';
+import 'printing.dart';
 import 'providers.dart';
 
 class CheckoutState {
@@ -72,6 +73,8 @@ class CheckoutController extends Notifier<CheckoutState> {
       ref.read(onlineProvider.notifier).report(null);
       await store.resolvePending(p.clientOrderId, synced: true);
       state = const CheckoutState();
+      // After commit, never before; a print failure can't affect the order (SPEC §11.3).
+      ref.read(printQueueProvider.notifier).autoPrint(order);
       return Sent(order);
     } on ApiException catch (e) {
       ref.read(onlineProvider.notifier).report(e);
