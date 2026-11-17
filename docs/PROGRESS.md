@@ -10,7 +10,7 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M3 | Pricing engine, orders, void, stock ops, low-stock email | ✅ Done (reviewed) | **User review required** |
 | M4 | Flutter cashier app | ✅ Done | |
 | M5 | Printing (Bluetooth + network) | ✅ Done (manual printer test pending) | Manual printer test by user |
-| M6 | Dashboard reports and remaining pages | ⬜ Not started | |
+| M6 | Dashboard reports and remaining pages | ✅ Done | |
 | M7 | Hardening, demo seed, user guide, UAT | ⬜ Not started | UAT with the shop owner |
 
 Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · ✅ Done
@@ -117,3 +117,14 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
   5. Reprint a receipt from Orders today; void an order and reprint it: the *** BATAL *** banner shows.
   6. Check that the Indonesian text and Rp amounts line up in the columns on both paper widths.
 - Known issues / notes: no printer was available here, so the Bluetooth and network transports are verified only up to the plugin and socket boundaries. The `print_jobs` rows are not pruned yet (they're small).
+
+### M6 — 2026-11-18
+- Done:
+  - API: owner reports `GET /reports/summary|daily|hourly|items|categories|payments|margin|voids|stock-value` (SPEC §12.2, D-045); `GET /orders` with range, status, method, user and text filters and cursor paging; `business_day_cutoff_hour` in `/auth/me`; line notes in `GET /orders/today`.
+  - Dashboard: owner home with today's numbers (refreshes every 60 s); reports for sales (cards, by day, by hour), payments, items/categories, margin + stock value, voids; orders list + detail; inventory levels, movements, stock-in, waste, count; users (add, edit, reset PIN, deactivate); devices (revoke); live tax and service example in settings. Date range picker with the five presets. Managers still land on `/menu`.
+- Tests:
+  - API 612 passing. The report tests use a seeded shop whose expected values were worked out by hand (including the order-discount allocation and margins). A mutation check confirmed they catch a broken remainder rule.
+  - The isolation suite covers every new route. Reports that return only numbers are checked against A's own figures, computed with an explicit tenant filter.
+  - Dashboard: 32 unit tests and 2 Playwright tests. The new one visits all 16 owner pages at 375 px, checks there is no horizontal scroll and checks the figures, then does a stock-in through the form.
+- Run: `docker compose up -d --build --wait && pnpm --filter @zurupos/dashboard test:e2e`.
+- Known issues / notes: the e2e tests still aren't in CI (they need the whole stack).

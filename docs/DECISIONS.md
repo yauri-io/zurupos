@@ -224,3 +224,16 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - **Times** print in the shop's time zone (`timezone` package; unknown zones fall back to Asia/Jakarta).
 - **Device settings:** printers (up to 2) and the Done screen's auto-return seconds (default 5, 0 = off) are stored on the device, not on the server.
 - **Reprint:** owner, manager and cashier reprint receipts and tickets from the order detail. Employees can't open order detail (D-034), so they reprint tickets from today's list; `GET /orders/today` items now include the line note for this.
+
+---
+
+## Decisions made during M6 (2026-11-18)
+
+## D-045: Report details and charts
+- **Charts** are plain CSS bars (`components/BarChart.vue`) instead of a chart library: the dashboard needs two simple bar charts (net sales by day and by hour), which this covers without adding a dependency.
+- **Ranges** are inclusive business dates, at most 366 days, kept in the URL (`?from=&to=`). "Today" is the shop's business date (time zone and cutoff come from `/auth/me`).
+- **Order-discount allocation** (§12.2): each line gets `floor(order_discount × line_net / Σ line_net)`; the remainder goes to the largest line (ties: lowest line number).
+- **Categories** group by the category name stored on the order line (what was sold), not the item's current category. Items are named by their most recent sale.
+- **Voids** are reported by the order's business date. **Margin %** is in basis points of net sales, half away from zero, and null when there were no sales. **Stock value** counts negative stock as zero and rounds each ingredient half-up.
+- `/reports/margin` and `/reports/stock-value` need `costs.view`; the other reports need `reports.view` (both owner only today).
+- `GET /orders` searches order number (exact), customer name and item name (literal text, `%` and `_` escaped), newest first, keyset-paged on `(paid_at, id)`.
