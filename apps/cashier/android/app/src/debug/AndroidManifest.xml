@@ -4,4 +4,7 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Debug builds only: the local API (docker compose) is plain http.
+         Release builds keep Android's default and require HTTPS. -->
+    <application android:usesCleartextTraffic="true"/>
 </manifest>
