@@ -96,9 +96,14 @@ pnpm lint && pnpm typecheck && pnpm format:check
 # Dashboard
 pnpm --filter @zurupos/dashboard dev      # http://localhost:3000
 pnpm --filter @zurupos/dashboard build
+pnpm --filter @zurupos/dashboard test     # unit tests (formatters)
+pnpm --filter @zurupos/dashboard test:e2e # Playwright vs the running stack (installed Chrome)
+
+# API client types (after changing routes/schemas; CI checks they're current)
+pnpm api:client
 
 # Cashier app (apps/cashier)
 flutter pub get && flutter analyze && flutter test
 ```
 
-Seeding (`db/seeds/demo.sql`) arrives with M2/M7.
+Seeding (`db/seeds/demo.sql`) arrives with M7.

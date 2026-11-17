@@ -6,8 +6,8 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 |---|---|---|---|
 | M0 | Repo scaffold, Docker Compose, skeletons, CI | ✅ Done | |
 | M1 | DB roles, migrations, RLS, auth, permissions | ✅ Done (reviewed) | **User review required** |
-| M2 | Menu, modifiers, ingredients, recipes, discounts, settings | 🟡 In progress | |
-| M3 | Pricing engine, orders, void, stock ops, low-stock email | ⬜ Not started | **User review required** |
+| M2 | Menu, modifiers, ingredients, recipes, discounts, settings | ✅ Done | |
+| M3 | Pricing engine, orders, void, stock ops, low-stock email | 🟡 In progress | **User review required** |
 | M4 | Flutter cashier app | ⬜ Not started | |
 | M5 | Printing (Bluetooth + network) | ⬜ Not started | Manual printer test by user |
 | M6 | Dashboard reports and remaining pages | ⬜ Not started | |
@@ -53,3 +53,14 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - User approved D-024 (with hardening), D-025 and D-026.
 - Hardening: `pg_temp` last in the `auth.*` functions' `search_path`; the API refuses to start if its DB role is superuser, has BYPASSRLS, is a member of `zuru_owner` or owns a table in `public`/`auth` (`src/db/role-guard.ts`, `test/db/role-guard.test.ts`); the isolation suite asserts no `CREATE` on `public`/`auth` for `zuru_app` and `zuru_worker`. SPEC §3.1/§3.4/§3.6 updated.
 - Tests: 263 passing.
+
+### M2 — 2026-11-17
+- Done:
+  - API modules (SPEC §9): settings, categories, items (incl. availability and modifier-group links), modifier groups/options, ingredients (+ movements, cursor-paginated), recipes, option effects, recipe preview, discounts. Archive instead of delete (D-029); quantities/costs as decimal strings, money as integers (D-028).
+  - `src/domain/recipe-resolve.ts` (SPEC §7.1, three passes, add redirect) and `src/domain/decimal.ts` (fixed-point, no floats).
+  - Dashboard: login/forgot/reset/invite, menu (categories + items), item page (recipe editor, modifier groups, live usage preview), modifiers (groups, options, effects editor), ingredients, discounts, settings. Bahasa Indonesia + English. One IDR formatter (`app/utils/money.ts`).
+  - Generated API client types (`packages/api-client`, `pnpm api:client`); CI checks they're up to date.
+- Tests: API 418 passing (incl. the §7.1 examples as unit tests and through `POST /recipes/preview`; every new route in the isolation registry, plus B's ids inside A's request bodies). Dashboard unit tests for formatting. Playwright e2e: an owner builds the demo menu in the dashboard and the preview shows Large + Oat + Extra shot = 36 g beans, 200 ml oat, 20 ml aren, 1 cup 16oz, 1 lid.
+- Run: `docker compose up -d --build --wait && pnpm --filter @zurupos/dashboard test:e2e` (uses the installed Google Chrome).
+- Fixed along the way: CORS only allowed GET/HEAD/POST (found by the e2e test, now covered by `test/cors.test.ts`).
+- Known issues / notes: owner home with today's numbers, inventory pages, users/devices pages and the settings tax example are M6. `GET /device/bootstrap` is M4 (D-031). The e2e test needs the full stack running; it isn't in CI yet.
