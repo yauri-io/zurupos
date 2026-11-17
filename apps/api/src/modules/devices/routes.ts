@@ -1,5 +1,6 @@
 import type { Database } from '../../db/kysely.js'
 import { apiError } from '../../http/errors.js'
+import { requireAuth } from '../../http/require-auth.js'
 import type { Limiters } from '../../http/rate-limit.js'
 import { IdParams, NoContent } from '../../http/schemas.js'
 import type { App } from '../../http/types.js'
@@ -107,11 +108,6 @@ export const deviceRoutes = async (app: App, { db, limiters }: Deps) => {
         service.heartbeat(trx, requireDevice(request.device), request.body.app_version),
       ),
   )
-}
-
-const requireAuth = <T>(auth: T | null): T => {
-  if (!auth) throw apiError('UNAUTHENTICATED')
-  return auth
 }
 
 const requireDevice = <T>(device: T | null): T => {

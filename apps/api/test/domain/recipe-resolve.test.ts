@@ -39,8 +39,8 @@ const oatMilk = option(3, 1, replace('milk', 'oat'))
 const extraShot = option(4, 0, add('beans', '18'))
 const vanilla = option(4, 1, add('vanilla', '15'))
 
-const plain = (m: Map<string, bigint>) =>
-  Object.fromEntries([...m].map(([k, v]) => [k, v]).sort(([a], [b]) => String(a).localeCompare(String(b))))
+const plain = (m: Map<string, bigint>): Record<string, bigint> =>
+  Object.fromEntries([...m].sort(([a], [b]) => a.localeCompare(b)))
 
 describe('resolveIngredients (SPEC §7.1)', () => {
   it('Kopi Susu + Oat + Extra shot + Less sugar ×2', () => {

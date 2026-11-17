@@ -15,6 +15,13 @@ import { authRoutes } from './modules/auth/routes.js'
 import { deviceRoutes } from './modules/devices/routes.js'
 import { healthRoutes } from './modules/health/routes.js'
 import { userRoutes } from './modules/users/routes.js'
+import { categoryRoutes } from './modules/categories/routes.js'
+import { discountRoutes } from './modules/discounts/routes.js'
+import { ingredientRoutes } from './modules/ingredients/routes.js'
+import { itemRoutes } from './modules/items/routes.js'
+import { modifierRoutes } from './modules/modifiers/routes.js'
+import { recipeRoutes } from './modules/recipes/routes.js'
+import { settingsRoutes } from './modules/settings/routes.js'
 
 export type AppDeps = { config: Config; db: Database; limiters?: Limiters }
 
@@ -74,6 +81,13 @@ export const buildApp = async ({ config, db, limiters = createLimiters() }: AppD
       await v1.register(authRoutes, { db, config, limiters })
       await v1.register(deviceRoutes, { db, limiters })
       await v1.register(userRoutes, { config })
+      await v1.register(settingsRoutes)
+      await v1.register(categoryRoutes)
+      await v1.register(itemRoutes)
+      await v1.register(modifierRoutes)
+      await v1.register(ingredientRoutes)
+      await v1.register(recipeRoutes)
+      await v1.register(discountRoutes)
     },
     { prefix: '/v1' },
   )

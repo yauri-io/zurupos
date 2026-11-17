@@ -2,6 +2,7 @@
 // credentials and shop B's resource ids, answers 404 and never returns B's data.
 // The registries below must classify every operation; an unclassified route
 // fails the meta-test, so new routes are covered automatically (D-022).
+import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import {
   createUser,
@@ -13,11 +14,13 @@ import {
   type TestApp,
 } from '../support/app.js'
 import { createTestApp } from '../support/app.js'
+import * as menu from '../support/menu.js'
 import { appPool } from '../support/pg.js'
 import { buildFullShop, leakedSecrets, type FullShop } from '../support/shops.js'
 
 type Caller = 'dashboard' | 'staff' | 'device'
-type Resource = 'user' | 'device'
+type Resource =
+  'user' | 'device' | 'category' | 'item' | 'modifier_group' | 'modifier_option' | 'ingredient' | 'discount'
 
 // Routes with path params. Each param names the kind of resource it addresses.
 const ID_ROUTES: Record<string, { caller: Caller; params: Record<string, Resource>; body?: unknown }> = {
@@ -25,11 +28,72 @@ const ID_ROUTES: Record<string, { caller: Caller; params: Record<string, Resourc
   'PATCH /v1/users/{id}': { caller: 'dashboard', params: { id: 'user' }, body: { name: 'Hijacked' } },
   'POST /v1/users/{id}/reset-pin': { caller: 'dashboard', params: { id: 'user' }, body: { pin: '8642' } },
   'POST /v1/users/{id}/deactivate': { caller: 'dashboard', params: { id: 'user' } },
+  'PATCH /v1/categories/{id}': {
+    caller: 'dashboard',
+    params: { id: 'category' },
+    body: { name: 'Hijacked' },
+  },
+  'DELETE /v1/categories/{id}': { caller: 'dashboard', params: { id: 'category' } },
+  'GET /v1/items/{id}': { caller: 'dashboard', params: { id: 'item' } },
+  'PATCH /v1/items/{id}': { caller: 'dashboard', params: { id: 'item' }, body: { price: 1 } },
+  'PATCH /v1/items/{id}/availability': {
+    caller: 'staff',
+    params: { id: 'item' },
+    body: { is_available: false },
+  },
+  'PUT /v1/items/{id}/modifier-groups': {
+    caller: 'dashboard',
+    params: { id: 'item' },
+    body: { group_ids: [] },
+  },
+  'DELETE /v1/items/{id}': { caller: 'dashboard', params: { id: 'item' } },
+  'GET /v1/items/{id}/recipe': { caller: 'dashboard', params: { id: 'item' } },
+  'PUT /v1/items/{id}/recipe': { caller: 'dashboard', params: { id: 'item' }, body: { lines: [] } },
+  'PATCH /v1/modifier-groups/{id}': {
+    caller: 'dashboard',
+    params: { id: 'modifier_group' },
+    body: { name: 'X' },
+  },
+  'DELETE /v1/modifier-groups/{id}': { caller: 'dashboard', params: { id: 'modifier_group' } },
+  'PATCH /v1/modifier-options/{id}': {
+    caller: 'dashboard',
+    params: { id: 'modifier_option' },
+    body: { name: 'X' },
+  },
+  'DELETE /v1/modifier-options/{id}': { caller: 'dashboard', params: { id: 'modifier_option' } },
+  'GET /v1/modifier-options/{id}/effects': { caller: 'dashboard', params: { id: 'modifier_option' } },
+  'PUT /v1/modifier-options/{id}/effects': {
+    caller: 'dashboard',
+    params: { id: 'modifier_option' },
+    body: { effects: [] },
+  },
+  'GET /v1/ingredients/{id}': { caller: 'staff', params: { id: 'ingredient' } },
+  'PATCH /v1/ingredients/{id}': {
+    caller: 'dashboard',
+    params: { id: 'ingredient' },
+    body: { low_stock_threshold: '1' },
+  },
+  'DELETE /v1/ingredients/{id}': { caller: 'dashboard', params: { id: 'ingredient' } },
+  'GET /v1/ingredients/{id}/movements': { caller: 'staff', params: { id: 'ingredient' } },
+  'PATCH /v1/discounts/{id}': { caller: 'dashboard', params: { id: 'discount' }, body: { value: 1 } },
+  'DELETE /v1/discounts/{id}': { caller: 'dashboard', params: { id: 'discount' } },
 }
 
 // Routes that take resource ids in the body.
 const BODY_ID_ROUTES: Record<string, { caller: Caller; body: (b: FullShop) => unknown }> = {
   'POST /v1/device/sessions': { caller: 'device', body: (b) => ({ user_id: b.owner.id, pin: b.owner.pin }) },
+  'POST /v1/items': {
+    caller: 'dashboard',
+    body: (b) => ({ category_id: b.seeded.categories, name: 'Hijack', price: 1 }),
+  },
+  'POST /v1/modifier-options': {
+    caller: 'dashboard',
+    body: (b) => ({ group_id: b.seeded.modifier_groups, name: 'Hijack' }),
+  },
+  'POST /v1/recipes/preview': {
+    caller: 'dashboard',
+    body: (b) => ({ item_id: b.seeded.items, option_ids: [] }),
+  },
 }
 
 // Reads without ids: the response must contain nothing of B.
@@ -38,6 +102,12 @@ const SCAN_ROUTES: Record<string, Caller[]> = {
   'GET /v1/devices': ['dashboard', 'staff'],
   'GET /v1/users': ['dashboard', 'staff'],
   'GET /v1/device/staff': ['device'],
+  'GET /v1/settings': ['dashboard', 'staff'],
+  'GET /v1/categories': ['dashboard', 'staff'],
+  'GET /v1/items': ['dashboard', 'staff'],
+  'GET /v1/modifier-groups': ['dashboard', 'staff'],
+  'GET /v1/ingredients': ['dashboard', 'staff'],
+  'GET /v1/discounts': ['dashboard', 'staff'],
 }
 
 // Routes that take no tenant resource id at all, with the reason.
@@ -52,6 +122,11 @@ const NO_TENANT_INPUT: Record<string, string> = {
   'DELETE /v1/device/sessions/current': 'acts on the caller’s own session',
   'POST /v1/device/heartbeat': 'acts on the caller’s own device',
   'POST /v1/users': 'creates a new row in the caller’s tenant',
+  'PATCH /v1/settings': 'acts on the caller’s own tenant',
+  'POST /v1/categories': 'creates a new row in the caller’s tenant',
+  'POST /v1/modifier-groups': 'creates a new row in the caller’s tenant',
+  'POST /v1/ingredients': 'creates a new row in the caller’s tenant',
+  'POST /v1/discounts': 'creates a new row in the caller’s tenant',
 }
 
 let t: TestApp
@@ -76,19 +151,61 @@ afterAll(async () => {
 
 const credsOf = (shop: FullShop, caller: Caller): Creds => shop[caller]
 
-const idOf = (shop: FullShop, resource: Resource) => (resource === 'user' ? shop.cashier.id : shop.deviceId)
+const required = (id: string | undefined): string => {
+  if (!id) throw new Error('seeded id missing')
+  return id
+}
+
+const idOf = (shop: FullShop, resource: Resource): string => {
+  switch (resource) {
+    case 'user':
+      return shop.cashier.id
+    case 'device':
+      return shop.deviceId
+    case 'category':
+      return required(shop.seeded.categories)
+    case 'item':
+      return required(shop.seeded.items)
+    case 'modifier_group':
+      return required(shop.seeded.modifier_groups)
+    case 'modifier_option':
+      return required(shop.seeded.modifier_options)
+    case 'ingredient':
+      return required(shop.seeded.ingredients)
+    case 'discount':
+      return required(shop.seeded.discounts)
+  }
+}
 
 // A throwaway resource in A, so the positive control can't disturb other tests.
-const freshA = async (resource: Resource) =>
-  resource === 'user'
-    ? (await createUser(t.app, a.ownerCookie, { name: 'Control', role: 'cashier', pin: '4826' })).id
-    : (await pairDevice(t.app, a.owner.email, a.owner.password, 'Control')).device.id
+const freshA = async (resource: Resource): Promise<string> => {
+  const d = a.dashboard
+  const unique = randomUUID().slice(0, 8)
+  switch (resource) {
+    case 'user':
+      return (await createUser(t.app, a.ownerCookie, { name: 'Control', role: 'cashier', pin: '4826' })).id
+    case 'device':
+      return (await pairDevice(t.app, a.owner.email, a.owner.password, 'Control')).device.id
+    case 'category':
+      return (await menu.createCategory(t.app, d, `Control ${unique}`)).id
+    case 'item':
+      return (await menu.createItem(t.app, d, (await menu.createCategory(t.app, d, `C ${unique}`)).id)).id
+    case 'modifier_group':
+      return (await menu.createGroup(t.app, d, `Control ${unique}`)).id
+    case 'modifier_option':
+      return (await menu.createOption(t.app, d, (await menu.createGroup(t.app, d, `G ${unique}`)).id)).id
+    case 'ingredient':
+      return (await menu.createIngredient(t.app, d, `Control ${unique}`)).id
+    case 'discount':
+      return (await menu.createDiscount(t.app, d, `Control ${unique}`)).id
+  }
+}
 
 const call = (key: string, creds: Creds, url: string, body?: unknown) => {
   const [method] = key.split(' ')
   const headers = { ...APP_HEADERS, ...headersFor(creds) }
   return t.app.inject({
-    method: method as 'GET' | 'POST' | 'PATCH' | 'DELETE',
+    method: method as 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE',
     url,
     headers,
     ...(body === undefined ? {} : { payload: body as Record<string, unknown> }),
@@ -165,5 +282,115 @@ describe("reads as A never contain B's data", () => {
     expect(leakedSecrets(res.body, b)).toEqual([])
     // Sanity: the scan would notice A's own data, so it is not vacuous.
     expect(leakedSecrets(res.body, a).length).toBeGreaterThan(0)
+  })
+})
+
+// Routes on A's own resources whose body references other rows: B's ids there
+// must be rejected as NOT_FOUND too (D-022: ids in bodies, covered per module).
+describe("A's own resource + B's ids in the body → 404", () => {
+  const cases: [string, (b: FullShop) => Promise<{ url: string; method: 'PATCH' | 'PUT'; body: unknown }>][] =
+    [
+      [
+        'PATCH /v1/items/{id} with B category_id',
+        async (b) => ({
+          method: 'PATCH',
+          url: `/v1/items/${await freshA('item')}`,
+          body: { category_id: b.seeded.categories },
+        }),
+      ],
+      [
+        'PUT /v1/items/{id}/modifier-groups with B group',
+        async (b) => ({
+          method: 'PUT',
+          url: `/v1/items/${await freshA('item')}/modifier-groups`,
+          body: { group_ids: [b.seeded.modifier_groups] },
+        }),
+      ],
+      [
+        'PUT /v1/items/{id}/recipe with B ingredient',
+        async (b) => ({
+          method: 'PUT',
+          url: `/v1/items/${await freshA('item')}/recipe`,
+          body: { lines: [{ ingredient_id: b.seeded.ingredients, qty: '1' }] },
+        }),
+      ],
+      [
+        'PUT /v1/modifier-options/{id}/effects with B ingredient',
+        async (b) => ({
+          method: 'PUT',
+          url: `/v1/modifier-options/${await freshA('modifier_option')}/effects`,
+          body: { effects: [{ effect: 'add', ingredient_id: b.seeded.ingredients, qty: '5' }] },
+        }),
+      ],
+      [
+        'PUT /v1/modifier-options/{id}/effects with B replace target',
+        async (b) => ({
+          method: 'PUT',
+          url: `/v1/modifier-options/${await freshA('modifier_option')}/effects`,
+          body: {
+            effects: [
+              {
+                effect: 'replace',
+                ingredient_id: await freshA('ingredient'),
+                target_ingredient_id: b.seeded.ingredients,
+              },
+            ],
+          },
+        }),
+      ],
+    ]
+
+  it.each(cases)('%s', async (_, build) => {
+    const { method, url, body } = await build(b)
+    const res = await call(`${method} ${url}`, a.dashboard, url, body)
+    expect(res.statusCode, res.body).toBe(404)
+    expect(leakedSecrets(res.body, b)).toEqual([])
+  })
+
+  it('POST /v1/recipes/preview with A item and B option', async () => {
+    const res = await call('POST /v1/recipes/preview', a.dashboard, '/v1/recipes/preview', {
+      item_id: await freshA('item'),
+      option_ids: [b.seeded.modifier_options],
+    })
+    expect(res.statusCode, res.body).toBe(404)
+  })
+
+  it("B's menu rows are untouched afterwards", async () => {
+    const item = expectStatus(await call('GET', b.dashboard, `/v1/items/${b.seeded.items}`), 200).json<{
+      price: number
+      name: string
+      is_available: boolean
+      modifier_group_ids: string[]
+    }>()
+    expect(item).toMatchObject({
+      price: 25000,
+      is_available: true,
+      modifier_group_ids: [b.seeded.modifier_groups],
+    })
+    const recipe = expectStatus(
+      await call('GET', b.dashboard, `/v1/items/${b.seeded.items}/recipe`),
+      200,
+    ).json<{
+      lines: unknown[]
+    }>()
+    expect(recipe.lines).toHaveLength(1)
+    const effects = expectStatus(
+      await call('GET', b.dashboard, `/v1/modifier-options/${b.seeded.modifier_options}/effects`),
+      200,
+    ).json<{ effects: unknown[] }>()
+    expect(effects.effects).toHaveLength(1)
+    const lists = await Promise.all(
+      ['categories', 'modifier-groups', 'ingredients', 'discounts'].map(
+        async (path) => expectStatus(await call('GET', b.dashboard, `/v1/${path}`), 200).body,
+      ),
+    )
+    for (const [i, id] of [
+      b.seeded.categories,
+      b.seeded.modifier_groups,
+      b.seeded.ingredients,
+      b.seeded.discounts,
+    ].entries()) {
+      expect(lists[i]).toContain(id)
+    }
   })
 })

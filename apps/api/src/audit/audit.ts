@@ -12,6 +12,10 @@ export type AuditAction =
   | 'device.pair'
   | 'device.revoke'
   | 'tenant.signup'
+  | 'settings.change'
+  | 'menu.price_change'
+  | 'recipe.change'
+  | 'option_effects.change'
 
 export const writeAudit = (
   trx: Tx,

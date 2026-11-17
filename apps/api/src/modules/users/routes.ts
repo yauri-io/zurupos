@@ -1,16 +1,11 @@
 import { assertPinAllowed } from '../../auth/policy-errors.js'
 import { hashSecret } from '../../auth/secrets.js'
 import type { Config } from '../../config/env.js'
-import { apiError } from '../../http/errors.js'
+import { requireAuth } from '../../http/require-auth.js'
 import { IdParams, NoContent } from '../../http/schemas.js'
 import type { App } from '../../http/types.js'
 import { CreateUserBody, ResetPinBody, UpdateUserBody, UserListResponse, UserResponse } from './schemas.js'
 import * as service from './service.js'
-
-const requireAuth = <T>(auth: T | null): T => {
-  if (!auth) throw apiError('UNAUTHENTICATED')
-  return auth
-}
 
 const MANAGE = { auth: 'user', permission: 'users.manage' } as const
 
