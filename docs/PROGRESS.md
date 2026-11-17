@@ -9,7 +9,7 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M2 | Menu, modifiers, ingredients, recipes, discounts, settings | ✅ Done | |
 | M3 | Pricing engine, orders, void, stock ops, low-stock email | ✅ Done (reviewed) | **User review required** |
 | M4 | Flutter cashier app | ✅ Done | |
-| M5 | Printing (Bluetooth + network) | ⬜ Not started | Manual printer test by user |
+| M5 | Printing (Bluetooth + network) | ✅ Done (manual printer test pending) | Manual printer test by user |
 | M6 | Dashboard reports and remaining pages | ⬜ Not started | |
 | M7 | Hardening, demo seed, user guide, UAT | ⬜ Not started | UAT with the shop owner |
 
@@ -101,3 +101,19 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
   3. Pair with the owner's email/password, sign in as a cashier, take a cash order and a split order, see them in the dashboard API / orders today, void one with the owner's PIN.
   4. Turn Wi-Fi off before *Selesai*: the order stays pending with *Coba lagi*; turn it back on and retry: one order, same number.
 - Known issues / notes: reprint and print status are M5. Done-screen auto-return isn't configurable yet (M5 device settings). CI runs `flutter analyze` and `flutter test` (the integration test skips without `ZURU_API_URL`); CI still hasn't run on GitHub.
+
+### M5 — 2026-11-18
+- Done:
+  - `lib/printing`: ESC/POS encoder; pure renderers `renderReceipt`, `renderTicket`, `renderTestPage` (58 mm = 32 columns, 80 mm = 48); `PrinterTransport` with `BluetoothClassicTransport` (Android SPP, runtime permissions, bonded devices) and `NetworkTransport` (TCP 9100, 3 s connect timeout); `PrinterConfig` (up to 2 printers: transport, address, paper, receipt/ticket roles, auto-print per role, drawer kick).
+  - Print queue (`state/printing.dart`): auto-print after the order is committed; one job at a time, 10 s timeout; status per printer on the Done screen with *Retry*; jobs stored in `print_jobs`. Reprint receipt/ticket from order detail; employees reprint tickets from today's list. Drawer kick (`ESC p 0 25 250`) after a receipt with cash when enabled. Settings: add/edit/remove printers, test print with a column ruler, auto-return seconds.
+  - API: `GET /orders/today` items include the line note (for ticket reprints).
+- Tests: Flutter 134 passing. Golden byte files for receipt, voided receipt, ticket and test page at 58 and 80 mm (`test/goldens/*.bin` plus readable `.txt`), with a check that no line is wider than the paper. Widget tests: auto-print to two printers, drawer kick only with cash, a printer that's off (order done, failure shown, Retry prints), a printer that hangs (fails after 10 s), voided reprint with the VOID banner, employee ticket reprint, printer settings + test print, Bluetooth pick, auto-return off. `NetworkTransport` is tested against a real loopback TCP server. API 572 passing.
+- Run: `cd apps/cashier && flutter test`; regenerate goldens after an intended layout change with `UPDATE_GOLDENS=1 flutter test test/printing` and review the `.txt` diff.
+- **Manual printer tests for the user** (need real hardware):
+  1. Bluetooth (58 mm, e.g. a common RPP02N/EPPOS-type printer): pair it in Android settings. In the app go to Settings → Add printer → Bluetooth → pick it, set it to Customer receipt, and press *Test print*. The ruler should show exactly 32 digits on one line.
+  2. Network (80 mm, port 9100): add it by IP, set it to Barista ticket, and run *Test print* (48 digits).
+  3. Take a cash order: the receipt prints on printer 1 and the ticket on printer 2. With *Open the cash drawer* on and a drawer connected, the drawer opens after the receipt; a QRIS-only order doesn't open it.
+  4. Turn the printer off and take an order. Done shows *Gagal* within about 10 s and the order is in Orders today. Turn it on and press *Coba lagi*: it prints.
+  5. Reprint a receipt from Orders today; void an order and reprint it: the *** BATAL *** banner shows.
+  6. Check that the Indonesian text and Rp amounts line up in the columns on both paper widths.
+- Known issues / notes: no printer was available here, so the Bluetooth and network transports are verified only up to the plugin and socket boundaries. The `print_jobs` rows are not pruned yet (they're small).

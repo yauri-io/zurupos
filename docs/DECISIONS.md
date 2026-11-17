@@ -209,3 +209,18 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - **Sold out:** cashiers may toggle sold out (`menu.availability`), so besides the Settings list (owner, manager) a long press on an item tile toggles it.
 - **Reprint and print status** (Orders today, Done screen) arrive with printing in M5. The Done screen's auto-return is fixed at 5 s until the device settings in M5 make it configurable.
 - **"Manual run against the local API":** this machine has no Android emulator or device. The run is automated instead: `test/integration/local_api_test.dart` drives the app's own state layer and HTTP client against the Docker API (pair, PIN, bootstrap + 304, split-paid order, idempotent retry, stock deduction, void with approval and restock, `PRICE_CHANGED` refresh). A debug APK builds. Running it on a real tablet is listed for the user in PROGRESS.
+
+---
+
+## Decisions made during M5 (2026-11-18)
+
+## D-044: Printing implementation
+- **ESC/POS bytes** come from a small encoder in the app (`lib/printing/escpos.dart`) instead of a package, so the renderer output is exact and golden-testable. Text is ASCII-only: common accents and typographic quotes/dashes are transliterated, anything else prints as `?` (SPEC §11.3 "ASCII-safe").
+- **Sizes:** "double" = double height (same 32/48 columns); "quad" = double width and height (16/24 columns). The receipt's shop name and TOTAL are double; the ticket's order number is quad and the customer name double.
+- **Bluetooth:** `print_bluetooth_thermal` (Android SPP; most used and recently maintained of the options compared), wrapped in `BluetoothClassicTransport`. Android 12+ `BLUETOOTH_CONNECT`/`BLUETOOTH_SCAN` are requested at runtime via `permission_handler` (pinned to ^12: version 13 needs compileSdk 37, which the current Android Gradle plugin doesn't support). Printers are paired in Android settings and picked from the bonded list.
+- **Network:** `Socket.connect(host, port default 9100, timeout 3 s)`.
+- **Queue:** one job at a time (the Bluetooth plugin holds a single connection), 10 s limit for connect + write, then `failed` with a reason and a *Retry* button. Jobs are queued only after the server accepted the order, and run asynchronously; a failure never touches the order (SPEC §11.3). Jobs are stored in the `print_jobs` table (drift schema v2).
+- **Language:** receipts and tickets use the device's language. A custom discount (no name, D-036) prints as "Diskon" plus its rate.
+- **Times** print in the shop's time zone (`timezone` package; unknown zones fall back to Asia/Jakarta).
+- **Device settings:** printers (up to 2) and the Done screen's auto-return seconds (default 5, 0 = off) are stored on the device, not on the server.
+- **Reprint:** owner, manager and cashier reprint receipts and tickets from the order detail. Employees can't open order detail (D-034), so they reprint tickets from today's list; `GET /orders/today` items now include the line note for this.
