@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: cp .env.example .env
+      - name: Start Postgres (roles bootstrapped by db/init)
+        run: docker compose up -d --wait postgres
+      - run: pnpm install --frozen-lockfile
+      - name: Migrate test database
+        run: pnpm db:migrate:test
+      - run: pnpm --filter @zurupos/api run lint
+      - run: pnpm --filter @zurupos/api run typecheck
+      - name: API tests (incl. RLS isolation suite, as zuru_app)
+        run: pnpm --filter @zurupos/api run test
+      - run: pnpm format:check
+
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @zurupos/dashboard run lint
+      - run: pnpm --filter @zurupos/dashboard run typecheck
+      - run: pnpm --filter @zurupos/dashboard run build
+
+  cashier:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/cashier
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.2
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
