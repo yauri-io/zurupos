@@ -175,3 +175,19 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
   - Release APK: fails without a key, and is signed with the given key when one exists.
 - The VPS was inspected read-only (Ubuntu 24.04, Docker; ports 80/443 taken by another stack). Nothing was deployed or changed there.
 - Still the owner's steps: Cloudflare setup and origin certificate, Resend domain, the release keystore, `deploy/.env.prod`, pushing the commits so the server can pull them, then the deploy itself.
+
+### Deployed — 2026-11-19
+- `app.zurupos.com` and `api.zurupos.com` run on the VPS as stack `zurupos-prod`, at commit `6842fdc`, behind Cloudflare (Origin Rule → 9443). The commits were copied to the server with a git bundle; GitHub was not pushed.
+- Checked through Cloudflare:
+  - `/healthz` is ok.
+  - HSTS and CSP are set on the dashboard.
+  - Signup is off (404).
+  - The real client IP reaches the API.
+  - The login page works in a browser.
+  - The worker started with Resend.
+- Open:
+  - Create the pilot shop (signup on briefly).
+  - First real email (UAT 2, 10).
+  - Release APK with the owner's key.
+  - Off-server backup copies.
+  - Cloudflare Web Analytics injects a beacon that the CSP blocks; turn the analytics off in Cloudflare or allow it in the Caddyfile.
