@@ -151,3 +151,15 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
   - The Resend email provider has never sent a real email.
   - Deployment (`docs/DEPLOY.md`) is a later task and was not started.
   - Two local e2e runs within an hour hit the signup rate limit (`docker compose restart api` clears it).
+
+### UAT round 1 — 2026-11-18 (tester, Galaxy S25 + Lenovo TB125FU, RPP02 Bluetooth)
+- Fixed:
+  - Bluetooth printing always failed: the plugin rejects a `Uint8List` without logging anything. Bytes are now sent as a plain list, and the app waits for the link to drain before closing. Verified on a real RPP02.
+  - Signup and staff forms showed "Data tidak valid" for a weak PIN or password. They now say why, and the PIN rule is written under the field.
+  - Payment provider *Lainnya* with a typed name (D-047).
+  - Owner home now has the PRD's low-stock list and today's voids.
+  - App settings: printers first; the sold-out list moved to its own searchable page. The paired-printer list has a reload button and reloads when you return from Android settings.
+  - Unpair the device from the app (D-048, `DELETE /v1/device`).
+  - The outbox worker (and the API) crashed when Postgres restarted. Idle pool errors are now handled and compose restarts the services.
+- Answered (by design): negative stock (PRD), PINs not unique (SPEC §5.3), staff logout = *Ganti pengguna*. Tablet reports are deferred to the owner's decision.
+- Tests: API 615, app 141 (1 skipped), dashboard e2e signup + reports pages.
