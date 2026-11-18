@@ -1,7 +1,18 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Release signing (docs/DEPLOY.md, "Cashier app"). android/key.properties and the
+// keystore stay on the build machine and are gitignored. Every update must be
+// signed with the same key, or Android refuses to install it over the old app.
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) FileInputStream(keystorePropertiesFile).use { load(it) }
 }
 
 android {
@@ -29,11 +40,20 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
@@ -46,4 +66,11 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+// Never fall back to the debug key for a release build.
+gradle.taskGraph.whenReady {
+    if (allTasks.any { it.name.contains("Release") } && !keystorePropertiesFile.exists()) {
+        throw GradleException("android/key.properties is missing; see docs/DEPLOY.md (Cashier app).")
+    }
 }
