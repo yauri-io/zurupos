@@ -227,6 +227,56 @@ void main() {
     await h.dispose(tester);
   });
 
+  testWidgets('settings: a printer paired after opening the page appears on reload', (tester) async {
+    final h = Harness();
+    await h.pump(tester);
+    await h.signIn(tester, 'u-dina', '2580');
+    await tester.tap(find.text('Pengaturan').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('printer-add')));
+    await tester.pumpAndSettle();
+    h.bonded.add((name: 'RP45BT', address: 'E8:9A:FF:F8:5B:D0'));
+    await tester.tap(find.byKey(const Key('printer-bonded')));
+    await tester.pumpAndSettle();
+    expect(find.text('RP45BT (E8:9A:FF:F8:5B:D0)'), findsNothing);
+    await tester.tapAt(Offset.zero); // close the dropdown
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('printer-bonded-refresh')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('printer-bonded')));
+    await tester.pumpAndSettle();
+    expect(find.text('RP45BT (E8:9A:FF:F8:5B:D0)').last, findsOneWidget);
+    await h.dispose(tester);
+  });
+
+  testWidgets('settings: printers come first; availability has its own searchable page', (tester) async {
+    final h = Harness();
+    await h.pump(tester);
+    await h.signIn(tester, 'u-dina', '2580');
+    await tester.tap(find.text('Pengaturan').first);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('printer-add')), findsOneWidget);
+    expect(find.byKey(const Key('availability-croissant')), findsNothing);
+    expect(find.text('0 menu ditandai habis'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('settings-availability')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('availability-search')), 'crois');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('availability-kopi-susu')), findsNothing);
+    await tester.tap(find.byKey(const Key('availability-croissant')));
+    await tester.pumpAndSettle();
+    expect(find.text('Habis'), findsOneWidget);
+
+    await tester.tap(
+      find.byTooltip(MaterialLocalizations.of(tester.element(find.byType(Scaffold).last)).backButtonTooltip),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('1 menu ditandai habis'), findsOneWidget);
+    await h.dispose(tester);
+  });
+
   testWidgets('settings: pick a bonded Bluetooth printer', (tester) async {
     final h = Harness();
     await h.pump(tester);

@@ -35,8 +35,18 @@ class _PrinterPageState extends ConsumerState<PrinterPage> {
   late final _ip = TextEditingController(text: _p.transport == TransportKind.network ? _p.address : '');
   bool _testing = false;
 
+  /// Coming back from Android's Bluetooth settings reloads the paired list.
+  late final AppLifecycleListener _lifecycle;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycle = AppLifecycleListener(onResume: () => ref.invalidate(bondedPrintersProvider));
+  }
+
   @override
   void dispose() {
+    _lifecycle.dispose();
     _name.dispose();
     _ip.dispose();
     super.dispose();
@@ -109,7 +119,18 @@ class _PrinterPageState extends ConsumerState<PrinterPage> {
             onSelectionChanged: (v) => setState(() => _p = _p.copyWith(transport: v.first, address: '')),
           ),
           const SizedBox(height: 12),
-          if (bluetooth)
+          if (bluetooth) ...[
+            Row(
+              children: [
+                Expanded(child: Text(l.printerBondedHint, style: Theme.of(context).textTheme.bodySmall)),
+                IconButton(
+                  key: const Key('printer-bonded-refresh'),
+                  tooltip: l.printerBondedRefresh,
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () => ref.invalidate(bondedPrintersProvider),
+                ),
+              ],
+            ),
             ref
                 .watch(bondedPrintersProvider)
                 .when(
@@ -135,8 +156,8 @@ class _PrinterPageState extends ConsumerState<PrinterPage> {
                             if (_name.text.trim().isEmpty) _name.text = d.name;
                           }),
                         ),
-                )
-          else
+                ),
+          ] else
             TextField(
               key: const Key('printer-ip'),
               controller: _ip,

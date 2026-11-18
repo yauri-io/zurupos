@@ -1,4 +1,6 @@
-// SPEC §11.1 #9 (manager/owner): language, sold-out toggles. Printers arrive with M5.
+// SPEC §11.1 #9 (manager/owner): printers, menu availability, language.
+// Printers come first; the per-item availability list has its own page because
+// it grows with the menu.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,36 +23,10 @@ class SettingsScreen extends ConsumerWidget {
     final locale = ref.watch(localeProvider).languageCode;
     final theme = Theme.of(context);
     final printers = ref.watch(printersProvider);
+    final soldOut = menu?.items.where((i) => !i.isAvailable).length ?? 0;
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text(l.language, style: theme.textTheme.titleMedium),
-        const SizedBox(height: 8),
-        SegmentedButton<String>(
-          segments: [
-            ButtonSegment(value: 'id', label: Text(l.languageId)),
-            ButtonSegment(value: 'en', label: Text(l.languageEn)),
-          ],
-          selected: {locale},
-          onSelectionChanged: (v) => ref.read(localeProvider.notifier).set(v.first),
-        ),
-        const SizedBox(height: 24),
-        Text(l.settingsAvailability, style: theme.textTheme.titleMedium),
-        for (final MenuItem item in menu?.items ?? const <MenuItem>[])
-          SwitchListTile(
-            key: Key('availability-${item.id}'),
-            title: Text(item.name),
-            subtitle: item.isAvailable ? null : Text(l.itemSoldOut),
-            value: item.isAvailable,
-            onChanged: (v) async {
-              try {
-                await ref.read(menuProvider.notifier).setAvailability(item.id, v);
-              } catch (e) {
-                if (context.mounted) showMessage(context, errorText(l, e), error: true);
-              }
-            },
-          ),
-        const SizedBox(height: 24),
         Row(
           children: [
             Expanded(child: Text(l.settingsPrinters, style: theme.textTheme.titleMedium)),
@@ -81,16 +57,100 @@ class SettingsScreen extends ConsumerWidget {
                 if (p.ticket) l.printerRoleTicket,
               ].join(' · '),
             ),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () =>
                 Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PrinterPage(existing: p))),
           ),
         const SizedBox(height: 8),
         _AutoReturnField(seconds: ref.watch(autoReturnProvider)),
-        const SizedBox(height: 24),
+        const Divider(height: 32),
+        ListTile(
+          key: const Key('settings-availability'),
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.no_food_outlined),
+          title: Text(l.settingsAvailability),
+          subtitle: Text(l.settingsSoldOutCount(soldOut)),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () =>
+              Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const AvailabilityPage())),
+        ),
+        const Divider(height: 32),
+        Text(l.language, style: theme.textTheme.titleMedium),
+        const SizedBox(height: 8),
+        SegmentedButton<String>(
+          segments: [
+            ButtonSegment(value: 'id', label: Text(l.languageId)),
+            ButtonSegment(value: 'en', label: Text(l.languageEn)),
+          ],
+          selected: {locale},
+          onSelectionChanged: (v) => ref.read(localeProvider.notifier).set(v.first),
+        ),
+        const Divider(height: 32),
         Text(l.settingsDevice, style: theme.textTheme.titleMedium),
         if (menu != null) Text(menu.settings.name),
         Text(l.settingsServer(apiBaseUrl)),
       ],
+    );
+  }
+}
+
+/// Sold-out toggles for every item, with a search box.
+class AvailabilityPage extends ConsumerStatefulWidget {
+  const AvailabilityPage({super.key});
+
+  @override
+  ConsumerState<AvailabilityPage> createState() => _AvailabilityPageState();
+}
+
+class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
+  String _query = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    final items = ref.watch(menuProvider).value?.items ?? const <MenuItem>[];
+    final q = _query.trim().toLowerCase();
+    final shown = [
+      for (final i in items)
+        if (q.isEmpty || i.name.toLowerCase().contains(q)) i,
+    ];
+    return Scaffold(
+      appBar: AppBar(title: Text(l.settingsAvailability)),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: TextField(
+              key: const Key('availability-search'),
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                hintText: l.settingsSearchMenu,
+              ),
+              onChanged: (v) => setState(() => _query = v),
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              children: [
+                for (final item in shown)
+                  SwitchListTile(
+                    key: Key('availability-${item.id}'),
+                    title: Text(item.name),
+                    subtitle: item.isAvailable ? null : Text(l.itemSoldOut),
+                    value: item.isAvailable,
+                    onChanged: (v) async {
+                      try {
+                        await ref.read(menuProvider.notifier).setAvailability(item.id, v);
+                      } catch (e) {
+                        if (context.mounted) showMessage(context, errorText(l, e), error: true);
+                      }
+                    },
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

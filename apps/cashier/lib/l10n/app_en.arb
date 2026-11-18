@@ -144,6 +144,15 @@
   "stockEmpty": "No ingredients yet.",
   "settingsTitle": "Settings",
   "settingsAvailability": "Menu availability",
+  "settingsSoldOutCount": "{count} items marked sold out",
+  "@settingsSoldOutCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsSearchMenu": "Search menu",
   "settingsPrinters": "Printers",
   "settingsDevice": "Device",
   "settingsServer": "Server: {url}",
@@ -163,6 +172,8 @@
   "printerNetwork": "Network (LAN/Wi-Fi)",
   "printerAddressIp": "IP address (e.g. 192.168.1.50 or 192.168.1.50:9100)",
   "printerPickBonded": "Bluetooth printer",
+  "printerBondedHint": "Pair the printer in Android Bluetooth settings first, then reload.",
+  "printerBondedRefresh": "Reload printer list",
   "printerNoBonded": "No paired Bluetooth printers. Pair one in Android Settings first.",
   "printerPaper": "Paper width",
   "printerRoleReceipt": "Customer receipt",

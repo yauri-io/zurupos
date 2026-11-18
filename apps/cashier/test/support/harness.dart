@@ -22,6 +22,9 @@ class Harness {
   final MemoryLocalStore store;
   final MemoryTokenStore tokens;
   final printers = FakePrinters();
+
+  /// Printers paired in Android settings; tests add to it to simulate pairing.
+  final bonded = <({String name, String address})>[(name: 'RPP02N', address: 'AA:BB:CC:DD:EE:FF')];
   int _ids = 0;
 
   /// Printers configured on the device before the app starts.
@@ -40,9 +43,7 @@ class Harness {
           tokenStoreProvider.overrideWithValue(tokens),
           newIdProvider.overrideWithValue(() => 'id-${++_ids}'),
           transportFactoryProvider.overrideWithValue(printers.transport),
-          bondedPrintersProvider.overrideWith(
-            (ref) async => [(name: 'RPP02N', address: 'AA:BB:CC:DD:EE:FF')],
-          ),
+          bondedPrintersProvider.overrideWith((ref) async => [...bonded]),
         ],
         child: const ZuruApp(),
       ),
