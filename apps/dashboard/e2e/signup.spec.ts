@@ -25,3 +25,14 @@ test('owner registers a shop in the dashboard', async ({ page }) => {
   await expect(page).toHaveURL(/\/settings$/)
   await expect(page.getByText('Kopi Daftar E2E').first()).toBeVisible()
 })
+
+test('a wrong password says so on the login page', async ({ page }) => {
+  await page.goto('/login')
+  await page.getByLabel('Email').fill(`e2e-nobody-${randomUUID().slice(0, 8)}@test.zurupos.local`)
+  await page.getByLabel('Kata sandi').fill('bukan-kata-sandi-2026')
+  await page.getByRole('button', { name: 'Masuk' }).click()
+  await expect(
+    page.getByRole('region', { name: /Notifikasi/ }).getByText('Email atau kata sandi salah.'),
+  ).toBeVisible()
+  await expect(page).toHaveURL(/\/login$/)
+})

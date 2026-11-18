@@ -16,7 +16,11 @@ const submit = async () => {
       typeof route.query.next === 'string' && route.query.next.startsWith('/') ? route.query.next : null
     await navigateTo(next ?? (can('reports.view') ? '/' : '/menu'))
   } catch (err) {
-    notify.failed(err)
+    // Every login failure is the same 401 (SPEC §5.1); say what it means here.
+    notify.failed(
+      err,
+      err instanceof ApiFailure && err.status === 401 ? t('auth.invalid_credentials') : undefined,
+    )
   } finally {
     busy.value = false
   }

@@ -45,6 +45,7 @@
   },
   "auth": {
     "login_title": "Masuk ke dasbor",
+    "invalid_credentials": "Email atau kata sandi salah.",
     "login": "Masuk",
     "logout": "Keluar",
     "email": "Email",

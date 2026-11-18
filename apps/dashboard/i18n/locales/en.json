@@ -45,6 +45,7 @@
   },
   "auth": {
     "login_title": "Sign in to the dashboard",
+    "invalid_credentials": "Wrong email or password.",
     "login": "Sign in",
     "logout": "Sign out",
     "email": "Email",
