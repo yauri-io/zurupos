@@ -1,8 +1,10 @@
 #!/bin/sh
-# Local development only (D-014). Runs once, as the Postgres superuser, when the
-# container's data volume is first created. Production role setup is documented
-# separately and never executed by this script.
+# Runs once, as the Postgres superuser, when the container's data volume is first
+# created (D-014). Local dev creates `zuru` and `zuru_test`; production
+# (deploy/compose.prod.yml) sets ZURU_DATABASES=zuru (D-049).
 set -eu
+
+ZURU_DATABASES="${ZURU_DATABASES:-zuru zuru_test}"
 
 : "${ZURU_MIGRATOR_PASSWORD:?}"
 : "${ZURU_APP_PASSWORD:?}"
@@ -28,12 +30,15 @@ create role zuru_app login nosuperuser nobypassrls nocreatedb nocreaterole
 -- Outbox worker. SELECT/UPDATE on outbox only (SPEC §3.5).
 create role zuru_worker login nosuperuser nobypassrls nocreatedb nocreaterole
   password :'worker_pw';
-
-create database zuru owner zuru_owner;
-create database zuru_test owner zuru_owner;
 SQL
 
-for db in zuru zuru_test; do
+for db in $ZURU_DATABASES; do
+  psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname postgres -v db="$db" <<'SQL'
+create database :"db" owner zuru_owner;
+SQL
+done
+
+for db in $ZURU_DATABASES; do
   psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$db" -v db="$db" <<'SQL'
 create extension if not exists citext;
 revoke all on database :"db" from public;
