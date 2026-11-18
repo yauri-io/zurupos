@@ -62,7 +62,7 @@ Di **Staf** → **Tambah staf**:
    Contoh: *Large* mengganti Cup 12oz dengan Cup 16oz dan menambah susu 50 ml.
 4. Buka menu → **Resep**: bahan per 1 porsi. Pasang grup pilihan ke menu.
    Kotak **pratinjau** menunjukkan bahan yang terpakai untuk kombinasi pilihan, misalnya *Large + Oat + Extra shot*. Periksa sebelum mulai berjualan.
-5. Menu habis? Kasir bisa menandai **Habis** dengan menekan lama tombol menu di aplikasi.
+5. Menu habis? Kasir bisa menandai **Habis** dengan menekan lama tombol menu di aplikasi, atau lewat **Pengaturan → Ketersediaan menu** (ada kolom cari).
 
 ## 6. Diskon
 
@@ -80,7 +80,8 @@ Kasir hanya bisa memakai diskon yang sudah dibuat; diskon bebas hanya untuk pemi
 
 Di aplikasi: **Pengaturan** → **Tambah printer** (maksimal 2).
 
-- **Bluetooth**: pasangkan dulu printer di *Pengaturan Android → Bluetooth*, lalu pilih dari daftar.
+- **Bluetooth**: pasangkan dulu printer di *Pengaturan Android → Bluetooth*, lalu pilih dari daftar. Printer belum muncul? Tekan tombol **muat ulang** di samping daftar.
+  Setiap tablet harus dipasangkan sendiri dengan printernya.
 - **Jaringan**: isi alamat IP printer (port 9100).
 - Pilih lebar kertas (58 atau 80 mm) dan fungsinya: **struk pelanggan** dan/atau **tiket barista**.
 - **Buka laci kas** setelah struk tunai, jika laci tersambung ke printer.
@@ -92,6 +93,7 @@ Printer mati atau kertas habis tidak membatalkan pesanan. Di layar *Selesai* aka
 
 - **Menerima pesanan**: ketuk menu → pilih ukuran dan lain-lain → **Tambah** → **Bayar** → pilih metode.
   Tunai: pilih nominal cepat atau ketik uang diterima; kembalian langsung tampil.
+  Non-tunai: pilih penyedia (misalnya GoPay). Tidak ada di daftar? Pilih **Lainnya** lalu ketik namanya.
   **Bayar terpisah**: tambahkan pembayaran berikutnya untuk sisa tagihan (misalnya sebagian tunai, sisanya QRIS).
 - **Internet putus**: tombol Bayar nonaktif dan muncul tanda *Offline*. Kalau putus tepat saat **Selesai**, pesanan tersimpan di tablet. Tekan **Coba lagi** setelah internet kembali; pesanan tidak akan tercatat dua kali.
 - **Membatalkan pesanan**: **Pesanan hari ini** → pilih pesanan → **Batalkan pesanan**, isi alasan, dan pilih apakah stok bahan dikembalikan. Kasir perlu PIN manajer atau pemilik.
