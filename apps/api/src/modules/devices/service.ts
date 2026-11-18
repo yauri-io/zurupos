@@ -58,6 +58,12 @@ export const listDevices = async (trx: Tx, auth: AuthContext) => {
 }
 
 // Revoking a device ends all of its staff sessions immediately (SPEC §5.2).
+// D-048: only from a staff session on that device; a dashboard session has no device.
+export const unpairCurrentDevice = async (trx: Tx, auth: AuthContext) => {
+  if (auth.deviceId === null) throw apiError('FORBIDDEN')
+  await revokeDevice(trx, auth, auth.deviceId)
+}
+
 export const revokeDevice = async (trx: Tx, auth: AuthContext, deviceId: string) => {
   const revoked = await q.revokeDevice(trx, auth.tenantId, deviceId)
   if (!revoked) {

@@ -59,6 +59,19 @@ export const deviceRoutes = async (app: App, { db, limiters }: Deps) => {
     },
   )
 
+  // D-048: owner/manager unpairs the device in hand (e.g. to pair it to another shop).
+  app.delete(
+    '/device',
+    {
+      config: { auth: 'user', permission: 'devices.pair' },
+      schema: { tags: ['device'], response: { 204: NoContent } },
+    },
+    async (request, reply) => {
+      await request.tenantTx((trx) => service.unpairCurrentDevice(trx, requireAuth(request.auth)))
+      return reply.status(204).send(null)
+    },
+  )
+
   app.get(
     '/device/staff',
     { config: { auth: 'device' }, schema: { tags: ['device'], response: { 200: StaffListResponse } } },

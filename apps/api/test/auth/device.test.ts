@@ -327,4 +327,54 @@ describe('heartbeat and revoke', () => {
     )
     expect(open).toEqual({ n: 0 })
   })
+
+  it('owner or manager on the device unpairs it: device and its sessions revoked, audited (D-048)', async () => {
+    const manager = await createManager(t.app, shop)
+    for (const who of [
+      { id: shop.owner.id, pin: shop.owner.pin },
+      { id: manager.id, pin: manager.pin },
+    ]) {
+      const paired = await pairDevice(t.app, shop.owner.email, shop.owner.password, 'Unpair me')
+      const cashierToken = await staffLogin(t.app, paired.device_token, cashier.id, cashier.pin)
+      const staffToken = await staffLogin(t.app, paired.device_token, who.id, who.pin)
+      expectStatus(
+        await t.app.inject({
+          method: 'DELETE',
+          url: '/v1/device',
+          headers: headersFor({ kind: 'staff', deviceToken: paired.device_token, staffToken }),
+        }),
+        204,
+      )
+      for (const token of [staffToken, cashierToken]) {
+        expect(
+          (await me(headersFor({ kind: 'staff', deviceToken: paired.device_token, staffToken: token })))
+            .statusCode,
+        ).toBe(401)
+      }
+      const rows = await inTx(
+        pool,
+        shop.tenantId,
+        async (c) =>
+          (
+            await c.query<Row>(
+              `select d.revoked_at is not null as revoked,
+                      (select actor_user_id from audit_log where action = 'device.revoke' and entity_id = d.id) as actor
+                 from devices d where d.id = $1`,
+              [paired.device.id],
+            )
+          ).rows,
+      )
+      expect(rows).toEqual([{ revoked: true, actor: who.id }])
+    }
+  })
+
+  it('a cashier cannot unpair the device, and a dashboard session has no device to unpair', async () => {
+    const paired = await pairDevice(t.app, shop.owner.email, shop.owner.password, 'Keep me')
+    const staffToken = await staffLogin(t.app, paired.device_token, cashier.id, cashier.pin)
+    const asCashier = headersFor({ kind: 'staff', deviceToken: paired.device_token, staffToken })
+    expectStatus(await t.app.inject({ method: 'DELETE', url: '/v1/device', headers: asCashier }), 403)
+    expect((await me(asCashier)).statusCode).toBe(200)
+    const owner = headersFor({ kind: 'dashboard', cookie: shop.ownerCookie })
+    expectStatus(await t.app.inject({ method: 'DELETE', url: '/v1/device', headers: owner }), 403)
+  })
 })

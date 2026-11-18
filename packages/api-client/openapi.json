@@ -546,6 +546,16 @@
         }
       }
     },
+    "/v1/device": {
+      "delete": {
+        "tags": ["device"],
+        "responses": {
+          "204": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
     "/v1/device/staff": {
       "get": {
         "tags": ["device"],

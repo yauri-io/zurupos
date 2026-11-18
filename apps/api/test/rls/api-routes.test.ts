@@ -190,6 +190,7 @@ const NO_TENANT_INPUT: Record<string, string> = {
   'POST /v1/devices/pair': 'pre-tenant; credentials only',
   'DELETE /v1/device/sessions/current': 'acts on the caller’s own session',
   'POST /v1/device/heartbeat': 'acts on the caller’s own device',
+  'DELETE /v1/device': 'acts on the caller’s own device (D-048)',
   'POST /v1/users': 'creates a new row in the caller’s tenant',
   'PATCH /v1/settings': 'acts on the caller’s own tenant',
   'POST /v1/categories': 'creates a new row in the caller’s tenant',
