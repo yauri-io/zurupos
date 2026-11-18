@@ -13,7 +13,12 @@ test('owner registers a shop in the dashboard', async ({ page }) => {
   // A weak PIN is rejected by the API with a specific message, not a generic one.
   await page.getByLabel('PIN').fill('1234')
   await page.getByRole('button', { name: 'Daftar' }).click()
-  await expect(page.getByText('PIN terlalu mudah ditebak.', { exact: false })).toBeVisible()
+  // Scoped to the toast region: the screen-reader announcement repeats the text.
+  await expect(
+    page
+      .getByRole('region', { name: /Notifikasi/ })
+      .getByText('PIN terlalu mudah ditebak.', { exact: false }),
+  ).toBeVisible()
   await expect(page).toHaveURL(/\/signup$/)
   await page.getByLabel('PIN').fill('2580')
   await page.getByRole('button', { name: 'Daftar' }).click()

@@ -10,7 +10,8 @@
     "typecheck": "nuxt typecheck",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:rehearsal": "playwright test --config playwright.rehearsal.config.ts e2e/signup.spec.ts"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.155",
