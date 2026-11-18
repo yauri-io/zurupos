@@ -54,3 +54,7 @@ pgdata/
 Claude outputs/
 test-results/
 playwright-report/
+
+# Production stack (deploy/): server-only files
+deploy/backups/
+deploy/certs/

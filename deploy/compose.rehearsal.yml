@@ -1,0 +1,12 @@
+# Local rehearsal of the production stack (docs/DEPLOY.md, "Rehearse locally").
+# Same images and settings as production, except:
+# - Caddy accepts local client IPs instead of only Cloudflare's ranges.
+# - email goes to a Mailpit inside the stack (http://localhost:18025).
+services:
+  caddy:
+    environment:
+      CF_RANGES: 127.0.0.1/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 ::1/128 fd00::/8
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - '127.0.0.1:18025:8025'

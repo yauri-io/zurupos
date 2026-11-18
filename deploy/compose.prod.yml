@@ -1,0 +1,156 @@
+# Production stack (D-049). Run it through deploy/prod.sh, which passes the
+# project name and deploy/.env.prod. See docs/DEPLOY.md.
+#
+# Cloudflare terminates public TLS and forwards to Caddy on HTTPS_PORT. Nothing
+# else is published: Postgres, the API and the dashboard are only reachable on
+# the stack's internal network.
+name: zurupos-prod
+
+# Docker keeps container logs forever by default; cap them per container.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: '5'
+
+x-email: &email
+  EMAIL_PROVIDER: ${EMAIL_PROVIDER:-resend}
+  EMAIL_FROM: ${EMAIL_FROM:?set EMAIL_FROM}
+  RESEND_API_KEY: ${RESEND_API_KEY:-}
+  SMTP_URL: ${SMTP_URL:-}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      ZURU_MIGRATOR_PASSWORD: ${ZURU_MIGRATOR_PASSWORD:?set ZURU_MIGRATOR_PASSWORD}
+      ZURU_APP_PASSWORD: ${ZURU_APP_PASSWORD:?set ZURU_APP_PASSWORD}
+      ZURU_WORKER_PASSWORD: ${ZURU_WORKER_PASSWORD:?set ZURU_WORKER_PASSWORD}
+      # No test database in production.
+      ZURU_DATABASES: zuru
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d zuru']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  migrate:
+    image: ghcr.io/amacneil/dbmate:2
+    logging: *logging
+    command: ['--no-dump-schema', 'up']
+    environment:
+      DATABASE_URL: postgres://zuru_migrator:${ZURU_MIGRATOR_PASSWORD}@postgres:5432/zuru?sslmode=disable
+      DBMATE_MIGRATIONS_DIR: /db/migrations
+    volumes:
+      - ../db/migrations:/db/migrations:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    image: zurupos-api:prod
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      <<: *email
+      NODE_ENV: production
+      API_HOST: 0.0.0.0
+      API_PORT: 4000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      # Caddy replaces X-Forwarded-For with the real client IP (rate limits).
+      TRUST_PROXY: 'true'
+      DATABASE_URL: postgres://zuru_app:${ZURU_APP_PASSWORD}@postgres:5432/zuru
+      DATABASE_POOL_MAX: ${DATABASE_POOL_MAX:-10}
+      DASHBOARD_ORIGIN: https://${APP_DOMAIN:?set APP_DOMAIN}
+      DASHBOARD_URL: https://${APP_DOMAIN}
+      COOKIE_SECURE: 'true'
+      SIGNUP_ENABLED: ${SIGNUP_ENABLED:-false}
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:4000/healthz >/dev/null || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  worker:
+    image: zurupos-api:prod
+    restart: unless-stopped
+    logging: *logging
+    command: ['node', 'dist/worker/worker.js']
+    environment:
+      <<: *email
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      WORKER_DATABASE_URL: postgres://zuru_worker:${ZURU_WORKER_PASSWORD}@postgres:5432/zuru
+      WORKER_POLL_MS: ${WORKER_POLL_MS:-5000}
+    depends_on:
+      api:
+        condition: service_healthy
+
+  dashboard:
+    image: zurupos-dashboard:prod
+    build:
+      context: ..
+      dockerfile: apps/dashboard/Dockerfile
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      NUXT_PUBLIC_API_BASE: https://${API_DOMAIN:?set API_DOMAIN}
+    depends_on:
+      - api
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+      API_DOMAIN: ${API_DOMAIN}
+    ports:
+      - '${HTTPS_PORT:-9443}:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - dashboard
+
+  # Nightly pg_dump of `zuru` into BACKUP_DIR, pruned after BACKUP_KEEP_DAYS.
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    logging: *logging
+    entrypoint: ['/bin/sh', '/backup/backup-loop.sh']
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: zuru
+      TZ: ${BACKUP_TZ:-Asia/Jakarta}
+      BACKUP_AT: ${BACKUP_AT:-0300}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - ./backup-loop.sh:/backup/backup-loop.sh:ro
+      - ${BACKUP_DIR:-./backups}:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
