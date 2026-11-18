@@ -8,11 +8,16 @@ export const useNotify = () => {
     saved: (title = t('common.saved')) => toast.add({ title, color: 'success', icon: 'i-lucide-check' }),
     failed: (err: unknown) => {
       const description = err instanceof ApiFailure ? err.message : t('common.unexpected_error')
-      const problem = err instanceof ApiFailure ? err.details.problem : undefined
-      const key = typeof problem === 'string' ? `problems.${problem}` : ''
+      const { problem, field } = err instanceof ApiFailure ? err.details : {}
+      // A field-specific text first (`pin_weak`), then the generic problem text.
+      const keys =
+        typeof problem === 'string'
+          ? [...(typeof field === 'string' ? [`problems.${field}_${problem}`] : []), `problems.${problem}`]
+          : []
+      const key = keys.find((k) => t(k) !== k)
       toast.add({
         title: t('common.failed'),
-        description: key && t(key) !== key ? t(key) : description,
+        description: key ? t(key) : description,
         color: 'error',
         icon: 'i-lucide-circle-alert',
       })

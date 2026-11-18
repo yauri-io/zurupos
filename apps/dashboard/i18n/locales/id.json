@@ -66,7 +66,7 @@
     "signup_link": "Belum punya akun? Daftarkan toko",
     "have_account": "Sudah punya akun? Masuk",
     "your_name": "Nama Anda",
-    "owner_pin_help": "4–6 angka, untuk masuk di aplikasi kasir.",
+    "owner_pin_help": "4–6 angka, untuk masuk di aplikasi kasir. Tidak boleh angka sama semua (1111), berurutan (1234, 4321) atau pola umum (1212).",
     "signup_closed": "Pendaftaran toko baru sedang ditutup. Hubungi ZuruPOS."
   },
   "home": {
@@ -246,7 +246,12 @@
     "more_defaults_than_max": "Opsi bawaan melebihi batas maksimal grup.",
     "unknown_timezone": "Zona waktu tidak dikenal.",
     "percent_max_10000_bps": "Persen maksimal 100%.",
-    "replace_same_ingredient_needs_qty": "Mengganti dengan bahan yang sama butuh jumlah baru."
+    "replace_same_ingredient_needs_qty": "Mengganti dengan bahan yang sama butuh jumlah baru.",
+    "pin_format": "PIN harus 4–6 angka.",
+    "pin_weak": "PIN terlalu mudah ditebak. Hindari angka sama semua (1111), berurutan (1234, 4321) atau pola umum (1212).",
+    "password_too_short": "Kata sandi minimal 8 karakter.",
+    "password_too_long": "Kata sandi maksimal 128 karakter.",
+    "password_common": "Kata sandi terlalu umum. Pilih kata sandi lain."
   },
   "range": {
     "today": "Hari ini",
@@ -353,7 +358,7 @@
     "email_manager_help": "Manajer menerima undangan lewat email untuk membuat kata sandi.",
     "email_optional": "Opsional; kasir dan karyawan masuk dengan PIN.",
     "pin": "PIN",
-    "pin_help": "4–6 angka; hindari 1234, 0000 dan sejenisnya.",
+    "pin_help": "4–6 angka. Tidak boleh angka sama semua (1111), berurutan (1234, 4321) atau pola umum (1212).",
     "language": "Bahasa",
     "inactive": "Nonaktif",
     "invite_pending": "Undangan belum diterima",

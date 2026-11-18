@@ -66,7 +66,7 @@
     "signup_link": "No account yet? Register your shop",
     "have_account": "Already have an account? Sign in",
     "your_name": "Your name",
-    "owner_pin_help": "4–6 digits, to sign in on the cashier app.",
+    "owner_pin_help": "4–6 digits, to sign in on the cashier app. No repeated digits (1111), runs (1234, 4321) or common patterns (1212).",
     "signup_closed": "New shop registration is closed. Contact ZuruPOS."
   },
   "home": {
@@ -246,7 +246,12 @@
     "more_defaults_than_max": "More default options than the group's maximum.",
     "unknown_timezone": "Unknown time zone.",
     "percent_max_10000_bps": "Percent can be at most 100%.",
-    "replace_same_ingredient_needs_qty": "Replacing with the same ingredient needs a new amount."
+    "replace_same_ingredient_needs_qty": "Replacing with the same ingredient needs a new amount.",
+    "pin_format": "The PIN must be 4–6 digits.",
+    "pin_weak": "This PIN is too easy to guess. Avoid repeated digits (1111), runs (1234, 4321) and common patterns (1212).",
+    "password_too_short": "The password must be at least 8 characters.",
+    "password_too_long": "The password can be at most 128 characters.",
+    "password_common": "This password is too common. Choose another one."
   },
   "range": {
     "today": "Today",
@@ -353,7 +358,7 @@
     "email_manager_help": "Managers get an email invite to set a password.",
     "email_optional": "Optional; cashiers and employees sign in with a PIN.",
     "pin": "PIN",
-    "pin_help": "4–6 digits; avoid 1234, 0000 and the like.",
+    "pin_help": "4–6 digits. No repeated digits (1111), runs (1234, 4321) or common patterns (1212).",
     "language": "Language",
     "inactive": "Inactive",
     "invite_pending": "Invite pending",
