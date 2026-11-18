@@ -30,6 +30,7 @@ const seed = async (page: Page) => {
   const cat = (await post('/v1/categories', { name: 'Kopi' })).id as string
   const item = (await post('/v1/items', { category_id: cat, name: 'Kopi Susu', price: 25000 })).id as string
   const ingredient = (await post('/v1/ingredients', { name: 'Biji Kopi', base_unit: 'g' })).id as string
+  await post('/v1/ingredients', { name: 'Susu Segar', base_unit: 'ml', low_stock_threshold: '1000' })
   const cashier = (await post('/v1/users', { name: 'Kasir', role: 'cashier', pin: '4826' })).id as string
   const pair = await json(
     await r.post(`${API}/v1/devices/pair`, {
@@ -78,6 +79,10 @@ test('owner pages at 375 px, with correct report figures', async ({ page }) => {
   // Home: today's net sales exclude the voided order.
   await page.goto('/')
   await expect(page.getByTestId('today')).toContainText('Rp 50.000')
+  // PRD §6 home: low-stock list (no stock yet, threshold 1 L) and today's voids.
+  await expect(page.getByTestId('low-stock')).toContainText('Susu Segar')
+  await expect(page.getByTestId('low-stock')).not.toContainText('Biji Kopi')
+  await expect(page.getByTestId('voids-today')).toContainText('1 pesanan (Rp 25.000)')
   await noHorizontalScroll(page, '/')
 
   const pages: [string, string][] = [

@@ -73,7 +73,12 @@
     "welcome": "Halo, {name}!",
     "net_today": "Penjualan bersih hari ini",
     "refresh_note": "Diperbarui otomatis setiap menit.",
-    "top_items": "Menu terlaris"
+    "top_items": "Menu terlaris",
+    "low_stock": "Stok menipis",
+    "see_stock": "Lihat stok",
+    "stock_ok": "Semua stok aman.",
+    "more_low": "dan {count} bahan lain",
+    "voids_today": "Pembatalan hari ini: {count} pesanan ({total})"
   },
   "menu": {
     "add_category": "Tambah kategori",

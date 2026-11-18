@@ -73,7 +73,12 @@
     "welcome": "Hello, {name}!",
     "net_today": "Net sales today",
     "refresh_note": "Refreshes every minute.",
-    "top_items": "Top items"
+    "top_items": "Top items",
+    "low_stock": "Low stock",
+    "see_stock": "View stock",
+    "stock_ok": "All stock is fine.",
+    "more_low": "and {count} more",
+    "voids_today": "Voids today: {count} orders ({total})"
   },
   "menu": {
     "add_category": "Add category",
