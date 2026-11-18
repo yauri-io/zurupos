@@ -1,7 +1,7 @@
 // Outbox worker process: `node dist/worker/worker.js`. Polls every WORKER_POLL_MS.
 import pino from 'pino'
 import { loadWorkerConfig } from '../config/env.js'
-import { createDb } from '../db/kysely.js'
+import { createDb, idleErrorFields } from '../db/kysely.js'
 import { assertSafeDbRole } from '../db/role-guard.js'
 import { processBatch } from './process.js'
 import { createSender } from './providers/index.js'
@@ -9,7 +9,7 @@ import { createSender } from './providers/index.js'
 const config = loadWorkerConfig()
 const log = pino({ level: config.logLevel })
 const db = createDb(config.databaseUrl, 2, (err) => {
-  log.warn({ err }, 'database connection lost; reconnecting on the next query')
+  log.warn(idleErrorFields(err), 'database connection lost; reconnecting on the next query')
 })
 try {
   await assertSafeDbRole(db)

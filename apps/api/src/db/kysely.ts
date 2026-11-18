@@ -12,6 +12,12 @@ export type Database = Kysely<DB>
 // An idle pooled connection can be closed by the server (restart, failover).
 // pg emits that as an 'error' event on the pool; unhandled, it kills the process.
 // Handled, the pool drops that client and opens a new one on the next query.
+// pg attaches the whole client to the error; log only what helps.
+export const idleErrorFields = (err: Error) => ({
+  code: (err as Error & { code?: string }).code,
+  message: err.message,
+})
+
 export const createDb = (
   connectionString: string,
   max: number,

@@ -1,6 +1,6 @@
 import { buildApp } from './app.js'
 import { loadConfig } from './config/env.js'
-import { createDb } from './db/kysely.js'
+import { createDb, idleErrorFields } from './db/kysely.js'
 import { assertSafeDbRole } from './db/role-guard.js'
 
 const config = loadConfig()
@@ -19,7 +19,7 @@ try {
 }
 const app = await buildApp({ config, db })
 logIdleError = (err) => {
-  app.log.warn({ err }, 'database connection lost; reconnecting on the next query')
+  app.log.warn(idleErrorFields(err), 'database connection lost; reconnecting on the next query')
 }
 
 const shutdown = async (signal: string) => {
