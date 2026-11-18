@@ -5,7 +5,7 @@ import { createDb, type Database } from '../../src/db/kysely.js'
 import { createLimiters, type Limiters } from '../../src/http/rate-limit.js'
 import type { App } from '../../src/http/types.js'
 import { testConfig } from '../helpers.js'
-import { workerPool } from './pg.js'
+import { ignoreIdleError, workerPool } from './pg.js'
 
 export type TestApp = { app: App; db: Database; close: () => Promise<void> }
 
@@ -13,7 +13,7 @@ export const createTestApp = async (
   opts: { poolMax?: number; limiters?: Limiters; signupEnabled?: boolean } = {},
 ): Promise<TestApp> => {
   const config = testConfig(opts.signupEnabled === undefined ? {} : { signupEnabled: opts.signupEnabled })
-  const db = createDb(config.databaseUrl, opts.poolMax ?? 4)
+  const db = createDb(config.databaseUrl, opts.poolMax ?? 4, ignoreIdleError)
   const app = await buildApp({ config, db, limiters: opts.limiters ?? createLimiters(1000) })
   await app.ready()
   return {

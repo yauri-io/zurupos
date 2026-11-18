@@ -4,7 +4,13 @@ import { createDb } from './db/kysely.js'
 import { assertSafeDbRole } from './db/role-guard.js'
 
 const config = loadConfig()
-const db = createDb(config.databaseUrl, config.databasePoolMax)
+// Replaced by the app's logger once it exists.
+let logIdleError = (err: Error) => {
+  console.error('database connection lost:', err.message)
+}
+const db = createDb(config.databaseUrl, config.databasePoolMax, (err) => {
+  logIdleError(err)
+})
 try {
   await assertSafeDbRole(db)
 } catch (err) {
@@ -12,6 +18,9 @@ try {
   throw err
 }
 const app = await buildApp({ config, db })
+logIdleError = (err) => {
+  app.log.warn({ err }, 'database connection lost; reconnecting on the next query')
+}
 
 const shutdown = async (signal: string) => {
   app.log.info({ signal }, 'shutting down')

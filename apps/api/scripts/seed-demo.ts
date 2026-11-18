@@ -42,7 +42,9 @@ const main = async () => {
   // Request logs would drown the summary.
   const config = loadConfig({ ...process.env, LOG_LEVEL: 'warn' })
   if (!config.signupEnabled) throw new Error('Set SIGNUP_ENABLED=true in .env to seed')
-  const db = createDb(config.databaseUrl, 4)
+  const db = createDb(config.databaseUrl, 4, (err) => {
+    console.error('database connection lost:', err.message)
+  })
   const app = await buildApp({ config, db, limiters: createLimiters(10_000) })
   const browser = { 'x-requested-with': 'zuru', origin: config.dashboardOrigin }
 

@@ -8,7 +8,9 @@ import { createSender } from './providers/index.js'
 
 const config = loadWorkerConfig()
 const log = pino({ level: config.logLevel })
-const db = createDb(config.databaseUrl, 2)
+const db = createDb(config.databaseUrl, 2, (err) => {
+  log.warn({ err }, 'database connection lost; reconnecting on the next query')
+})
 try {
   await assertSafeDbRole(db)
 } catch (err) {

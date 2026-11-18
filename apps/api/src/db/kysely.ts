@@ -9,7 +9,15 @@ pg.types.setTypeParser(pg.types.builtins.DATE, (value) => value)
 
 export type Database = Kysely<DB>
 
-export const createDb = (connectionString: string, max: number): Database =>
-  new Kysely<DB>({
-    dialect: new PostgresDialect({ pool: new pg.Pool({ connectionString, max }) }),
-  })
+// An idle pooled connection can be closed by the server (restart, failover).
+// pg emits that as an 'error' event on the pool; unhandled, it kills the process.
+// Handled, the pool drops that client and opens a new one on the next query.
+export const createDb = (
+  connectionString: string,
+  max: number,
+  onIdleError: (err: Error) => void,
+): Database => {
+  const pool = new pg.Pool({ connectionString, max })
+  pool.on('error', onIdleError)
+  return new Kysely<DB>({ dialect: new PostgresDialect({ pool }) })
+}

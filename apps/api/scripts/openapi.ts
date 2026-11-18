@@ -6,7 +6,7 @@ import { loadConfig } from '../src/config/env.js'
 import { createDb } from '../src/db/kysely.js'
 
 const config = loadConfig({ ...process.env, NODE_ENV: 'test' })
-const db = createDb(config.databaseUrl, 1)
+const db = createDb(config.databaseUrl, 1, () => {})
 const app = await buildApp({ config, db })
 await app.ready()
 const out = new URL('../../../packages/api-client/openapi.json', import.meta.url)

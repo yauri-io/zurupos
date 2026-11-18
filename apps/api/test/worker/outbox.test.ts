@@ -10,7 +10,7 @@ import type { EmailSender } from '../../src/worker/providers/types.js'
 import { createTestApp, type TestApp } from '../support/app.js'
 import { kopiShop } from '../support/kopi.js'
 import { api } from '../support/menu.js'
-import { workerPool } from '../support/pg.js'
+import { ignoreIdleError, workerPool } from '../support/pg.js'
 
 const env = (name: string) => {
   const value = process.env[name]
@@ -26,7 +26,7 @@ const worker = workerPool(1)
 
 beforeAll(async () => {
   t = await createTestApp()
-  workerDb = createDb(env('TEST_WORKER_DATABASE_URL'), 2)
+  workerDb = createDb(env('TEST_WORKER_DATABASE_URL'), 2, ignoreIdleError)
 })
 afterAll(async () => {
   await t.close()

@@ -3,10 +3,11 @@ import { buildApp } from '../src/app.js'
 import { createDb } from '../src/db/kysely.js'
 import type { App } from '../src/http/types.js'
 import { testConfig } from './helpers.js'
+import { ignoreIdleError } from './support/pg.js'
 
 describe('GET /healthz', () => {
   const config = testConfig()
-  const db = createDb(config.databaseUrl, 2)
+  const db = createDb(config.databaseUrl, 2, ignoreIdleError)
   let app: App
 
   beforeAll(async () => {

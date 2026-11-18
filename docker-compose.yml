@@ -40,6 +40,7 @@ services:
       - '8025:8025'
 
   api:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: apps/api/Dockerfile
@@ -67,6 +68,7 @@ services:
 
   # Outbox worker (SPEC §10): sends queued emails to Mailpit, as zuru_worker.
   worker:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: apps/api/Dockerfile
@@ -86,6 +88,7 @@ services:
         condition: service_started
 
   dashboard:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: apps/dashboard/Dockerfile

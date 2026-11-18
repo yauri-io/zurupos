@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, it } from 'vitest'
 import { createDb, type Database } from '../../src/db/kysely.js'
 import { assertSafeDbRole, fetchRoleFacts, roleViolations, type RoleFacts } from '../../src/db/role-guard.js'
+import { ignoreIdleError } from '../support/pg.js'
 
 const env = (name: string): string => {
   const value = process.env[name]
@@ -10,7 +11,7 @@ const env = (name: string): string => {
 
 const dbs: Database[] = []
 const connect = (url: string): Database => {
-  const db = createDb(url, 1)
+  const db = createDb(url, 1, ignoreIdleError)
   dbs.push(db)
   return db
 }

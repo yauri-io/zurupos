@@ -16,6 +16,9 @@ export const workerPool = (max = 2): pg.Pool => {
   return new pg.Pool({ connectionString: url, max })
 }
 
+// Tests don't restart Postgres; test/db/reconnect.test.ts covers the handler.
+export const ignoreIdleError = (): void => {}
+
 export type Row = Record<string, unknown>
 
 // Runs fn in a transaction with app.tenant_id set LOCAL (SPEC §3.3). null = no context.
