@@ -87,11 +87,17 @@ Future<List<({String name, String address})>> bondedPrinters() async {
   return [for (final d in await PrintBluetoothThermal.pairedBluetooths) (name: d.name, address: d.macAdress)];
 }
 
+/// How long to wait after a Bluetooth write before the socket may close.
+/// Android drops bytes still queued in the stack when an RFCOMM socket closes,
+/// so a receipt would lose its tail. Assumes a slow ~4 KB/s SPP link.
+Duration bluetoothDrainTime(int bytes) => Duration(milliseconds: 300 + bytes ~/ 4);
+
 /// The plugin holds one connection at a time; the print queue runs one job at a time.
 class BluetoothClassicTransport implements PrinterTransport {
-  BluetoothClassicTransport(this.mac);
+  BluetoothClassicTransport(this.mac, {this.drainTime = bluetoothDrainTime});
 
   final String mac;
+  final Duration Function(int bytes) drainTime;
 
   @override
   Future<void> connect() async {
@@ -105,7 +111,12 @@ class BluetoothClassicTransport implements PrinterTransport {
 
   @override
   Future<void> write(Uint8List bytes) async {
-    if (!await PrintBluetoothThermal.writeBytes(bytes)) throw const PrinterException('write_failed');
+    // The plugin casts its argument to List<Int>; a Uint8List arrives on Android
+    // as byte[], fails that cast and the write silently returns false.
+    if (!await PrintBluetoothThermal.writeBytes(List<int>.of(bytes, growable: false))) {
+      throw const PrinterException('write_failed');
+    }
+    await Future<void>.delayed(drainTime(bytes.length));
   }
 
   @override
