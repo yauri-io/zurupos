@@ -33,6 +33,10 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   /// Digits typed on the pad: cash received (cash) or the amount (non-cash).
   String _entry = '';
   String? _provider;
+
+  /// *Lainnya*: the cashier types the provider (D-047).
+  bool _otherProvider = false;
+  final _providerText = TextEditingController();
   final _reference = TextEditingController();
   bool _busy = false;
 
@@ -40,6 +44,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
 
   @override
   void dispose() {
+    _providerText.dispose();
     _reference.dispose();
     super.dispose();
   }
@@ -50,9 +55,21 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   void _selectMethod(String m) => setState(() {
     _method = m;
     _entry = '';
-    _provider = null;
+    _clearProvider();
     _reference.clear();
   });
+
+  void _clearProvider() {
+    _provider = null;
+    _otherProvider = false;
+    _providerText.clear();
+  }
+
+  String? get _chosenProvider {
+    if (!_otherProvider) return _provider;
+    final typed = _providerText.text.trim();
+    return typed.isEmpty ? null : typed;
+  }
 
   void _key(String k) => setState(() {
     if (k == '⌫') {
@@ -79,10 +96,10 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     if (amount <= 0 || amount > _remaining) return;
     setState(() {
       _payments.add(
-        PaymentDraft(method: _method, amount: amount, provider: _provider, reference: _reference.text),
+        PaymentDraft(method: _method, amount: amount, provider: _chosenProvider, reference: _reference.text),
       );
       _entry = '';
-      _provider = null;
+      _clearProvider();
       _reference.clear();
     });
   }
@@ -272,21 +289,40 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       Text(formatIdr(amount), key: const Key('noncash-amount'), style: theme.textTheme.headlineMedium),
       const SizedBox(height: 8),
       Center(child: NumberPad(onKey: _key, showDoubleZero: true, keySize: 56)),
-      if (suggestions.isNotEmpty) ...[
-        const SizedBox(height: 12),
-        Text(context.l10n.payProvider, style: theme.textTheme.titleSmall),
-        Wrap(
-          spacing: 8,
-          children: [
-            for (final p in suggestions)
-              ChoiceChip(
-                label: Text(p),
-                selected: _provider == p,
-                onSelected: (on) => setState(() => _provider = on ? p : null),
-              ),
-          ],
+      const SizedBox(height: 12),
+      Text(context.l10n.payProvider, style: theme.textTheme.titleSmall),
+      Wrap(
+        spacing: 8,
+        children: [
+          for (final p in suggestions)
+            ChoiceChip(
+              label: Text(p),
+              selected: !_otherProvider && _provider == p,
+              onSelected: (on) => setState(() {
+                _clearProvider();
+                if (on) _provider = p;
+              }),
+            ),
+          ChoiceChip(
+            key: const Key('provider-other'),
+            label: Text(context.l10n.payProviderOther),
+            selected: _otherProvider,
+            onSelected: (on) => setState(() {
+              _clearProvider();
+              _otherProvider = on;
+            }),
+          ),
+        ],
+      ),
+      if (_otherProvider)
+        TextField(
+          key: const Key('provider-other-text'),
+          controller: _providerText,
+          autofocus: true,
+          maxLength: 40,
+          textCapitalization: TextCapitalization.words,
+          decoration: InputDecoration(labelText: context.l10n.payProviderName),
         ),
-      ],
       const SizedBox(height: 8),
       TextField(
         key: const Key('reference'),

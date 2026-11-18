@@ -245,3 +245,11 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 ## D-046: The demo seed is a script that drives the API
 **Context:** SPEC §13 names `db/seeds/demo.sql` with ~200 historical orders. Writing orders, lines, payments, COGS, stock movements and counters by hand in SQL would bypass the pricing, recipe and stock rules, and could break the money CHECKs or the stock invariant.
 **Decision:** `pnpm db:seed` runs `apps/api/scripts/seed-demo.ts`, which builds the shop through the API in-process, so all ~200 orders are priced, costed and deducted by the real code. Afterwards, using the migration role, it moves the orders back over 14 days (`paid_at`, `business_date`, numbering per day, counters) and backdates the stock movements. Data is deterministic (fixed pseudo-random seed). Tax 10% and service 5% are configured but off, as §13 says. The script refuses to run if the demo owner already exists. `db/seeds/README.md` points to it.
+
+---
+
+## Decisions made during UAT (2026-11-18)
+
+## D-047: Payment provider "Lainnya" with free text
+**Context:** SPEC §11.1 #5 shows optional provider chips for non-cash payments, and `payments.provider` is free text (≤ 40 characters). In UAT the owner needed a provider outside the short chip list (e.g. a QRIS acquired by another bank).
+**Decision:** every non-cash method shows its chips plus **Lainnya**, which opens a text field. The typed name (trimmed; empty means no provider) is sent as `provider`. The API already validates the length, and reports group by method and provider. Typed names are not saved as new chips; spelling differences show up as separate rows in the payments report.

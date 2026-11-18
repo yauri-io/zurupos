@@ -86,6 +86,8 @@
   "payAddCash": "Add cash {amount}",
   "payAmount": "Amount",
   "payProvider": "Provider",
+  "payProviderOther": "Other",
+  "payProviderName": "Provider name",
   "payReference": "Reference no.",
   "payAddLine": "Add payment",
   "payChange": "Change {amount}",

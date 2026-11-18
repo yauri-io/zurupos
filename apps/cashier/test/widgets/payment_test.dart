@@ -104,6 +104,25 @@ void main() {
     await h.dispose(tester);
   });
 
+  testWidgets('Other provider: the cashier types the name (D-047)', (tester) async {
+    final h = await _withKopiInCart(tester);
+    await tester.tap(find.byKey(const Key('method-qris')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('provider-other-text')), findsNothing);
+    await tester.tap(find.byKey(const Key('provider-other')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('provider-other-text')), '  Bank Jago ');
+    await tester.tap(find.byKey(const Key('noncash-add')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('provider-other-text')), findsNothing);
+    await tester.tap(find.byKey(const Key('pay-complete')));
+    await tester.pumpAndSettle();
+    expect(h.api.orderPayloads.single['payments'], [
+      {'method': 'qris', 'amount': 57200, 'provider': 'Bank Jago'},
+    ]);
+    await h.dispose(tester);
+  });
+
   testWidgets('typed cash below the total becomes a partial line', (tester) async {
     final h = await _withKopiInCart(tester);
     for (final k in ['5', '0', '00', '0']) {

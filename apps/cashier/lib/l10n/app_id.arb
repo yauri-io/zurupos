@@ -176,6 +176,8 @@
   },
   "payAmount": "Jumlah",
   "payProvider": "Penyedia",
+  "payProviderOther": "Lainnya",
+  "payProviderName": "Nama penyedia",
   "payReference": "No. referensi",
   "payAddLine": "Tambah pembayaran",
   "payChange": "Kembalian {amount}",
