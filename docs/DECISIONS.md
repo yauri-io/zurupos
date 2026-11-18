@@ -270,3 +270,11 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - Backups: a `backup` service writes a nightly superuser `pg_dump` (forced RLS hides rows from every other role) and keeps 14 days; `deploy/restore.sh` checks a dump in a scratch database or replaces the live one. Off-server copies are the owner's step (DEPLOY.md).
 - The cashier release APK is signed with the owner's key from `android/key.properties`; a release build without it fails instead of using the debug key.
 **Consequences:** No change to the other stacks on the VPS. Cloudflare is part of the request path: it has to be set up as DEPLOY.md describes, and Bot Fight Mode must stay off for the cashier app.
+
+## D-050: Requirements before signup opens to the public
+**Context:** Signup has no email verification; neither the PRD nor SPEC asks for it. That is acceptable while `SIGNUP_ENABLED` is off in production and only switched on briefly by the operator for a known shop (D-017, DEPLOY.md). On 2026-11-19 the owner asked why signup sends no verification email.
+**Decision:** `SIGNUP_ENABLED` stays off in production until all of these exist:
+1. **Email verification.** Signup sends a single-use, expiring link (same token handling as `password_resets`). Until the owner verifies, the shop can't pair devices or take orders, and nothing else is emailed to that address except the verification link.
+2. **No account enumeration.** Signup returns the same response whether or not the email is already registered (D-017's `CONFLICT` goes away). An existing owner gets an email instead.
+3. **Abuse limits** sized for public traffic, beyond the per-IP limit of 5 per hour. For example: a CAPTCHA or Cloudflare Turnstile on the form, and a cleanup of shops that are never verified.
+**Consequences:** Until then, new shops are created by the operator turning signup on for a few minutes (DEPLOY.md, "Create the pilot shop"). Each owner should check their address with *Lupa kata sandi?* after signing up. This is next-phase work; it isn't built in the MVP.
