@@ -315,6 +315,17 @@
     }
   },
   "settingsSearchMenu": "Cari menu",
+  "unpairButton": "Lepas perangkat dari toko",
+  "unpairTitle": "Lepas perangkat ini?",
+  "unpairBody": "Perangkat ini akan keluar dari {shop}. Semua staf di perangkat ini langsung keluar. Untuk memakainya lagi, pemilik atau manajer harus memasangkan ulang (bisa ke toko lain). Pengaturan printer tetap tersimpan.",
+  "@unpairBody": {
+    "placeholders": {
+      "shop": {
+        "type": "String"
+      }
+    }
+  },
+  "unpairPendingOrder": "Masih ada pesanan yang belum terkirim. Kirim dulu sebelum melepas perangkat.",
   "settingsPrinters": "Printer",
   "settingsDevice": "Perangkat",
   "settingsServer": "Server: {url}",

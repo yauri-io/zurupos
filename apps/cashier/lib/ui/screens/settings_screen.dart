@@ -4,8 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../api/api_error.dart';
 import '../../api/models.dart';
+import '../../domain/permissions.dart';
 import '../../printing/printer_config.dart';
+import '../../state/auth.dart';
 import '../../state/locale.dart';
 import '../../state/printing.dart';
 import '../../state/menu.dart';
@@ -89,8 +92,48 @@ class SettingsScreen extends ConsumerWidget {
         Text(l.settingsDevice, style: theme.textTheme.titleMedium),
         if (menu != null) Text(menu.settings.name),
         Text(l.settingsServer(apiBaseUrl)),
+        if (ref.watch(currentUserProvider) case final user? when can(user.role, 'devices.pair')) ...[
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              key: const Key('device-unpair'),
+              style: OutlinedButton.styleFrom(foregroundColor: theme.colorScheme.error),
+              onPressed: () => _unpair(context, ref, menu?.settings.name ?? ''),
+              icon: const Icon(Icons.link_off),
+              label: Text(l.unpairButton),
+            ),
+          ),
+        ],
       ],
     );
+  }
+
+  Future<void> _unpair(BuildContext context, WidgetRef ref, String shop) async {
+    final l = context.l10n;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l.unpairTitle),
+        content: Text(l.unpairBody(shop)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l.commonCancel)),
+          FilledButton(
+            key: const Key('device-unpair-confirm'),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l.unpairButton),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await ref.read(authProvider.notifier).unpair();
+    } on UnsentOrderException {
+      if (context.mounted) showMessage(context, l.unpairPendingOrder, error: true);
+    } on ApiException catch (e) {
+      if (context.mounted) showMessage(context, errorText(l, e), error: true);
+    }
   }
 }
 

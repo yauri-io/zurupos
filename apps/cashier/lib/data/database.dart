@@ -172,4 +172,10 @@ class DriftLocalStore implements LocalStore {
       (db.update(db.printJobs)..where((t) => t.id.equals(id))).write(
         PrintJobsCompanion(status: Value(status.name), error: Value(error)),
       );
+
+  @override
+  Future<void> clearShopData() => db.transaction(() async {
+    await db.delete(db.menuCache).go();
+    await db.delete(db.printJobs).go();
+  });
 }

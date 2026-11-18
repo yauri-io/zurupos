@@ -70,6 +70,14 @@ class FakeApi implements ZuruApi {
   @override
   Future<void> logout() async {}
 
+  bool unpaired = false;
+
+  @override
+  Future<void> unpairDevice() async {
+    _net();
+    unpaired = true;
+  }
+
   @override
   Future<Json?> bootstrapJson({String? since}) async {
     _net();

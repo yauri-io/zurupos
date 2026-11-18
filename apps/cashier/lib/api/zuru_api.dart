@@ -16,6 +16,9 @@ abstract interface class ZuruApi {
   // Staff session (device + staff token).
   Future<void> logout();
 
+  /// D-048: revoke this device (owner/manager staff session).
+  Future<void> unpairDevice();
+
   /// The raw payload (cached as-is), or null when [since] is still current (304).
   Future<Json?> bootstrapJson({String? since});
   Future<ShopSettings> settings();

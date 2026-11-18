@@ -3,7 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/api_error.dart';
 import '../api/models.dart';
+import 'menu.dart';
+import 'printing.dart';
 import 'providers.dart';
+
+class UnsentOrderException implements Exception {
+  const UnsentOrderException();
+}
 
 sealed class AuthState {
   const AuthState();
@@ -69,8 +75,21 @@ class AuthController extends Notifier<AuthState> {
     if (state is SignedIn) state = const Paired();
   }
 
-  /// The device token was rejected (revoked in the dashboard): pair again.
+  /// D-048: an owner/manager unpairs this device, e.g. to pair it to another shop.
+  /// Refused while an order is still waiting to be sent: it belongs to this shop.
+  /// Throws [ApiException]; [UnsentOrderException] if an order is pending.
+  Future<void> unpair() async {
+    if (await ref.read(localStoreProvider).pendingOrder() != null) throw const UnsentOrderException();
+    await ref.read(apiProvider).unpairDevice();
+    await forgetDevice();
+  }
+
+  /// The device token was rejected (revoked in the dashboard) or unpaired: pair again.
+  /// A pending order is kept: re-pairing to the same shop retries it with the same id.
   Future<void> forgetDevice() async {
+    await ref.read(localStoreProvider).clearShopData();
+    ref.invalidate(menuProvider);
+    ref.invalidate(printQueueProvider);
     await ref.read(tokenStoreProvider).clear();
     final creds = ref.read(credentialsProvider);
     creds.deviceToken = null;

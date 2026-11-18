@@ -14,6 +14,7 @@ const _matrix = <String, Set<Role>>{
   'stock.adjust': {_o, _m, _e},
   'menu.availability': {_o, _m, _c},
   'device.settings': {_o, _m},
+  'devices.pair': {_o, _m},
 };
 
 bool can(Role role, String permission) => _matrix[permission]?.contains(role) ?? false;

@@ -100,4 +100,50 @@ void main() {
     expect(await h.tokens.read(), isNull);
     await h.dispose(tester);
   });
+
+  testWidgets('owner unpairs the device: back to pairing, shop data cleared, settings kept (D-048)', (
+    tester,
+  ) async {
+    final h = Harness();
+    await h.store.setSetting('printers', '[]');
+    await h.pump(tester);
+    await h.signIn(tester, 'u-dina', '2580');
+    expect(await h.store.menu(), isNotNull);
+    await tester.tap(find.text('Pengaturan').first);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('device-unpair')));
+    await tester.tap(find.byKey(const Key('device-unpair')));
+    await tester.pumpAndSettle();
+    expect(find.text('Lepas perangkat ini?'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('device-unpair-confirm')));
+    await tester.pumpAndSettle();
+
+    expect(h.api.unpaired, isTrue);
+    expect(find.text('Pasangkan perangkat ini'), findsOneWidget);
+    expect(await h.tokens.read(), isNull);
+    expect(await h.store.menu(), isNull);
+    expect(await h.store.setting('printers'), '[]');
+    await h.dispose(tester);
+  });
+
+  testWidgets('unpair is refused while an order is still unsent', (tester) async {
+    final h = Harness();
+    await h.pump(tester);
+    await h.signIn(tester, 'u-dina', '2580');
+    await h.store.savePending('order-1', {'client_order_id': 'order-1'});
+    await tester.tap(find.text('Pengaturan').first);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('device-unpair')));
+    await tester.tap(find.byKey(const Key('device-unpair')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('device-unpair-confirm')));
+    await tester.pumpAndSettle();
+    expect(h.api.unpaired, isFalse);
+    expect(
+      find.text('Masih ada pesanan yang belum terkirim. Kirim dulu sebelum melepas perangkat.'),
+      findsOneWidget,
+    );
+    expect(await h.tokens.read(), isNotNull);
+    await h.dispose(tester);
+  });
 }

@@ -153,6 +153,17 @@
     }
   },
   "settingsSearchMenu": "Search menu",
+  "unpairButton": "Unpair this device",
+  "unpairTitle": "Unpair this device?",
+  "unpairBody": "This device will leave {shop}. Everyone signed in on it is signed out. To use it again, an owner or manager pairs it again (to any shop). Printer settings are kept.",
+  "@unpairBody": {
+    "placeholders": {
+      "shop": {
+        "type": "String"
+      }
+    }
+  },
+  "unpairPendingOrder": "An order has not been sent yet. Send it before unpairing the device.",
   "settingsPrinters": "Printers",
   "settingsDevice": "Device",
   "settingsServer": "Server: {url}",

@@ -39,6 +39,10 @@ abstract interface class LocalStore {
   /// Print jobs are kept so a failure can be retried and reviewed.
   Future<void> savePrintJob(PrintJob job);
   Future<void> setPrintJobStatus(String id, JobStatus status, String? error);
+
+  /// The device left its shop (D-048): drop the cached menu and print history.
+  /// Device settings (printers, language) stay.
+  Future<void> clearShopData();
 }
 
 class MemoryLocalStore implements LocalStore {
@@ -93,5 +97,11 @@ class MemoryLocalStore implements LocalStore {
   Future<void> setPrintJobStatus(String id, JobStatus status, String? error) async {
     final j = printJobs[id];
     if (j != null) printJobs[id] = j.withStatus(status, error: error);
+  }
+
+  @override
+  Future<void> clearShopData() async {
+    _menu = null;
+    printJobs.clear();
   }
 }
