@@ -257,3 +257,16 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 ## D-048: Unpair the device from the app (`DELETE /v1/device`)
 **Context:** SPEC §5.2 only lets the owner revoke a device from the dashboard. In UAT the tester needed to move a tablet between shops, which meant revoking it on the dashboard of the old shop first. The owner will need the same when a tablet is reassigned.
 **Decision:** `DELETE /v1/device` revokes the **calling** device, the same way as `POST /devices/:id/revoke` (device and all its staff sessions revoked, `device.revoke` audit entry). It needs a staff session on that device whose role has `devices.pair` (owner, manager: the roles that can pair it). A dashboard session has no device and gets 403; it never takes a device id, so it cannot reach another shop's device. In the app, *Settings → Lepas perangkat dari toko* asks for confirmation. The app refuses while an order is still waiting to be sent (it belongs to the current shop). It then clears the cached menu and print history but keeps device settings (printers, language), and returns to pairing. A dashboard revoke clears the same cache when the app notices it.
+
+## Decisions made for deployment (2026-11-18)
+
+## D-049: Production runs behind Cloudflare on a shared VPS
+**Context:** SPEC §15 leaves TLS to a reverse proxy and deployment to `docs/DEPLOY.md`. The VPS the owner provided already runs two other stacks; one of them holds host ports 80 and 443, and the other already runs behind Cloudflare on its own port.
+**Decision:**
+- ZuruPOS gets its own stack (`deploy/compose.prod.yml`, project `zurupos-prod`) with its own Caddy on port 9443. Cloudflare terminates public TLS and an Origin Rule forwards to 9443.
+- Caddy serves a Cloudflare origin certificate (no ACME), refuses connections that don't come from Cloudflare's ranges, and replaces `X-Forwarded-For` with the client IP from `CF-Connecting-IP`. The API runs with `TRUST_PROXY=true`, so its rate limits see real client IPs and a client can't spoof them.
+- Domains: `app.zurupos.com` (dashboard) and `api.zurupos.com` (API). Being the same site, the `SameSite=Lax`, `Secure` session cookie works across them.
+- Postgres is not published. `db/init/00-roles.sh` creates the same roles as in development; `ZURU_DATABASES=zuru` skips the test database.
+- Backups: a `backup` service writes a nightly superuser `pg_dump` (forced RLS hides rows from every other role) and keeps 14 days; `deploy/restore.sh` checks a dump in a scratch database or replaces the live one. Off-server copies are the owner's step (DEPLOY.md).
+- The cashier release APK is signed with the owner's key from `android/key.properties`; a release build without it fails instead of using the debug key.
+**Consequences:** No change to the other stacks on the VPS. Cloudflare is part of the request path: it has to be set up as DEPLOY.md describes, and Bot Fight Mode must stay off for the cashier app.

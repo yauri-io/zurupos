@@ -163,3 +163,15 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
   - The outbox worker (and the API) crashed when Postgres restarted. Idle pool errors are now handled and compose restarts the services.
 - Answered (by design): negative stock (PRD), PINs not unique (SPEC §5.3), staff logout = *Ganti pengguna*. Tablet reports are deferred to the owner's decision.
 - Tests: API 615, app 141 (1 skipped), dashboard e2e signup + reports pages.
+
+### Deployment prepared — 2026-11-18 (not deployed)
+- `deploy/`: production compose (Postgres, migrate, API, worker, dashboard, Caddy, nightly backup), Caddyfile for Cloudflare-fronted TLS, `env.prod.example`, `prod.sh`, `restore.sh` (D-049). How-to in `docs/DEPLOY.md`.
+- Cashier release signing from `android/key.properties`; `apps/cashier/tool/build_release.sh <https url>`.
+- Rehearsed locally:
+  - The production stack over HTTPS with a self-signed certificate.
+  - Browser signup through the real domain names: CORS, the `Secure` cookie and the CSP all work.
+  - A spoofed `X-Forwarded-For` is ignored.
+  - Backup, then `restore.sh check` and `replace`: the restored database keeps its owner, grants and forced RLS, and `zuru_app` sees no rows without a tenant.
+  - Release APK: fails without a key, and is signed with the given key when one exists.
+- The VPS was inspected read-only (Ubuntu 24.04, Docker; ports 80/443 taken by another stack). Nothing was deployed or changed there.
+- Still the owner's steps: Cloudflare setup and origin certificate, Resend domain, the release keystore, `deploy/.env.prod`, pushing the commits so the server can pull them, then the deploy itself.

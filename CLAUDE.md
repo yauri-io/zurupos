@@ -115,6 +115,13 @@ flutter build apk --debug
 
 # Demo shop (dev database only; prints the logins and PINs; D-046)
 pnpm db:seed
+
+# Production stack (docs/DEPLOY.md; never run against a server unless asked)
+deploy/prod.sh up -d --build --wait            # on the server, with deploy/.env.prod
+ZURU_REHEARSAL=1 ZURU_ENV_FILE=deploy/.env.rehearsal deploy/prod.sh up -d --build --wait  # local rehearsal, :9443
+pnpm --filter @zurupos/dashboard test:e2e:rehearsal
+deploy/restore.sh check <dump>                 # verify a backup in a scratch database
+apps/cashier/tool/build_release.sh https://api.zurupos.com   # signed release APK (needs android/key.properties)
 ```
 
 Note: signup is rate-limited to 5 per IP per hour in the running API, and the e2e and cashier integration tests each sign up a shop. If they fail with 429, run `docker compose restart api`.
