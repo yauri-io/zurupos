@@ -74,6 +74,12 @@ const noHorizontalScroll = async (page: Page, path: string) => {
 
 test('owner pages at 375 px, with correct report figures', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 })
+  // Icons are bundled; a runtime fetch (Iconify API or the local fallback)
+  // means one is missing, and production's CSP would block it.
+  const iconFetches: string[] = []
+  page.on('request', (r) => {
+    if (/api\.iconify\.design|\/api\/_nuxt_icon/.test(r.url())) iconFetches.push(r.url())
+  })
   const { paid, ingredient } = await seed(page)
 
   // Home: today's net sales exclude the voided order.
@@ -125,4 +131,5 @@ test('owner pages at 375 px, with correct report figures', async ({ page }) => {
   await page.goto(`/inventory/${ingredient}`)
   await expect(page.getByTestId('movements')).toContainText('Stok masuk')
   await expect(page.getByTestId('movements')).toContainText('Rp 300.000')
+  expect(iconFetches, 'icons fetched at runtime instead of bundled').toEqual([])
 })

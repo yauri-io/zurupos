@@ -10,6 +10,13 @@ export default defineNuxtConfig({
       apiBase: 'http://localhost:4000',
     },
   },
+  icon: {
+    // Bundle every icon the app names, including those in .ts files (navigation,
+    // actions), and never fetch icons from api.iconify.design: production's CSP
+    // blocks it, and the dashboard shouldn't depend on a third-party service.
+    clientBundle: { scan: { globInclude: ['app/**/*.{vue,ts}'] } },
+    fallbackToApi: false,
+  },
   i18n: {
     defaultLocale: 'id',
     strategy: 'no_prefix',
