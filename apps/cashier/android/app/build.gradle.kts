@@ -68,9 +68,19 @@ flutter {
     source = "../.."
 }
 
-// Never fall back to the debug key for a release build.
+// Never fall back to the debug key for a release build, and say plainly what's wrong.
 gradle.taskGraph.whenReady {
-    if (allTasks.any { it.name.contains("Release") } && !keystorePropertiesFile.exists()) {
+    if (allTasks.none { it.name.contains("Release") }) return@whenReady
+    if (!keystorePropertiesFile.exists()) {
         throw GradleException("android/key.properties is missing; see docs/DEPLOY.md (Cashier app).")
+    }
+    val missing = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
+        .filter { keystoreProperties.getProperty(it).isNullOrBlank() }
+    if (missing.isNotEmpty()) {
+        throw GradleException("android/key.properties has no ${missing.joinToString()}; see docs/DEPLOY.md (Cashier app).")
+    }
+    val store = file(keystoreProperties.getProperty("storeFile"))
+    if (!store.isFile) {
+        throw GradleException("The keystore in android/key.properties doesn't exist: $store")
     }
 }

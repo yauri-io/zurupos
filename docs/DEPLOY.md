@@ -96,7 +96,9 @@ keyAlias=zurupos
 keyPassword=<password>
 ```
 
-A release build without this file fails on purpose; it never falls back to the debug key.
+Replace `<you>` and the passwords with the real values. A release build fails on purpose, with a message saying what's wrong, if this file, a value or the keystore is missing; it never falls back to the debug key.
+
+Build the release APK with the script below, not Android Studio's *Build → Generate Signed App Bundle or APK*. Android Studio doesn't pass the API address, so its APK would point at the emulator address (`10.0.2.2`) and couldn't reach the server.
 
 ### Build and install
 
