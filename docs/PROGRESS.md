@@ -191,3 +191,9 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
   - Release APK with the owner's key.
   - Off-server backup copies.
   - Cloudflare Web Analytics injects a beacon that the CSP blocks; turn the analytics off in Cloudflare or allow it in the Caddyfile.
+- 2026-11-19 updates:
+  - The wrong-password message.
+  - Cloudflare Web Analytics allowed in the CSP.
+  - All dashboard icons bundled; the production CSP had blocked the ones fetched from the Iconify API.
+  - The pilot shop is registered and signup is closed again.
+  - The server runs `fc79ebf`.
