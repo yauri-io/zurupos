@@ -376,5 +376,37 @@
   "printReprintReceipt": "Cetak ulang struk",
   "printReprintTicket": "Cetak ulang tiket",
   "printSent": "Dikirim ke printer.",
-  "doneAutoReturnSetting": "Kembali otomatis setelah pesanan (detik, 0 = mati)"
+  "doneAutoReturnSetting": "Kembali otomatis setelah pesanan (detik, 0 = mati)",
+  "navReport": "Laporan",
+  "reportToday": "Hari ini",
+  "reportYesterday": "Kemarin",
+  "reportTotalCollected": "Total diterima",
+  "reportOrders": "Pesanan",
+  "reportAov": "Rata-rata per pesanan",
+  "reportGrossSales": "Penjualan kotor",
+  "reportDiscounts": "Diskon",
+  "reportNetSales": "Penjualan bersih",
+  "reportServiceCharge": "Biaya layanan",
+  "reportTax": "Pajak",
+  "reportPayments": "Per metode pembayaran",
+  "reportTopItems": "Menu terlaris",
+  "reportVoids": "Pembatalan",
+  "reportNOrders": "{count} pesanan",
+  "@reportNOrders": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportQtySold": "{count} terjual",
+  "@reportQtySold": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportEmpty": "Belum ada penjualan.",
+  "reportOwnerNote": "Hanya untuk pemilik. Pesanan batal tidak dihitung. Laporan lengkap ada di dashboard."
 }

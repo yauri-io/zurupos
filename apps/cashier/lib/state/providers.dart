@@ -24,3 +24,6 @@ final tokenStoreProvider = Provider<TokenStore>((ref) => SecureTokenStore());
 
 /// A fresh client order id (UUID v4). Overridable so tests are deterministic.
 final newIdProvider = Provider<String Function()>((ref) => const Uuid().v4);
+
+/// The current time. Overridable so tests can fix the business date.
+final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);

@@ -153,4 +153,13 @@ class HttpZuruApi implements ZuruApi {
 
   @override
   Future<void> count(Json body) => _send('POST', '/stock/count', body: body);
+
+  @override
+  Future<DayReport> dayReport(String day) async {
+    final range = {'from': day, 'to': day};
+    final [summary, payments, items, voids] = await Future.wait([
+      for (final r in ['summary', 'payments', 'items', 'voids']) _json('GET', '/reports/$r', query: range),
+    ]);
+    return DayReport.fromJson(day: day, summary: summary, payments: payments, items: items, voids: voids);
+  }
 }

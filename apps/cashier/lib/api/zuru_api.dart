@@ -31,4 +31,7 @@ abstract interface class ZuruApi {
   Future<void> stockIn(Json body);
   Future<void> waste(Json body);
   Future<void> count(Json body);
+
+  /// Owner only (`reports.view`): the reports for one business date.
+  Future<DayReport> dayReport(String day);
 }

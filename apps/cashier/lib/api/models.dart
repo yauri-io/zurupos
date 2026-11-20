@@ -31,6 +31,7 @@ class ShopSettings {
     required this.address,
     required this.phone,
     required this.timezone,
+    required this.businessDayCutoffHour,
     required this.receiptHeader,
     required this.receiptFooter,
     required this.serviceChargeEnabled,
@@ -48,6 +49,7 @@ class ShopSettings {
     address: j['address'] as String?,
     phone: j['phone'] as String?,
     timezone: j['timezone'] as String,
+    businessDayCutoffHour: j['business_day_cutoff_hour'] as int,
     receiptHeader: j['receipt_header'] as String?,
     receiptFooter: j['receipt_footer'] as String?,
     serviceChargeEnabled: j['service_charge_enabled'] as bool,
@@ -64,6 +66,7 @@ class ShopSettings {
   final String? address;
   final String? phone;
   final String timezone;
+  final int businessDayCutoffHour;
   final String? receiptHeader;
   final String? receiptFooter;
   final bool serviceChargeEnabled;
@@ -490,4 +493,69 @@ class Ingredient {
   final bool isLow;
 
   bool get isNegative => stockQty.startsWith('-');
+}
+
+/// One business day from the owner reports (SPEC §12.2): `/reports/summary`,
+/// `/payments`, `/items` and `/voids` with from = to = [day]. Owner only.
+class DayReport {
+  const DayReport({
+    required this.day,
+    required this.totalCollected,
+    required this.orders,
+    required this.averageOrderValue,
+    required this.grossSales,
+    required this.discounts,
+    required this.netSales,
+    required this.serviceCharge,
+    required this.tax,
+    required this.payments,
+    required this.items,
+    required this.voidCount,
+    required this.voidTotal,
+  });
+
+  factory DayReport.fromJson({
+    required String day,
+    required Json summary,
+    required Json payments,
+    required Json items,
+    required Json voids,
+  }) => DayReport(
+    day: day,
+    totalCollected: summary['total_collected'] as int,
+    orders: summary['orders'] as int,
+    averageOrderValue: summary['average_order_value'] as int,
+    grossSales: summary['gross_sales'] as int,
+    discounts: summary['discounts'] as int,
+    netSales: summary['net_sales'] as int,
+    serviceCharge: summary['service_charge'] as int,
+    tax: summary['tax'] as int,
+    payments: _list(
+      payments['methods'],
+      (m) => (
+        method: m['method'] as String,
+        provider: m['provider'] as String?,
+        count: m['count'] as int,
+        amount: m['amount'] as int,
+      ),
+    ),
+    items: _list(items['items'], (i) => (name: i['name'] as String, qty: i['qty'] as int)),
+    voidCount: voids['count'] as int,
+    voidTotal: voids['total'] as int,
+  );
+
+  /// Business date, `YYYY-MM-DD`.
+  final String day;
+  final int totalCollected;
+  final int orders;
+  final int averageOrderValue;
+  final int grossSales;
+  final int discounts;
+  final int netSales;
+  final int serviceCharge;
+  final int tax;
+  final List<({String method, String? provider, int count, int amount})> payments;
+  final List<({String name, int qty})> items;
+  final int voidCount;
+  final int voidTotal;
 }

@@ -265,4 +265,32 @@ class FakeApi implements ZuruApi {
 
   @override
   Future<void> count(Json body) async => stockCalls.add({'kind': 'count', ...body});
+
+  /// Business dates asked for, and the reports to answer with (empty day otherwise).
+  final List<String> reportDays = [];
+  final Map<String, DayReport> reports = {};
+
+  @override
+  Future<DayReport> dayReport(String day) async {
+    _net();
+    reportDays.add(day);
+    return reports[day] ?? emptyDay(day);
+  }
 }
+
+DayReport emptyDay(String day) => DayReport.fromJson(
+  day: day,
+  summary: {
+    'total_collected': 0,
+    'orders': 0,
+    'average_order_value': 0,
+    'gross_sales': 0,
+    'discounts': 0,
+    'net_sales': 0,
+    'service_charge': 0,
+    'tax': 0,
+  },
+  payments: {'methods': <Json>[]},
+  items: {'items': <Json>[]},
+  voids: {'count': 0, 'total': 0},
+);

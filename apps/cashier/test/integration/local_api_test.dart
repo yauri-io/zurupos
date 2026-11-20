@@ -14,6 +14,7 @@ import 'package:zurupos_cashier/api/http_api.dart';
 import 'package:zurupos_cashier/api/models.dart';
 import 'package:zurupos_cashier/data/local_store.dart';
 import 'package:zurupos_cashier/data/token_store.dart';
+import 'package:zurupos_cashier/domain/business_day.dart';
 import 'package:zurupos_cashier/domain/cart.dart';
 import 'package:zurupos_cashier/domain/payment.dart';
 import 'package:zurupos_cashier/domain/selection.dart';
@@ -305,5 +306,27 @@ void main() {
     expect(c.read(checkoutProvider).pending, isNull);
     expect(c.read(menuProvider).value!.items.firstWhere((i) => i.id == ids['croissant']).price, 24000);
     expect(c.read(cartProvider).lines.single.item.price, 24000);
+  });
+
+  test('D-051: the owner reads today’s report on the tablet; a cashier is refused', () async {
+    final c = app();
+    c.listen(authProvider, (_, _) {});
+    await Future<void>.delayed(Duration.zero);
+    await c.read(authProvider.notifier).pair(email: email, password: password, deviceName: 'Tablet 3');
+    final api = c.read(apiProvider);
+    await c.read(authProvider.notifier).signIn(cashierId, cashierPin);
+    final s = await api.settings();
+    final today = businessToday(DateTime.now(), s.timezone, s.businessDayCutoffHour);
+    await expectLater(
+      api.dayReport(today),
+      throwsA(isA<ApiException>().having((e) => e.status, 'status', 403)),
+    );
+    await c.read(authProvider.notifier).signOut();
+
+    await c.read(authProvider.notifier).signIn(ownerId, ownerPin);
+    final r = await api.dayReport(today);
+    // The first test's order was voided: no sales, one void.
+    expect([r.orders, r.totalCollected, r.voidCount, r.voidTotal], [0, 0, 1, 98175]);
+    expect(r.payments, isEmpty);
   });
 }

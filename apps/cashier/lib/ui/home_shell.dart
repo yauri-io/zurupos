@@ -17,15 +17,17 @@ import 'common.dart';
 import 'screens/done_screen.dart';
 import 'screens/order_screen.dart';
 import 'screens/orders_today_screen.dart';
+import 'screens/report_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/stock_screen.dart';
 import 'widgets/banners.dart';
 
-enum Section { order, today, stock, settings }
+enum Section { order, today, report, stock, settings }
 
 List<Section> sectionsFor(Role role) => [
   if (can(role, 'orders.create')) Section.order,
   Section.today,
+  if (can(role, 'reports.view')) Section.report,
   if (can(role, 'stock.adjust')) Section.stock,
   if (can(role, 'device.settings')) Section.settings,
 ];
@@ -94,6 +96,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     return switch (s) {
       Section.order => l.navOrder,
       Section.today => l.navOrdersToday,
+      Section.report => l.navReport,
       Section.stock => l.navStock,
       Section.settings => l.navSettings,
     };
@@ -102,6 +105,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   IconData _icon(Section s) => switch (s) {
     Section.order => Icons.point_of_sale,
     Section.today => Icons.receipt_long,
+    Section.report => Icons.bar_chart,
     Section.stock => Icons.inventory_2_outlined,
     Section.settings => Icons.settings_outlined,
   };
@@ -109,6 +113,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Widget _page(Section s) => switch (s) {
     Section.order => const OrderScreen(),
     Section.today => const OrdersTodayScreen(),
+    Section.report => const ReportScreen(),
     Section.stock => const StockScreen(),
     Section.settings => const SettingsScreen(),
   };

@@ -13,7 +13,7 @@ import 'fake_api.dart';
 import 'fake_printer.dart';
 
 class Harness {
-  Harness({FakeApi? api, String? deviceToken = 'device-token'})
+  Harness({FakeApi? api, String? deviceToken = 'device-token', this.now})
     : api = api ?? FakeApi(),
       store = MemoryLocalStore(),
       tokens = MemoryTokenStore(deviceToken);
@@ -22,6 +22,9 @@ class Harness {
   final MemoryLocalStore store;
   final MemoryTokenStore tokens;
   final printers = FakePrinters();
+
+  /// Fixes the clock for the app (business dates); real time when null.
+  final DateTime? now;
 
   /// Printers paired in Android settings; tests add to it to simulate pairing.
   final bonded = <({String name, String address})>[(name: 'RPP02N', address: 'AA:BB:CC:DD:EE:FF')];
@@ -42,6 +45,7 @@ class Harness {
           localStoreProvider.overrideWithValue(store),
           tokenStoreProvider.overrideWithValue(tokens),
           newIdProvider.overrideWithValue(() => 'id-${++_ids}'),
+          if (now case final now?) clockProvider.overrideWithValue(() => now),
           transportFactoryProvider.overrideWithValue(printers.transport),
           bondedPrintersProvider.overrideWith((ref) async => [...bonded]),
         ],
