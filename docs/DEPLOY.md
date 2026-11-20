@@ -10,7 +10,7 @@ The agent prepares and rehearses this locally. It connects to the server or depl
 tablet / phone ──HTTPS──▶ Cloudflare ──HTTPS :9443──▶ Caddy ─┬─▶ dashboard:3000
                                     (origin cert)            └─▶ api:4000 ──▶ postgres
                                                         worker ──▶ postgres, Resend
-                                                        backup ──▶ postgres → deploy/backups/
+                                                        backup ──▶ postgres → deploy/backups/ → Cloudflare R2
 ```
 
 Everything is in `deploy/`:
@@ -18,12 +18,13 @@ Everything is in `deploy/`:
 | File | What it is |
 |---|---|
 | `compose.prod.yml` | The production stack: postgres, migrate, api, worker, dashboard, caddy, backup |
+| `backup.Dockerfile` | The backup image: Postgres client tools plus rclone for the R2 copy |
 | `Caddyfile` | TLS with the Cloudflare origin certificate, Cloudflare-only access, security headers, real client IP |
 | `env.prod.example` | Every production setting. Copy to `deploy/.env.prod` on the server (gitignored) |
 | `prod.sh` | `docker compose` with the right file and env file: `deploy/prod.sh ps`, `logs -f api`, … |
-| `backup-loop.sh` | Nightly `pg_dump` of `zuru` into `deploy/backups/`, keeps 14 days |
+| `backup-loop.sh` | Nightly `pg_dump` of `zuru` into `deploy/backups/` (keeps 14 days), copies it to R2, pings the backup monitor |
 | `restore.sh` | `check` (restore into a scratch database and compare) or `replace` (restore over the live database) |
-| `compose.rehearsal.yml` | Local rehearsal only: accepts local IPs, adds Mailpit |
+| `compose.rehearsal.yml` | Local rehearsal only: accepts local IPs, adds Mailpit and a local S3 server in place of R2 |
 
 Only Caddy publishes a port (`HTTPS_PORT`, default 9443). Postgres, the API and the dashboard are reachable only inside the stack. Ports 80 and 443 on the VPS belong to another stack and aren't used.
 
@@ -42,7 +43,18 @@ Only Caddy publishes a port (`HTTPS_PORT`, default 9443). Postgres, the API and 
 2. Add a DMARC record: `TXT _dmarc` = `v=DMARC1; p=none; rua=mailto:<your address>`.
 3. Wait until Resend shows the domain as verified, then create an API key with *Sending access* only. Put it in `RESEND_API_KEY`.
 
-## 3. Server setup (once)
+## 3. Off-site backups: Cloudflare R2 (once)
+
+The nightly dumps are copied to an R2 bucket, so losing the VPS doesn't lose the data (D-052). In the Cloudflare dashboard:
+
+1. **R2 Object Storage → Create bucket**: name `zurupos-backups`, location hint *Asia-Pacific*, storage class *Standard*. Leave public access off.
+2. In the bucket, **Settings → Object lifecycle rules → Add rule**: apply to all objects, *delete objects 90 days after upload*. The server never deletes anything in the bucket; this rule is what removes old dumps.
+3. **R2 Object Storage → Manage API tokens → Create API token**: permission **Object Read & Write**, *Apply to specific buckets only* → `zurupos-backups`, no expiry (or a long one, with a reminder). Cloudflare shows the **Access Key ID**, the **Secret Access Key** (shown only once) and the S3 endpoint `https://<account id>.r2.cloudflarestorage.com`.
+4. On the server, put them in `deploy/.env.prod`: `R2_BUCKET=zurupos-backups`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`. Then `deploy/prod.sh up -d --build backup` and take one backup now (section 7) to check that it reaches the bucket.
+
+The dumps hold the shop's sales, staff names and the hashed passwords and PINs. Keep the bucket private and the token limited to this one bucket.
+
+## 4. Server setup (once)
 
 The server needs Docker with the Compose plugin and a checkout of this repository in `~/zurupos`.
 
@@ -73,9 +85,21 @@ Public signup stays off (D-017). To create the shop:
 
 ### Monitoring
 
-Add an HTTP monitor for `https://api.zurupos.com/healthz` (expects `"status":"ok"`) and `https://app.zurupos.com` in any uptime checker (the Uptime Kuma already running on the VPS can do it). Logs: `deploy/prod.sh logs -f api worker`. Each container keeps at most 50 MB of logs.
+Use monitors that run **outside** the VPS. One on the same server can't tell you the server is down.
 
-## 4. Cashier app
+1. **Uptime: UptimeRobot** (free plan, a check every 5 minutes, alerts by email and in its phone app). Add two monitors:
+   - *Keyword* monitor, URL `https://api.zurupos.com/healthz`, keyword `"status":"ok"`, alert when the keyword is **not** found. The API answers this only when it can reach the database, so it catches a stopped API, a stopped Postgres and an unreachable server. Through Cloudflare a down origin shows as a 52x error, which also alerts.
+   - *HTTP(s)* monitor, URL `https://app.zurupos.com/login`, for the dashboard.
+
+   Add the owner's email (and the developer's) as alert contacts.
+2. **Backups: Healthchecks.io** (free plan). This is a dead man's switch: it alerts when the nightly backup *doesn't* report in.
+   - Create a check named `zurupos backup`, with schedule *Simple*, period **1 day** and grace **2 hours**.
+   - Put its ping URL (`https://hc-ping.com/<uuid>`) in `BACKUP_PING_URL` in `deploy/.env.prod`, then run `deploy/prod.sh up -d backup`.
+   - Every good backup pings the URL. A failed dump or failed R2 copy pings `<url>/fail` and alerts at once. If no ping comes at all (the service stopped, or the server is down), it alerts at about 05:00 WIB.
+
+Logs: `deploy/prod.sh logs -f api worker`. Each container keeps at most 50 MB of logs.
+
+## 5. Cashier app
 
 ### Release key (once, on your computer)
 
@@ -109,7 +133,7 @@ adb install apps/cashier/build/app/outputs/flutter-apk/app-release.apk
 
 Release builds only talk HTTPS. A tablet that has the **debug** app must uninstall it first, because the signatures differ. Before uninstalling, make sure **Pesanan hari ini** shows no unsent order, because uninstalling deletes the device pairing and any order still waiting on the tablet. Then pair the tablet again, and revoke its old entry in the dashboard under **Perangkat**.
 
-## 5. Updates
+## 6. Updates
 
 ```sh
 cd ~/zurupos
@@ -122,17 +146,22 @@ Migrations run automatically (the `migrate` service) before the API starts. They
 
 Update outside opening hours. The API restarts in a few seconds; the cashier app shows *Offline* meanwhile and an order completed during the restart waits on the tablet for **Coba lagi**.
 
-## 6. Backups
+## 7. Backups
 
-- **Nightly**: the `backup` service writes `deploy/backups/zuru-YYYYMMDD-HHMM.dump` at 03:00 WIB and deletes dumps older than 14 days. `deploy/prod.sh logs backup` shows each run.
-- **On demand**: `deploy/prod.sh exec backup /bin/sh /backup/backup-loop.sh now`.
+- **Nightly**: the `backup` service writes `deploy/backups/zuru-YYYYMMDD-HHMM.dump` at 03:00 WIB and deletes local dumps older than 14 days. When `R2_BUCKET` is set, it then copies to R2 every dump the bucket doesn't have yet, so a dump whose upload failed goes up the next night. R2 keeps 90 days (the lifecycle rule). `deploy/prod.sh logs backup` shows each run, and the backup monitor alerts on a failure.
+- **On demand**: `deploy/prod.sh exec backup /bin/sh /backup/backup-loop.sh now`. It also copies to R2 and pings the monitor.
+- **What's in R2**: `deploy/prod.sh exec backup rclone lsl r2:zurupos-backups`.
 - **Check a backup** (safe any time; do it monthly): `deploy/restore.sh check zuru-20261201-0300.dump`. It restores into a scratch database, compares row counts with the live one, and drops the scratch database.
 - **Restore** (replaces the live data, asks you to type `restore`): `deploy/restore.sh replace zuru-20261201-0300.dump`. The API and worker stop during the restore.
-- **Off the server**: dumps on the VPS don't survive losing the VPS. Turn on the provider's weekly droplet backups, and copy the dumps off the server regularly, for example from your computer:
+- **Restore from R2** (for example on a new server, after section 4): fetch the dump into `deploy/backups/`, then check or restore it as above.
 
   ```sh
-  rsync -av -e "ssh -p <port> -i <key>" <user>@<server>:zurupos/deploy/backups/ ~/zurupos-backups/
+  deploy/prod.sh exec backup rclone copy r2:zurupos-backups/zuru-20261201-0300.dump /backups/
+  deploy/restore.sh check zuru-20261201-0300.dump
   ```
+
+  The R2 settings in `deploy/.env.prod` are needed for this, so keep a copy of that file off the server (section 4).
+- **Droplet backups**: also turn on the provider's weekly droplet backups. They restore the whole server, certificates and settings included.
 
 The dumps contain the shop's sales, staff and the hashed passwords and PINs. Keep copies as private as the server.
 
@@ -142,7 +171,9 @@ The whole production stack runs on a development machine with a self-signed cert
 
 ```sh
 # Throwaway settings (gitignored): copy env.prod.example to deploy/.env.rehearsal and set
-# random passwords, SIGNUP_ENABLED=true, EMAIL_PROVIDER=smtp, SMTP_URL=smtp://mailpit:1025.
+# random passwords, SIGNUP_ENABLED=true, EMAIL_PROVIDER=smtp, SMTP_URL=smtp://mailpit:1025,
+# and the local S3 server: R2_BUCKET=zurupos-backups, R2_ENDPOINT=http://s3:9000,
+# R2_ACCESS_KEY_ID=rehearsal, R2_SECRET_ACCESS_KEY=rehearsal-secret.
 mkdir -p deploy/certs && openssl req -x509 -newkey rsa:2048 -nodes -days 30 \
   -subj "/CN=zurupos rehearsal" -addext "subjectAltName=DNS:app.zurupos.com,DNS:api.zurupos.com" \
   -keyout deploy/certs/origin.key -out deploy/certs/origin.pem
@@ -150,7 +181,8 @@ export ZURU_REHEARSAL=1 ZURU_ENV_FILE=deploy/.env.rehearsal
 deploy/prod.sh up -d --build --wait
 curl -sk --resolve api.zurupos.com:9443:127.0.0.1 https://api.zurupos.com:9443/healthz
 pnpm --filter @zurupos/dashboard test:e2e:rehearsal    # signup in a browser over HTTPS
-deploy/prod.sh exec -T backup /bin/sh /backup/backup-loop.sh now
+deploy/prod.sh exec -T backup /bin/sh /backup/backup-loop.sh now   # and copies it to the local S3
+deploy/prod.sh exec -T backup rclone lsl r2:zurupos-backups
 deploy/restore.sh check <file>       # and `replace` to rehearse a full restore
 deploy/prod.sh down -v               # remove the rehearsal, data included
 ```

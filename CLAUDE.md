@@ -121,6 +121,7 @@ deploy/prod.sh up -d --build --wait            # on the server, with deploy/.env
 ZURU_REHEARSAL=1 ZURU_ENV_FILE=deploy/.env.rehearsal deploy/prod.sh up -d --build --wait  # local rehearsal, :9443
 pnpm --filter @zurupos/dashboard test:e2e:rehearsal
 deploy/restore.sh check <dump>                 # verify a backup in a scratch database
+deploy/prod.sh exec -T backup rclone lsl r2:zurupos-backups   # dumps copied off the server (R2; rehearsal: local S3)
 apps/cashier/tool/build_release.sh https://api.zurupos.com   # signed release APK (needs android/key.properties)
 ```
 
