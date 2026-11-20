@@ -13,6 +13,12 @@ x-logging: &logging
     max-size: 10m
     max-file: '5'
 
+# Error reporting (D-053). Empty DSN: off.
+x-sentry: &sentry
+  SENTRY_DSN: ${SENTRY_DSN:-}
+  SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
+  SENTRY_RELEASE: ${SENTRY_RELEASE:-}
+
 x-email: &email
   EMAIL_PROVIDER: ${EMAIL_PROVIDER:-resend}
   EMAIL_FROM: ${EMAIL_FROM:?set EMAIL_FROM}
@@ -62,7 +68,7 @@ services:
     restart: unless-stopped
     logging: *logging
     environment:
-      <<: *email
+      <<: [*email, *sentry]
       NODE_ENV: production
       API_HOST: 0.0.0.0
       API_PORT: 4000
@@ -90,7 +96,7 @@ services:
     logging: *logging
     command: ['node', 'dist/worker/worker.js']
     environment:
-      <<: *email
+      <<: [*email, *sentry]
       NODE_ENV: production
       LOG_LEVEL: ${LOG_LEVEL:-info}
       WORKER_DATABASE_URL: postgres://zuru_worker:${ZURU_WORKER_PASSWORD}@postgres:5432/zuru
@@ -108,6 +114,9 @@ services:
     logging: *logging
     environment:
       NUXT_PUBLIC_API_BASE: https://${API_DOMAIN:?set API_DOMAIN}
+      NUXT_PUBLIC_SENTRY_DSN: ${NUXT_PUBLIC_SENTRY_DSN:-}
+      NUXT_PUBLIC_SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
+      NUXT_PUBLIC_SENTRY_RELEASE: ${SENTRY_RELEASE:-}
     depends_on:
       - api
 
