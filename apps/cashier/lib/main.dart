@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
+import 'observability/sentry.dart';
 
-void main() {
-  runApp(const ProviderScope(child: ZuruApp()));
-}
+Future<void> main() => runWithSentry(const ProviderScope(child: ZuruApp()));
