@@ -8,6 +8,11 @@ export default defineNuxtConfig({
     public: {
       // Overridden by NUXT_PUBLIC_API_BASE.
       apiBase: 'http://localhost:4000',
+      // Error reporting (D-053): NUXT_PUBLIC_SENTRY_DSN, _ENVIRONMENT, _RELEASE.
+      // An empty DSN keeps Sentry off.
+      sentryDsn: '',
+      sentryEnvironment: 'development',
+      sentryRelease: '',
     },
   },
   icon: {
