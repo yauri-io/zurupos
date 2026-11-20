@@ -197,3 +197,17 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
   - All dashboard icons bundled; the production CSP had blocked the ones fetched from the Iconify API.
   - The pilot shop is registered and signup is closed again.
   - The server runs `fc79ebf`.
+
+### 2026-11-20 (local; not on the server yet)
+- From the owner: pushed to GitHub. The release APK builds. Forgot-password and invite emails arrive. Shop setup, printer tests, UAT and the dry run are in progress.
+- Cashier app: a **Laporan** section for the owner only (D-051). It shows today or yesterday: total collected, orders and average order, gross sales to net sales, service charge and tax, per payment method, top 5 items and voids. It uses the existing owner report endpoints; the API still refuses other roles. Tests:
+  - Widget tests: the figures, the yesterday switch, no section for manager, cashier or employee, and *Ganti pengguna* leaves the screen.
+  - Business-date unit tests.
+  - An integration test against the real API: the owner reads the day, a cashier gets 403.
+- Backups (D-052): the nightly dump is copied to Cloudflare R2 (`R2_*` in `deploy/.env.prod`), and failed uploads are retried the next night. A Healthchecks.io ping fires after each run (`BACKUP_PING_URL`, with `/fail` on failure). Rehearsed locally with `rclone serve s3` in place of R2:
+  - Upload works.
+  - A wrong secret fails the run (exit 1, `/fail` ping), and the next run uploads the missed dump.
+  - A dump fetched back from the bucket passes `restore.sh check`.
+- Monitoring: DEPLOY.md now sets up UptimeRobot on `/healthz` and the dashboard, and Healthchecks.io for the backups. These are accounts the owner creates.
+- Tests: app 147 (1 skipped) plus 3 against the live API.
+- To go live: the R2 bucket, token and lifecycle rule, plus the two monitors (DEPLOY.md sections 3 and 4), then deploy these commits.
