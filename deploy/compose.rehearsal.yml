@@ -2,6 +2,9 @@
 # Same images and settings as production, except:
 # - Caddy accepts local client IPs instead of only Cloudflare's ranges.
 # - email goes to a Mailpit inside the stack (http://localhost:18025).
+# - the off-site copy goes to a local S3 server (rclone serve s3) instead of R2.
+#   In deploy/.env.rehearsal: R2_BUCKET=zurupos-backups, R2_ENDPOINT=http://s3:9000,
+#   R2_ACCESS_KEY_ID=rehearsal, R2_SECRET_ACCESS_KEY=rehearsal-secret.
 services:
   caddy:
     environment:
@@ -10,3 +13,18 @@ services:
     image: axllent/mailpit:latest
     ports:
       - '127.0.0.1:18025:8025'
+  backup:
+    environment:
+      RCLONE_CONFIG_R2_PROVIDER: Rclone
+    depends_on:
+      - s3
+  s3:
+    image: zurupos-backup:prod
+    entrypoint:
+      - /bin/sh
+      - -c
+      - mkdir -p /data/zurupos-backups && exec rclone serve s3 --addr :9000 --auth-key rehearsal,rehearsal-secret /data
+    volumes:
+      - s3data:/data
+volumes:
+  s3data:
