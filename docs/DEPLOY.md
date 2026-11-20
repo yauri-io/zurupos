@@ -99,6 +99,18 @@ Use monitors that run **outside** the VPS. One on the same server can't tell you
 
 Logs: `deploy/prod.sh logs -f api worker`. Each container keeps at most 50 MB of logs.
 
+### Error reporting: Sentry (optional)
+
+Sentry collects crashes and unexpected errors from the API, the outbox worker, the dashboard and the cashier app (D-053). Everything stays off until a DSN is set.
+
+1. In Sentry, create three projects: **zurupos-api** (Node.js), **zurupos-dashboard** (Vue) and **zurupos-cashier** (Flutter). Copy each project's DSN (*Settings → Client Keys (DSN)*).
+2. In `deploy/.env.prod` set `SENTRY_DSN` (the API project; the worker uses it too) and `NUXT_PUBLIC_SENTRY_DSN` (the dashboard project). Optionally set `SENTRY_RELEASE` to the commit you deploy.
+3. `deploy/prod.sh up -d api worker dashboard caddy`. Caddy needs the restart for the new CSP, which lets the dashboard reach `*.sentry.io`.
+4. For the app, build with the cashier project's DSN: `SENTRY_DSN=<dsn> apps/cashier/tool/build_release.sh https://api.zurupos.com`.
+5. In each project, add an alert rule that emails the developer on a new issue.
+
+What is sent: the error, its stack trace, the request method and route, the request id (also in the `x-request-id` response header and the API logs), the shop's tenant id, and the browser or app version. What is never sent: request bodies (PINs, passwords, customer names), cookies, auth and device tokens, query strings, invite and reset tokens, IP addresses, emails, and screenshots. Expected failures (4xx answers, lost connections on the tablet) aren't reported.
+
 ## 5. Cashier app
 
 ### Release key (once, on your computer)
@@ -128,6 +140,8 @@ Build the release APK with the script below, not Android Studio's *Build → Gen
 
 ```sh
 apps/cashier/tool/build_release.sh https://api.zurupos.com
+# with crash reporting (section 4, "Error reporting"):
+# SENTRY_DSN=<cashier dsn> apps/cashier/tool/build_release.sh https://api.zurupos.com
 adb install apps/cashier/build/app/outputs/flutter-apk/app-release.apk
 ```
 

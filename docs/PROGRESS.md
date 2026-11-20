@@ -211,3 +211,10 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Monitoring: DEPLOY.md now sets up UptimeRobot on `/healthz` and the dashboard, and Healthchecks.io for the backups. These are accounts the owner creates.
 - Tests: app 147 (1 skipped) plus 3 against the live API.
 - To go live: the R2 bucket, token and lifecycle rule, plus the two monitors (DEPLOY.md sections 3 and 4), then deploy these commits.
+- Error reporting with Sentry (D-053), off until a DSN is set:
+  - API: 500s with the request id, tenant, method and route; the worker reports crashed batches and emails that failed for good.
+  - Dashboard: uncaught errors, with invite and reset tokens cut out of URLs.
+  - Cashier app: crashes and unexpected errors (`SENTRY_DSN=<dsn> tool/build_release.sh ...`).
+  - Never sent: bodies, cookies, tokens, query strings, IPs, emails or screenshots. Unit tests cover the scrubbers. A live check against a stand-in Sentry endpoint (API with Postgres stopped, dashboard in Chrome on an invite link) showed the expected tags and no secrets.
+  - To turn it on: three Sentry projects and their DSNs (DEPLOY.md, "Error reporting").
+
