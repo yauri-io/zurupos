@@ -2,6 +2,13 @@
 
 export type EmailProvider = 'smtp' | 'resend'
 
+// Error reporting (D-053). No DSN means Sentry stays off (local dev, tests).
+export type SentryConfig = {
+  dsn: string | undefined
+  environment: string
+  release: string | undefined
+}
+
 export type Config = {
   nodeEnv: 'development' | 'test' | 'production'
   host: string
@@ -20,6 +27,7 @@ export type Config = {
     smtpUrl: string | undefined
     resendApiKey: string | undefined
   }
+  sentry: SentryConfig
 }
 
 type Env = Record<string, string | undefined>
@@ -73,12 +81,19 @@ const loadEmail = (env: Env): Config['email'] => {
   return email
 }
 
+export const loadSentry = (env: Env, fallbackEnvironment: string): SentryConfig => ({
+  dsn: env['SENTRY_DSN'] || undefined,
+  environment: optional(env, 'SENTRY_ENVIRONMENT', fallbackEnvironment),
+  release: env['SENTRY_RELEASE'] || undefined,
+})
+
 // The outbox worker (SPEC §10) connects as zuru_worker and only needs email settings.
 export type WorkerConfig = {
   logLevel: string
   databaseUrl: string
   pollIntervalMs: number
   email: Config['email']
+  sentry: SentryConfig
 }
 
 export const loadWorkerConfig = (env: Env = process.env): WorkerConfig => ({
@@ -86,11 +101,13 @@ export const loadWorkerConfig = (env: Env = process.env): WorkerConfig => ({
   databaseUrl: required(env, 'WORKER_DATABASE_URL'),
   pollIntervalMs: int(env, 'WORKER_POLL_MS', 5000),
   email: loadEmail(env),
+  sentry: loadSentry(env, optional(env, 'NODE_ENV', 'development')),
 })
 
 export const loadConfig = (env: Env = process.env): Config => {
+  const nodeEnv = oneOf(env, 'NODE_ENV', ['development', 'test', 'production'] as const, 'development')
   const config: Config = {
-    nodeEnv: oneOf(env, 'NODE_ENV', ['development', 'test', 'production'] as const, 'development'),
+    nodeEnv,
     host: optional(env, 'API_HOST', '0.0.0.0'),
     port: int(env, 'API_PORT', 4000),
     logLevel: optional(env, 'LOG_LEVEL', 'info'),
@@ -102,6 +119,7 @@ export const loadConfig = (env: Env = process.env): Config => {
     cookieSecure: bool(env, 'COOKIE_SECURE', true),
     signupEnabled: bool(env, 'SIGNUP_ENABLED', false),
     email: loadEmail(env),
+    sentry: loadSentry(env, nodeEnv),
   }
   return config
 }

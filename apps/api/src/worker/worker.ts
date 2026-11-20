@@ -3,10 +3,12 @@ import pino from 'pino'
 import { loadWorkerConfig } from '../config/env.js'
 import { createDb, idleErrorFields } from '../db/kysely.js'
 import { assertSafeDbRole } from '../db/role-guard.js'
+import { captureError, captureMessage, closeSentry, initSentry } from '../observability/sentry.js'
 import { processBatch } from './process.js'
 import { createSender } from './providers/index.js'
 
 const config = loadWorkerConfig()
+initSentry(config.sentry, 'worker')
 const log = pino({ level: config.logLevel })
 const db = createDb(config.databaseUrl, 2, (err) => {
   log.warn(idleErrorFields(err), 'database connection lost; reconnecting on the next query')
@@ -30,6 +32,9 @@ const tick = async () => {
         from: config.email.from,
         log: (msg, data) => {
           log.error(data, msg)
+          // The provider's error text can name a recipient, so it stays in the
+          // outbox row (last_error) and only the ids go to Sentry.
+          captureMessage(msg, { id: data['id'], kind: data['kind'], attempts: data['attempts'] })
         },
       })
       if (r.sent + r.retried + r.failed > 0) log.info(r, 'outbox batch')
@@ -37,6 +42,7 @@ const tick = async () => {
     }
   } catch (err) {
     log.error({ err }, 'outbox batch crashed')
+    captureError(err)
   }
   if (!stopping) timer = setTimeout(() => void tick(), config.pollIntervalMs)
 }
@@ -46,6 +52,7 @@ const shutdown = async (signal: string) => {
   stopping = true
   if (timer) clearTimeout(timer)
   await db.destroy()
+  await closeSentry()
   process.exit(0)
 }
 process.on('SIGINT', () => void shutdown('SIGINT'))

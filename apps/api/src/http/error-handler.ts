@@ -1,6 +1,7 @@
 import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify'
 import { isApiError, type ErrorCode } from './errors.js'
 import { errorMessage, localeFromHeader } from './messages.js'
+import { captureError } from '../observability/sentry.js'
 
 const send = (
   request: FastifyRequest,
@@ -39,6 +40,12 @@ export const errorHandler = (err: FastifyError, request: FastifyRequest, reply: 
     return send(request, reply, err.statusCode, err.statusCode === 404 ? 'NOT_FOUND' : 'VALIDATION', {})
   }
   request.log.error({ err }, 'unhandled error')
+  captureError(err, {
+    requestId: request.id,
+    tenantId: request.auth?.tenantId ?? request.device?.tenantId,
+    method: request.method,
+    route: request.routeOptions.url,
+  })
   return send(request, reply, 500, 'INTERNAL', {})
 }
 

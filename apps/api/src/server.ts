@@ -2,8 +2,10 @@ import { buildApp } from './app.js'
 import { loadConfig } from './config/env.js'
 import { createDb, idleErrorFields } from './db/kysely.js'
 import { assertSafeDbRole } from './db/role-guard.js'
+import { closeSentry, initSentry } from './observability/sentry.js'
 
 const config = loadConfig()
+initSentry(config.sentry, 'api')
 // Replaced by the app's logger once it exists.
 let logIdleError = (err: Error) => {
   console.error('database connection lost:', err.message)
@@ -26,6 +28,7 @@ const shutdown = async (signal: string) => {
   app.log.info({ signal }, 'shutting down')
   await app.close()
   await db.destroy()
+  await closeSentry()
   process.exit(0)
 }
 process.on('SIGINT', () => void shutdown('SIGINT'))
