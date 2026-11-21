@@ -1,0 +1,635 @@
+/* ZuruPOS landing page. Colours and type from docs/BRAND.md: mostly paper and
+   ink, amber as the one warm accent, amber-dark for text links. */
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin.woff2') format('woff2');
+}
+
+:root {
+  --ink: #1a1a1a;
+  --paper: #f6f0e4;
+  --paper-deep: #ede4d1;
+  --paper-light: #fbf8f1;
+  --amber: #c8873a;
+  --amber-dark: #8f5b1e;
+  --muted: #5c564c;
+  --radius: 14px;
+  --wrap: 1120px;
+  --gutter: 16px;
+  --zigzag: 14px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family:
+    'Plus Jakarta Sans',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.15;
+  margin: 0 0 0.5em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(2.4rem, 7vw, 4.25rem);
+  letter-spacing: -0.025em;
+}
+
+h2 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+}
+
+h3 {
+  font-size: 1.15rem;
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+a {
+  color: var(--amber-dark);
+  text-underline-offset: 3px;
+}
+
+a:focus-visible,
+.btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.wrap {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+@media (min-width: 720px) {
+  :root {
+    --gutter: 32px;
+  }
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+
+.skip:focus {
+  left: var(--gutter);
+  top: 8px;
+  z-index: 10;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.small {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+/* ---------- Header ---------- */
+
+.site-header {
+  padding: 16px 0;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand img {
+  width: 120px;
+  height: auto;
+}
+
+.header-nav {
+  display: flex;
+  gap: 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.header-nav a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.header-nav a:hover {
+  color: var(--amber-dark);
+  text-decoration: underline;
+}
+
+/* On phones only "Masuk" stays; the sections are a scroll away. */
+@media (max-width: 559px) {
+  .header-nav a:not(:last-child) {
+    display: none;
+  }
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 12px 24px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+/* Amber button, ink label (BRAND.md §5: 5.8:1). */
+.btn-wa {
+  background: var(--amber);
+  color: var(--ink);
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+.btn-wa:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 var(--ink);
+}
+
+.btn-wa:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.wa-icon {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  flex: none;
+}
+
+.text-link {
+  font-weight: 700;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  margin: 28px 0 10px;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  padding: 24px 0 64px;
+}
+
+.hero-grid {
+  display: grid;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .hero-grid {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 64px;
+  }
+
+  .hero {
+    padding: 48px 0 96px;
+  }
+}
+
+.eyebrow {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--amber-dark);
+  margin-bottom: 12px;
+}
+
+.lead {
+  font-size: clamp(1.2rem, 2.6vw, 1.45rem);
+  font-weight: 700;
+  margin-bottom: 0.75em;
+}
+
+.hero-copy > p:not(.eyebrow):not(.lead):not(.small) {
+  color: var(--muted);
+  max-width: 34em;
+}
+
+/* ---------- The receipt ---------- */
+
+.receipt-figure {
+  margin: 0;
+  justify-self: center;
+  width: min(100%, 360px);
+}
+
+/* Torn zigzag top and bottom, like the paper in the mark: an ink layer and a
+   paper layer inset by the outline width, both cut by the same zigzag mask. */
+.receipt-edge,
+.receipt {
+  --teeth:
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) 50% 0 / 16px 51% repeat-x,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% 100% / 16px 51% repeat-x;
+  -webkit-mask: var(--teeth);
+  mask: var(--teeth);
+}
+
+.receipt-edge {
+  background: var(--ink);
+  padding: 3px 2px;
+  transform: rotate(-1.5deg);
+}
+
+.receipt {
+  background: var(--paper-light);
+  padding: 30px 22px 32px;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.receipt p {
+  margin: 0;
+}
+
+.receipt hr {
+  border: 0;
+  border-top: 2px dashed var(--ink);
+  opacity: 0.35;
+  margin: 10px 0;
+}
+
+.r-center {
+  text-align: center;
+}
+
+.r-strong {
+  font-weight: 700;
+}
+
+.r-muted {
+  color: var(--muted);
+}
+
+.r-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.r-row span:last-child {
+  white-space: nowrap;
+}
+
+.r-big {
+  font-weight: 700;
+  font-size: 1.02rem;
+}
+
+.r-note {
+  border-left: 4px solid var(--amber);
+  padding-left: 8px;
+}
+
+.r-foot {
+  margin-top: 12px !important;
+}
+
+.receipt-figure figcaption {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ---------- Sections ---------- */
+
+.section {
+  padding: 72px 0;
+}
+
+.section-lead {
+  color: var(--muted);
+  font-size: 1.05rem;
+  margin-bottom: 32px;
+}
+
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 980px) {
+  .cards {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+.card {
+  background: var(--paper-light);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 22px 22px 8px;
+}
+
+.card h3::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--amber);
+  margin-bottom: 14px;
+}
+
+.card p {
+  color: var(--muted);
+}
+
+/* Ink section with torn receipt edges top and bottom. */
+.section-ink {
+  position: relative;
+  background: var(--ink);
+  color: var(--paper);
+  margin: var(--zigzag) 0;
+}
+
+.section-ink::before,
+.section-ink::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--zigzag);
+  background:
+    linear-gradient(135deg, var(--ink) 33%, transparent 33%) 0 0 / var(--zigzag) var(--zigzag),
+    linear-gradient(225deg, var(--ink) 33%, transparent 33%) 0 0 / var(--zigzag) var(--zigzag);
+}
+
+.section-ink::before {
+  top: calc(var(--zigzag) * -1 + 1px);
+  transform: scaleY(-1);
+}
+
+.section-ink::after {
+  bottom: calc(var(--zigzag) * -1 + 1px);
+}
+
+.principles {
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 32px;
+  counter-reset: p;
+}
+
+@media (min-width: 860px) {
+  .principles {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+}
+
+.principles li {
+  counter-increment: p;
+}
+
+.principles li::before {
+  content: counter(p);
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--amber);
+  color: var(--ink);
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.principles h3 {
+  font-size: 1.3rem;
+}
+
+.principles p {
+  color: #d9d2c4;
+}
+
+.two-col {
+  display: grid;
+  gap: 48px;
+}
+
+@media (min-width: 860px) {
+  .two-col {
+    grid-template-columns: 1.2fr 1fr;
+    gap: 64px;
+  }
+}
+
+.plain-list,
+.check-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.plain-list li {
+  padding: 14px 0;
+  border-bottom: 2px dashed rgba(26, 26, 26, 0.2);
+}
+
+.plain-list li:first-child {
+  padding-top: 0;
+}
+
+.check-list {
+  margin-top: 24px;
+}
+
+.check-list li {
+  position: relative;
+  padding: 10px 0 10px 40px;
+}
+
+.check-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: var(--amber)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%231A1A1A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 16px no-repeat;
+}
+
+.section-paper-deep {
+  background: var(--paper-deep);
+}
+
+.story {
+  display: grid;
+  gap: 28px;
+  max-width: 860px;
+}
+
+@media (min-width: 720px) {
+  .story {
+    grid-template-columns: 120px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+}
+
+.story-mark {
+  width: 96px;
+  height: 96px;
+}
+
+@media (min-width: 720px) {
+  .story-mark {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+.tagline-en {
+  font-weight: 800;
+  font-size: 1.2rem;
+  margin-top: 1.25em;
+}
+
+.final {
+  text-align: center;
+}
+
+.final-box {
+  max-width: 640px;
+}
+
+.final-box p {
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.final-box .btn {
+  margin: 16px 0 12px;
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+  border-top: 2px solid var(--ink);
+  padding: 24px 0;
+  font-size: 0.9rem;
+}
+
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+
+.footer-row p {
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+}
+
+/* ---------- Sticky button on phones ---------- */
+
+.sticky-cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
+  background: rgba(246, 240, 228, 0.96);
+  border-top: 2px solid var(--ink);
+}
+
+@media (min-width: 720px) {
+  .sticky-cta {
+    display: none !important;
+  }
+}
+
+body.has-sticky {
+  padding-bottom: 84px;
+}
