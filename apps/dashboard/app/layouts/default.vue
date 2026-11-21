@@ -49,8 +49,10 @@ const items = computed<NavigationMenuItem[]>(() =>
   <UDashboardGroup>
     <UDashboardSidebar collapsible :ui="{ footer: 'border-t border-default' }">
       <template #header="{ collapsed }">
-        <span v-if="!collapsed" class="font-semibold truncate">{{ me?.tenant.name ?? t('app.name') }}</span>
-        <UIcon v-else name="i-lucide-coffee" class="size-5 mx-auto" />
+        <div class="flex items-center gap-2 min-w-0" :class="{ 'mx-auto': collapsed }">
+          <img src="/logo-mark.png" alt="" class="size-6 shrink-0" />
+          <span v-if="!collapsed" class="font-semibold truncate">{{ me?.tenant.name ?? t('app.name') }}</span>
+        </div>
       </template>
 
       <template #default="{ collapsed }">
