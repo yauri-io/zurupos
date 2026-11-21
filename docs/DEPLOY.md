@@ -49,7 +49,7 @@ The nightly dumps are copied to an R2 bucket, so losing the VPS doesn't lose the
 
 1. **R2 Object Storage → Create bucket**: name `zurupos-backups`, location hint *Asia-Pacific*, storage class *Standard*. Leave public access off.
 2. In the bucket, **Settings → Object lifecycle rules → Add rule**: apply to all objects, *delete objects 90 days after upload*. The server never deletes anything in the bucket; this rule is what removes old dumps.
-3. **R2 Object Storage → Manage API tokens → Create API token**: permission **Object Read & Write**, *Apply to specific buckets only* → `zurupos-backups`, no expiry (or a long one, with a reminder). Cloudflare shows the **Access Key ID**, the **Secret Access Key** (shown only once) and the S3 endpoint `https://<account id>.r2.cloudflarestorage.com`.
+3. **R2 Object Storage → Manage API tokens → Create API token**: permission **Object Read & Write**, *Apply to specific buckets only* → `zurupos-backups`, no expiry (or a long one, with a reminder). Cloudflare shows the **Access Key ID**, the **Secret Access Key** (shown only once) and the S3 endpoint `https://<account id>.r2.cloudflarestorage.com`. The bucket's settings page shows the endpoint with `/zurupos-backups` on the end: leave that part off, or the dumps end up in a `zurupos-backups/` folder inside the bucket and the backup reports a failure.
 4. On the server, put them in `deploy/.env.prod`: `R2_BUCKET=zurupos-backups`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`. Then `deploy/prod.sh up -d --build backup` and take one backup now (section 7) to check that it reaches the bucket.
 
 The dumps hold the shop's sales, staff names and the hashed passwords and PINs. Keep the bucket private and the token limited to this one bucket.

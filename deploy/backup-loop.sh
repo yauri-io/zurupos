@@ -26,8 +26,21 @@ backup() {
 # lifecycle rule expires old ones), so a failed upload is retried the next run.
 offsite() {
   [ -n "${R2_BUCKET:-}" ] || return 0
+  # The endpoint is the account's host only. Cloudflare shows the S3 URL with
+  # the bucket on the end; with that, uploads land in a folder named after the
+  # bucket and listing the bucket fails.
+  host=${R2_ENDPOINT:-}
+  host=${host#*://}
+  case "$host" in
+    */*)
+      echo "backup: R2_ENDPOINT must end at the host (https://<account id>.r2.cloudflarestorage.com), with no bucket or path after it" >&2
+      return 1
+      ;;
+  esac
   rclone copy --include 'zuru-*.dump' --retries 3 /backups "r2:$R2_BUCKET" || return 1
-  echo "backup: copied to r2:$R2_BUCKET ($(rclone lsf --include 'zuru-*.dump' "r2:$R2_BUCKET" | wc -l) dumps there)"
+  # Check the bucket really has the dumps; a failed listing fails the backup.
+  listed=$(rclone lsf --include 'zuru-*.dump' "r2:$R2_BUCKET") || return 1
+  echo "backup: copied to r2:$R2_BUCKET ($(printf '%s\n' "$listed" | grep -c .) dumps there)"
 }
 
 ping_monitor() {
