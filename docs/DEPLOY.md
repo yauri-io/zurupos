@@ -1,13 +1,14 @@
 # Deploying ZuruPOS
 
-How to run ZuruPOS for real shops: `app.zurupos.com` (owner dashboard) and `api.zurupos.com` (API for the dashboard and the cashier app), on one VPS behind Cloudflare (D-049).
+How to run ZuruPOS for real shops: `zurupos.com` (landing page), `app.zurupos.com` (owner dashboard) and `api.zurupos.com` (API for the dashboard and the cashier app), on one VPS behind Cloudflare (D-049).
 
 The agent prepares and rehearses this locally. It connects to the server or deploys only when the owner of the project asks for that in the same message (CLAUDE.md, rule 1).
 
 ## Overview
 
 ```
-tablet / phone ──HTTPS──▶ Cloudflare ──HTTPS :9443──▶ Caddy ─┬─▶ dashboard:3000
+tablet / phone ──HTTPS──▶ Cloudflare ──HTTPS :9443──▶ Caddy ─┬─▶ apps/landing (static)
+                                                              ├─▶ dashboard:3000
                                     (origin cert)            └─▶ api:4000 ──▶ postgres
                                                         worker ──▶ postgres, Resend
                                                         backup ──▶ postgres → deploy/backups/ → Cloudflare R2
@@ -19,7 +20,7 @@ Everything is in `deploy/`:
 |---|---|
 | `compose.prod.yml` | The production stack: postgres, migrate, api, worker, dashboard, caddy, backup |
 | `backup.Dockerfile` | The backup image: Postgres client tools plus rclone for the R2 copy |
-| `Caddyfile` | TLS with the Cloudflare origin certificate, Cloudflare-only access, security headers, real client IP |
+| `Caddyfile` | TLS with the Cloudflare origin certificate, Cloudflare-only access, security headers, real client IP, the landing page |
 | `env.prod.example` | Every production setting. Copy to `deploy/.env.prod` on the server (gitignored) |
 | `prod.sh` | `docker compose` with the right file and env file: `deploy/prod.sh ps`, `logs -f api`, … |
 | `backup-loop.sh` | Nightly `pg_dump` of `zuru` into `deploy/backups/` (keeps 14 days), copies it to R2, pings the backup monitor |
@@ -31,10 +32,10 @@ Only Caddy publishes a port (`HTTPS_PORT`, default 9443). Postgres, the API and 
 ## 1. Cloudflare (once)
 
 1. Add `zurupos.com` to Cloudflare and set the nameservers at the registrar.
-2. **DNS**: `A app → <VPS IP>` and `A api → <VPS IP>`, both **Proxied** (orange cloud).
+2. **DNS**: `A app → <VPS IP>`, `A api → <VPS IP>`, `A @ → <VPS IP>` (the landing page) and `CNAME www → zurupos.com`, all **Proxied** (orange cloud).
 3. **SSL/TLS → Overview**: mode **Full (strict)**.
 4. **SSL/TLS → Origin Server → Create certificate** for `zurupos.com, *.zurupos.com` (RSA, 15 years). Save the certificate as `deploy/certs/origin.pem` and the private key as `deploy/certs/origin.key` on the server (`chmod 600` the key). The key is shown only once.
-5. **Rules → Origin Rules → Create rule**: when *Hostname is in* `app.zurupos.com api.zurupos.com`, set *Destination Port* to `9443`.
+5. **Rules → Origin Rules → Create rule**: when *Hostname is in* `zurupos.com www.zurupos.com app.zurupos.com api.zurupos.com`, set *Destination Port* to `9443`. (Adding the landing page later: add `zurupos.com` and `www.zurupos.com` to the existing rule.)
 6. **Security**: leave **Bot Fight Mode** off. It challenges non-browser clients, and the cashier app is one. If the tablet ever gets HTTP 403 from Cloudflare, add a WAF custom rule that skips bot checks for `api.zurupos.com`.
 
 ## 2. Email: Resend (once)
@@ -189,7 +190,7 @@ The whole production stack runs on a development machine with a self-signed cert
 # and the local S3 server: R2_BUCKET=zurupos-backups, R2_ENDPOINT=http://s3:9000,
 # R2_ACCESS_KEY_ID=rehearsal, R2_SECRET_ACCESS_KEY=rehearsal-secret.
 mkdir -p deploy/certs && openssl req -x509 -newkey rsa:2048 -nodes -days 30 \
-  -subj "/CN=zurupos rehearsal" -addext "subjectAltName=DNS:app.zurupos.com,DNS:api.zurupos.com" \
+  -subj "/CN=zurupos rehearsal" -addext "subjectAltName=DNS:app.zurupos.com,DNS:api.zurupos.com,DNS:zurupos.com,DNS:www.zurupos.com" \
   -keyout deploy/certs/origin.key -out deploy/certs/origin.pem
 export ZURU_REHEARSAL=1 ZURU_ENV_FILE=deploy/.env.rehearsal
 deploy/prod.sh up -d --build --wait
@@ -202,3 +203,9 @@ deploy/prod.sh down -v               # remove the rehearsal, data included
 ```
 
 Mail from the rehearsal is at http://localhost:18025.
+
+## Landing page
+
+`apps/landing/` is the static site at `zurupos.com`: plain HTML, CSS and one small script, with the font and images hosted alongside it. Caddy serves the folder directly (mounted read-only), so a `git pull` publishes changes to it; only a change to the Caddyfile needs `deploy/prod.sh up -d caddy`. `www.zurupos.com` redirects to `zurupos.com`. Its images come from `python3 docs/brand/generate_icons.py` (BRAND.md).
+
+To preview it on your computer: `python3 -m http.server -d apps/landing 8765`, then open http://localhost:8765.
