@@ -19,6 +19,11 @@ Writes:
     favicon.ico                           16/32 simplified, 48 full
     apple-touch-icon.png, icon-192.png, icon-512.png, icon-maskable-512.png
     logo-mark.png                         transparent mark for in-app use
+  apps/landing/img/
+    logo-lockup.png                       transparent mark + wordmark (site header)
+    logo-mark.png                         transparent mark
+    favicon.ico, apple-touch-icon.png, icon-192.png, icon-512.png
+    og-image.png                          link preview (1200x630, lockup on paper)
   docs/brand/
     zuru-icon.png                         transparent master cut-out
     play-store-icon-512.png               Google Play listing icon
@@ -30,8 +35,10 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "docs/brand/zuru-icon-source.png"
+LOCKUP_SOURCE = ROOT / "docs/brand/zuru-logo-source.png"
 RES = ROOT / "apps/cashier/android/app/src/main/res"
 PUBLIC = ROOT / "apps/dashboard/public"
+LANDING = ROOT / "apps/landing/img"
 BRAND = ROOT / "docs/brand"
 
 INK = (26, 26, 26)  # #1A1A1A
@@ -63,6 +70,19 @@ def cutout(img: Image.Image) -> Image.Image:
     rgba = rgb.copy()
     rgba.putalpha(alpha)
     return square(rgba)
+
+
+def cutout_wide(img: Image.Image) -> Image.Image:
+    """Like cutout(), cropped to the artwork instead of squared (the lockup)."""
+    img = img.convert("RGB")
+    out = outside_mask(img)
+    edge = out.filter(ImageFilter.MaxFilter(5))
+    lum = img.convert("L")
+    edge_alpha = lum.point(lambda p: max(0, min(255, round((245 - p) * 255 / (245 - 26)))))
+    alpha = Image.composite(edge_alpha, Image.new("L", img.size, 255), edge)
+    rgb = Image.composite(Image.new("RGB", img.size, INK), img, edge)
+    rgb.putalpha(alpha)
+    return rgb.crop(alpha.point(lambda p: 255 if p > 8 else 0).getbbox())
 
 
 def square(rgba: Image.Image) -> Image.Image:
@@ -180,6 +200,26 @@ def dashboard(mark: Image.Image, simple: Image.Image) -> None:
     write(place(mark, 256, 1.0), PUBLIC / "logo-mark.png")
 
 
+def landing(mark: Image.Image, simple: Image.Image) -> None:
+    lockup = cutout_wide(Image.open(LOCKUP_SOURCE))
+    LANDING.mkdir(parents=True, exist_ok=True)
+    w = 480
+    write(lockup.resize((w, round(lockup.height * w / lockup.width)), Image.LANCZOS), LANDING / "logo-lockup.png")
+    write(place(mark, 384, 1.0), LANDING / "logo-mark.png")
+    ico = LANDING / "favicon.ico"
+    frames = [place(simple, 16, 1.0), place(simple, 32, 1.0), place(mark, 48, 1.0)]
+    frames[-1].save(ico, format="ICO", sizes=[(16, 16), (32, 32), (48, 48)], append_images=frames[:-1])
+    print("wrote", ico.relative_to(ROOT))
+    write(place(mark, 180, 0.64, AMBER), LANDING / "apple-touch-icon.png")
+    write(place(mark, 192, 0.64, AMBER, radius=0.22), LANDING / "icon-192.png")
+    write(place(mark, 512, 0.64, AMBER, radius=0.22), LANDING / "icon-512.png")
+    og = Image.new("RGBA", (1200, 630), CREAM + (255,))
+    lw = 760
+    big = lockup.resize((lw, round(lockup.height * lw / lockup.width)), Image.LANCZOS)
+    og.alpha_composite(big, ((1200 - big.width) // 2, (630 - big.height) // 2))
+    write(og.convert("RGB"), LANDING / "og-image.png")
+
+
 def main() -> None:
     mark = cutout(Image.open(SOURCE))
     mark = mark.resize((1024, 1024), Image.LANCZOS)
@@ -189,6 +229,7 @@ def main() -> None:
     write(place(mark, 512, 0.62, AMBER), BRAND / "play-store-icon-512.png")
     android(mark)
     dashboard(mark, simple)
+    landing(mark, simple)
 
 
 if __name__ == "__main__":
