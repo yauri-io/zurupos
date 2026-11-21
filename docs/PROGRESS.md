@@ -218,3 +218,12 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
   - Never sent: bodies, cookies, tokens, query strings, IPs, emails or screenshots. Unit tests cover the scrubbers. A live check against a stand-in Sentry endpoint (API with Postgres stopped, dashboard in Chrome on an invite link) showed the expected tags and no secrets.
   - To turn it on: three Sentry projects and their DSNs (DEPLOY.md, "Error reporting").
 
+
+### Deployed — 2026-11-22
+- The landing page is live at `https://zurupos.com`; `www` redirects to it. Its main action is *Chat via Whatsapp* (0851-9009-5200).
+- The server runs `1b544bc`, and only Caddy was restarted.
+- A backup taken just before the update reached R2 (10 dumps in the bucket).
+- Checked through Cloudflare:
+  - CSP and headers are set, with no console errors on desktop or a 375 px phone.
+  - `/healthz` is ok and the dashboard login loads.
+- Open: `BACKUP_PING_URL` (Healthchecks.io) and the UptimeRobot monitors aren't set up yet. The page shows no price yet (BRAND.md: no "starting from").
