@@ -127,11 +127,13 @@ services:
     environment:
       APP_DOMAIN: ${APP_DOMAIN}
       API_DOMAIN: ${API_DOMAIN}
+      SITE_DOMAIN: ${SITE_DOMAIN:-zurupos.com}
     ports:
       - '${HTTPS_PORT:-9443}:443'
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./certs:/certs:ro
+      - ../apps/landing:/srv/landing:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
