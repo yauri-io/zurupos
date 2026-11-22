@@ -226,4 +226,7 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Checked through Cloudflare:
   - CSP and headers are set, with no console errors on desktop or a 375 px phone.
   - `/healthz` is ok and the dashboard login loads.
-- Open: `BACKUP_PING_URL` (Healthchecks.io) and the UptimeRobot monitors aren't set up yet. The page shows no price yet (BRAND.md: no "starting from").
+- Open: the page shows no price yet (BRAND.md: no "starting from").
+
+### Monitoring live — 2026-11-22
+- Set up by the owner (D-052): a Healthchecks.io check for the nightly backup (`BACKUP_PING_URL` in `deploy/.env.prod`) and UptimeRobot monitors on `/healthz` and the dashboard login.
