@@ -5,9 +5,17 @@ const api = useApi()
 const run = useAction()
 useHead({ title: () => t('nav.menu') })
 
+const route = useRoute()
+const router = useRouter()
+
 const categories = ref<Category[]>([])
 const items = ref<Item[]>([])
-const selected = ref<string | null>(null)
+// The open category is kept in the URL (?category=) and remembered for the
+// session, so coming back from an item's page, the sidebar or a reload opens
+// the same category again.
+const lastCategory = useState<string | null>('menu-category', () => null)
+const fromQuery = typeof route.query.category === 'string' ? route.query.category : null
+const selected = ref<string | null>(fromQuery ?? lastCategory.value)
 
 const load = async () => {
   const [c, i] = await Promise.all([unwrap(api.GET('/v1/categories')), unwrap(api.GET('/v1/items'))])
@@ -18,6 +26,14 @@ const load = async () => {
   }
 }
 await load()
+watch(
+  selected,
+  (id) => {
+    lastCategory.value = id
+    if (id && route.query.category !== id) router.replace({ query: { ...route.query, category: id } })
+  },
+  { immediate: true },
+)
 
 const visibleItems = computed(() => items.value.filter((i) => i.category_id === selected.value))
 const countIn = (categoryId: string) => items.value.filter((i) => i.category_id === categoryId).length

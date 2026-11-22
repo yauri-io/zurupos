@@ -136,7 +136,14 @@ await refreshPreview()
 <template>
   <PagePanel :title="item?.name ?? ''">
     <template #actions>
-      <UButton to="/menu" icon="i-lucide-arrow-left" variant="ghost" color="neutral" :label="t('nav.menu')" />
+      <UButton
+        :to="item ? { path: '/menu', query: { category: item.category_id } } : '/menu'"
+        icon="i-lucide-arrow-left"
+        data-testid="back-to-menu"
+        variant="ghost"
+        color="neutral"
+        :label="t('nav.menu')"
+      />
     </template>
 
     <div v-if="item" class="grid gap-6 xl:grid-cols-2">
