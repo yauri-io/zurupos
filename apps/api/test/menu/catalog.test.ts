@@ -267,3 +267,93 @@ describe('modifier groups and options', () => {
     expect(body).not.toContain(opt.id)
   })
 })
+
+// D-054: choose the items that offer a group from the group's side.
+describe('group items', () => {
+  const groupsOf = async (itemId: string) =>
+    (await api(t.app, shop.as.owner, 'GET', `/v1/items/${itemId}`)).json<{ modifier_group_ids: string[] }>()
+      .modifier_group_ids
+  const setItems = (groupId: string, itemIds: string[], creds = shop.as.manager) =>
+    api(t.app, creds, 'PUT', `/v1/modifier-groups/${groupId}/items`, { item_ids: itemIds })
+
+  it('adds the group last on new items, keeps the others, and removes it from unpicked items', async () => {
+    const o = shop.as.owner
+    const size = await createGroup(t.app, o, 'Ukuran')
+    const topping = await createGroup(t.app, o, 'Topping', { selection: 'multiple', max_select: 3 })
+    const cat = await createCategory(t.app, o, 'Bulk')
+    const latte = await createItem(t.app, o, cat.id, 'Latte', 25000)
+    const mocha = await createItem(t.app, o, cat.id, 'Mocha', 27000)
+    const tea = await createItem(t.app, o, cat.id, 'Teh', 10000)
+    await attachGroups(t.app, o, latte.id, [size.id])
+
+    const res = await setItems(topping.id, [latte.id, mocha.id])
+    expect(res.statusCode).toBe(200)
+    expect(res.json<{ item_ids: string[] }>().item_ids.sort()).toEqual([latte.id, mocha.id].sort())
+    expect(await groupsOf(latte.id)).toEqual([size.id, topping.id])
+    expect(await groupsOf(mocha.id)).toEqual([topping.id])
+    expect(await groupsOf(tea.id)).toEqual([])
+
+    // Unpick Latte, pick Teh; Mocha stays as it was.
+    expect((await setItems(topping.id, [mocha.id, tea.id])).statusCode).toBe(200)
+    expect(await groupsOf(latte.id)).toEqual([size.id])
+    expect(await groupsOf(mocha.id)).toEqual([topping.id])
+    expect(await groupsOf(tea.id)).toEqual([topping.id])
+
+    expect((await setItems(topping.id, [])).json()).toEqual({ item_ids: [] })
+    expect(await groupsOf(mocha.id)).toEqual([])
+  })
+
+  it('refuses unknown, archived or other shops’ items, and archived groups', async () => {
+    const o = shop.as.owner
+    const g = await createGroup(t.app, o, 'Gula')
+    const cat = await createCategory(t.app, o, 'Bulk refuse')
+    const item = await createItem(t.app, o, cat.id, 'Kopi Hitam', 12000)
+    const gone = await createItem(t.app, o, cat.id, 'Lama', 12000)
+    expect((await api(t.app, o, 'DELETE', `/v1/items/${gone.id}`)).statusCode).toBe(204)
+    const other = await roleShop(t.app, 'catalog-other')
+    const otherCat = await createCategory(t.app, other.as.owner, 'Lain')
+    const otherItem = await createItem(t.app, other.as.owner, otherCat.id, 'Punya orang', 5000)
+
+    for (const ids of [
+      [item.id, gone.id],
+      [item.id, otherItem.id],
+      [item.id, crypto.randomUUID()],
+    ]) {
+      expect((await setItems(g.id, ids)).statusCode).toBe(404)
+    }
+    expect(await groupsOf(item.id)).toEqual([])
+    expect(
+      (await api(t.app, other.as.owner, 'GET', `/v1/items/${otherItem.id}`)).json<{
+        modifier_group_ids: string[]
+      }>().modifier_group_ids,
+    ).toEqual([])
+
+    expect((await api(t.app, o, 'DELETE', `/v1/modifier-groups/${g.id}`)).statusCode).toBe(204)
+    expect((await setItems(g.id, [item.id])).statusCode).toBe(404)
+  })
+
+  it('an item takes at most 20 groups; items that already have the group are fine', async () => {
+    const o = shop.as.owner
+    const cat = await createCategory(t.app, o, 'Bulk full')
+    const full = await createItem(t.app, o, cat.id, 'Penuh', 20000)
+    const groups = []
+    for (let n = 0; n < 20; n++) groups.push((await createGroup(t.app, o, `G${n}`)).id)
+    await attachGroups(t.app, o, full.id, groups)
+    const extra = await createGroup(t.app, o, 'Satu lagi')
+
+    const res = await setItems(extra.id, [full.id])
+    expect(res.statusCode).toBe(400)
+    expect(res.json()).toMatchObject({
+      error: { code: 'VALIDATION', details: { problem: 'too_many_groups' } },
+    })
+    expect(await groupsOf(full.id)).toEqual(groups)
+    expect((await setItems(groups[0] ?? '', [full.id])).statusCode).toBe(200)
+  })
+
+  it('is for owners and managers only', async () => {
+    const g = await createGroup(t.app, shop.as.owner, 'Es batu')
+    expect((await setItems(g.id, [], shop.as.cashier)).statusCode).toBe(403)
+    expect((await setItems(g.id, [], shop.as.employee)).statusCode).toBe(403)
+    expect((await setItems(g.id, [], shop.as.owner)).statusCode).toBe(200)
+  })
+})

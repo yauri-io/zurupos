@@ -5,6 +5,8 @@ import type { App } from '../../http/types.js'
 import {
   CreateGroupBody,
   CreateOptionBody,
+  GroupItemsBody,
+  GroupItemsResponse,
   GroupListResponse,
   GroupResponse,
   OptionResponse,
@@ -53,6 +55,18 @@ export const modifierRoutes = async (app: App) => {
       await request.tenantTx((trx) => service.archiveGroup(trx, requireAuth(request.auth), request.params.id))
       return reply.status(204).send(null)
     },
+  )
+
+  app.put(
+    '/modifier-groups/:id/items',
+    {
+      config: MANAGE,
+      schema: { tags, params: IdParams, body: GroupItemsBody, response: { 200: GroupItemsResponse } },
+    },
+    async (request) =>
+      request.tenantTx((trx) =>
+        service.setGroupItems(trx, requireAuth(request.auth), request.params.id, request.body.item_ids),
+      ),
   )
 
   app.post(

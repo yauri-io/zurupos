@@ -304,3 +304,12 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - The production CSP allows `connect-src https://*.sentry.io`.
 - `@sentry/node` and `@sentry/vue` are pinned at 11.14.0: 11.15.0 was released the day before and is inside pnpm's minimum release age.
 **Consequences:** The tenant id (an opaque UUID) goes to Sentry, a third party, so support can find the shop; nothing else that identifies a shop or person does. Turning Sentry on is a config change (DEPLOY.md, "Error reporting"). The Sentry CLI handoff (it creates the projects and DSNs) couldn't run from the build environment because sentry.io isn't on its network allowlist, so the projects are created by hand.
+
+## D-054: Choosing the items that offer an add-on group, from the group's side
+**Context:** On 2026-11-23, while setting up the pilot menu, the owner reported that attaching an add-on group (e.g. *Topping*) meant opening every item one by one. SPEC §9 only has `PUT /items/:id/modifier-groups`, which sets one item's groups.
+**Decision:**
+- New `PUT /v1/modifier-groups/:id/items` with `{ item_ids }`: the complete list of live items that should offer the group, saved in one transaction. Same permission as the rest of the menu (`menu.manage`: owner, manager).
+- Items that gain the group get it last on their modifier sheet (D-033 order); items that keep it keep their position; unpicked items lose it. Other groups on those items are untouched.
+- Unknown, archived or other shops' items and an archived group → 404, and nothing changes. An item that would go over 20 groups (the `PUT /items/:id/modifier-groups` limit) → 400 `too_many_groups`.
+- The dashboard's add-ons page gets a "Pakai di menu" dialog per group: items listed by category with checkboxes, plus a tick-all per category.
+**Consequences:** One extra menu route; the RLS route table covers it. The tablet picks the change up through the bootstrap's `menu_version` like any other menu edit. The order of groups within an item is still set on the item's page.

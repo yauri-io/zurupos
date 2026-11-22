@@ -60,3 +60,9 @@ export const UpdateOptionBody = Body({
   sort: Type.Optional(Sort),
   is_active: Type.Optional(Type.Boolean()),
 })
+
+// D-054: the items that offer a group, set from the group's side.
+export const GroupItemsBody = Body({
+  item_ids: Type.Array(Uuid, { maxItems: 500, uniqueItems: true }),
+})
+export const GroupItemsResponse = Type.Object({ item_ids: Type.Array(Uuid) })

@@ -153,3 +153,24 @@ export const archiveOption = async (trx: Tx, auth: AuthContext, id: string) => {
   await loadOption(trx, auth, id)
   await q.updateOption(trx, auth.tenantId, id, { archived_at: new Date(), is_default: false })
 }
+
+// Same limit as PUT /items/:id/modifier-groups (ItemGroupsBody).
+const MAX_GROUPS_PER_ITEM = 20
+
+// D-054: choose which items offer this group, from the group's side. Items that
+// gain it get it last on their modifier sheet; the others keep their order.
+export const setGroupItems = async (trx: Tx, auth: AuthContext, id: string, itemIds: string[]) => {
+  await loadGroup(trx, auth, id)
+  const wanted = new Set(await q.liveItemIds(trx, auth.tenantId, itemIds))
+  if (itemIds.some((i) => !wanted.has(i))) throw apiError('NOT_FOUND')
+  const before = new Set(await q.itemsWithGroup(trx, auth.tenantId, id))
+  const added = itemIds.filter((i) => !before.has(i))
+  const removed = [...before].filter((i) => !wanted.has(i))
+  const counts = await q.liveGroupCounts(trx, auth.tenantId, added)
+  if (counts.some((c) => Number(c.n) >= MAX_GROUPS_PER_ITEM)) {
+    throw apiError('VALIDATION', { field: 'item_ids', problem: 'too_many_groups' })
+  }
+  await q.removeGroupFromItems(trx, auth.tenantId, id, removed)
+  await q.appendGroupToItems(trx, auth.tenantId, id, added)
+  return { item_ids: await q.itemsWithGroup(trx, auth.tenantId, id) }
+}

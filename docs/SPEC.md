@@ -562,7 +562,7 @@ Auth headers: dashboard = cookie; cashier app = `X-Device-Token` + `Authorizatio
 | Bootstrap | `GET /device/bootstrap` → tenant settings subset, categories, items, groups, options, item-group links, discounts, `menu_version` (max `updated_at`). Cached by the app. `GET /device/bootstrap?since=<menu_version>` → 304 if unchanged. |
 | Users | `GET/POST /users`, `PATCH /users/:id`, `POST /users/:id/reset-pin`, `POST /users/:id/deactivate` (owner) |
 | Settings | `GET/PATCH /settings` (owner; GET subset for others) |
-| Menu | CRUD `/categories`, `/items`, `/modifier-groups`, `/modifier-options`, `PUT /items/:id/modifier-groups`, `PATCH /items/:id/availability` (owner, manager; availability also cashier) |
+| Menu | CRUD `/categories`, `/items`, `/modifier-groups`, `/modifier-options`, `PUT /items/:id/modifier-groups`, `PUT /modifier-groups/:id/items` (D-054), `PATCH /items/:id/availability` (owner, manager; availability also cashier) |
 | Ingredients | CRUD `/ingredients` (owner, manager; cost fields owner-only), `GET /ingredients/:id/movements` |
 | Recipes | `GET/PUT /items/:id/recipe`, `GET/PUT /modifier-options/:id/effects`, `POST /recipes/preview` (owner, manager) |
 | Stock | `POST /stock/in`, `POST /stock/waste`, `POST /stock/count` (owner, manager, employee) |

@@ -1,3 +1,4 @@
+import { sql } from 'kysely'
 import type { Tx } from '../../db/with-tenant.js'
 
 const GROUP_COLUMNS = ['id', 'name', 'selection', 'min_select', 'max_select', 'sort'] as const
@@ -87,6 +88,87 @@ export const detachGroupFromItems = (trx: Tx, tenantId: string, groupId: string)
     .where('tenant_id', '=', tenantId)
     .where('group_id', '=', groupId)
     .execute()
+
+// D-054: attaching a group from the group's side.
+export const liveItemIds = async (trx: Tx, tenantId: string, ids: readonly string[]) =>
+  ids.length === 0
+    ? []
+    : (
+        await trx
+          .selectFrom('items')
+          .select('id')
+          .where('tenant_id', '=', tenantId)
+          .where('id', 'in', ids)
+          .where('archived_at', 'is', null)
+          .execute()
+      ).map((r) => r.id)
+
+// Live items that offer the group.
+export const itemsWithGroup = async (trx: Tx, tenantId: string, groupId: string) =>
+  (
+    await trx
+      .selectFrom('item_modifier_groups as l')
+      .innerJoin('items as i', (j) =>
+        j.onRef('i.tenant_id', '=', 'l.tenant_id').onRef('i.id', '=', 'l.item_id'),
+      )
+      .select('l.item_id')
+      .where('l.tenant_id', '=', tenantId)
+      .where('l.group_id', '=', groupId)
+      .where('i.archived_at', 'is', null)
+      .orderBy('i.sort')
+      .orderBy('i.name')
+      .execute()
+  ).map((r) => r.item_id)
+
+// How many live groups each item already offers (an item takes at most 20).
+export const liveGroupCounts = (trx: Tx, tenantId: string, itemIds: readonly string[]) =>
+  itemIds.length === 0
+    ? Promise.resolve([])
+    : trx
+        .selectFrom('item_modifier_groups as l')
+        .innerJoin('modifier_groups as g', (j) =>
+          j.onRef('g.tenant_id', '=', 'l.tenant_id').onRef('g.id', '=', 'l.group_id'),
+        )
+        .select(['l.item_id', (eb) => eb.fn.countAll<string>().as('n')])
+        .where('l.tenant_id', '=', tenantId)
+        .where('l.item_id', 'in', itemIds)
+        .where('g.archived_at', 'is', null)
+        .groupBy('l.item_id')
+        .execute()
+
+// Adds the group last on each item's modifier sheet; existing links are kept.
+export const appendGroupToItems = async (
+  trx: Tx,
+  tenantId: string,
+  groupId: string,
+  itemIds: readonly string[],
+) => {
+  if (itemIds.length === 0) return
+  await sql`
+    insert into item_modifier_groups (tenant_id, item_id, group_id, sort)
+    select i.tenant_id, i.id, ${groupId}::uuid,
+           coalesce((select max(l.sort) + 1 from item_modifier_groups l
+                     where l.tenant_id = i.tenant_id and l.item_id = i.id), 0)
+    from items i
+    where i.tenant_id = ${tenantId} and i.id in (${sql.join(itemIds)})
+    on conflict (item_id, group_id) do nothing
+  `.execute(trx)
+}
+
+export const removeGroupFromItems = async (
+  trx: Tx,
+  tenantId: string,
+  groupId: string,
+  itemIds: readonly string[],
+) => {
+  if (itemIds.length === 0) return
+  await trx
+    .deleteFrom('item_modifier_groups')
+    .where('tenant_id', '=', tenantId)
+    .where('group_id', '=', groupId)
+    .where('item_id', 'in', itemIds)
+    .execute()
+}
 
 export const findOption = (trx: Tx, tenantId: string, id: string) =>
   trx

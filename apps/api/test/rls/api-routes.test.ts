@@ -63,6 +63,11 @@ const ID_ROUTES: Record<string, { caller: Caller; params: Record<string, Resourc
     body: { name: 'X' },
   },
   'DELETE /v1/modifier-groups/{id}': { caller: 'dashboard', params: { id: 'modifier_group' } },
+  'PUT /v1/modifier-groups/{id}/items': {
+    caller: 'dashboard',
+    params: { id: 'modifier_group' },
+    body: { item_ids: [] },
+  },
   'PATCH /v1/modifier-options/{id}': {
     caller: 'dashboard',
     params: { id: 'modifier_option' },
