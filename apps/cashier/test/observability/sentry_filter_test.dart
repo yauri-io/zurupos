@@ -1,4 +1,5 @@
-// D-053: expected API failures never reach Sentry; real crashes do.
+// D-053: expected API failures never reach Sentry; real crashes do, without
+// screenshots or the view hierarchy.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:zurupos_cashier/api/api_error.dart';
@@ -16,5 +17,12 @@ void main() {
   test('keeps 5xx answers and everything else', () {
     expect(filter(const ApiException('INTERNAL', status: 500)), isNotNull);
     expect(filter(StateError('boom')), isNotNull);
+  });
+
+  test('screenshots and the view hierarchy stay off', () {
+    final options = SentryFlutterOptions();
+    expect(options.attachScreenshot, isFalse);
+    // ignore: experimental_member_use
+    expect(options.attachViewHierarchy, isFalse);
   });
 }

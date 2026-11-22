@@ -18,6 +18,8 @@ SentryEvent? filterEvent(SentryEvent event, Hint hint) {
 
 /// Runs the app, inside Sentry when a DSN was given at build time. No
 /// screenshots or view hierarchy: the screen shows orders, amounts and names.
+/// The view hierarchy is off by Sentry's default (the option is experimental,
+/// so it isn't set here); a test checks that default.
 Future<void> runWithSentry(Widget app) async {
   if (sentryDsn.isEmpty) {
     runApp(app);
@@ -28,7 +30,6 @@ Future<void> runWithSentry(Widget app) async {
     options.environment = sentryEnvironment;
     options.sendDefaultPii = false;
     options.attachScreenshot = false;
-    options.attachViewHierarchy = false;
     options.beforeSend = filterEvent;
   }, appRunner: () => runApp(app));
 }
