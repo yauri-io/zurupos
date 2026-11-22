@@ -231,3 +231,9 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 ### Monitoring live — 2026-11-22
 - Set up by the owner (D-052): a Healthchecks.io check for the nightly backup (`BACKUP_PING_URL` in `deploy/.env.prod`) and UptimeRobot monitors on `/healthz` and the dashboard login.
 - Sentry: the API project receives events (test event from the server). An earlier 403 was a setting on the Sentry side. The test command is in DEPLOY.md, "Error reporting".
+
+### Menu setup feedback — 2026-11-23 (local; not deployed yet)
+- The menu page keeps the open category in the URL and for the session: the item page's back button, the sidebar and a reload reopen it.
+- Add-on groups can be put on many items at once (D-054): *Pakai di menu* on each group opens the items by category with a tick-all per category; `PUT /v1/modifier-groups/:id/items` saves it in one transaction.
+- Tests: API catalog + RLS suites (287), dashboard e2e 5 (new `menu-setup.spec.ts`).
+
