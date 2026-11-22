@@ -135,7 +135,15 @@
     "rule_single_optional": "Pick one (optional)",
     "rule_multiple": "Pick {min}–{max}",
     "confirm_archive_group": "Archive group \"{name}\"? It will be removed from every item.",
-    "confirm_archive_option": "Archive option \"{name}\"?"
+    "confirm_archive_option": "Archive option \"{name}\"?",
+    "use_on_items": "Use on items",
+    "used_on": "Used on {n} items",
+    "used_on_none": "Not used on any item yet",
+    "items_title": "Items with {name}",
+    "items_help": "Tick the items that offer this group. Newly ticked items get it last; change the order on the item's page.",
+    "items_all": "All",
+    "items_empty": "No items yet. Add them on the Menu page first.",
+    "items_selected": "{n} items selected"
   },
   "effects": {
     "button": "Ingredient effects",
@@ -257,7 +265,8 @@
     "pin_weak": "This PIN is too easy to guess. Avoid repeated digits (1111), runs (1234, 4321) and common patterns (1212).",
     "password_too_short": "The password must be at least 8 characters.",
     "password_too_long": "The password can be at most 128 characters.",
-    "password_common": "This password is too common. Choose another one."
+    "password_common": "This password is too common. Choose another one.",
+    "too_many_groups": "One of the items already has 20 groups, the maximum. Remove another group from that item first."
   },
   "range": {
     "today": "Today",

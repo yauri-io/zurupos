@@ -135,7 +135,15 @@
     "rule_single_optional": "Pilih satu (opsional)",
     "rule_multiple": "Pilih {min}–{max}",
     "confirm_archive_group": "Arsipkan grup \"{name}\"? Grup akan dilepas dari semua menu.",
-    "confirm_archive_option": "Arsipkan opsi \"{name}\"?"
+    "confirm_archive_option": "Arsipkan opsi \"{name}\"?",
+    "use_on_items": "Pakai di menu",
+    "used_on": "Dipakai di {n} menu",
+    "used_on_none": "Belum dipakai di menu mana pun",
+    "items_title": "Menu dengan {name}",
+    "items_help": "Centang menu yang menawarkan grup ini. Menu yang baru dicentang mendapat grup ini di urutan terakhir; urutannya bisa diubah di halaman menu itu.",
+    "items_all": "Semua",
+    "items_empty": "Belum ada menu. Tambahkan dulu di halaman Menu.",
+    "items_selected": "{n} menu dipilih"
   },
   "effects": {
     "button": "Efek bahan",
@@ -257,7 +265,8 @@
     "pin_weak": "PIN terlalu mudah ditebak. Hindari angka sama semua (1111), berurutan (1234, 4321) atau pola umum (1212).",
     "password_too_short": "Kata sandi minimal 8 karakter.",
     "password_too_long": "Kata sandi maksimal 128 karakter.",
-    "password_common": "Kata sandi terlalu umum. Pilih kata sandi lain."
+    "password_common": "Kata sandi terlalu umum. Pilih kata sandi lain.",
+    "too_many_groups": "Salah satu menu sudah punya 20 grup pilihan, batas maksimalnya. Lepas grup lain dari menu itu dulu."
   },
   "range": {
     "today": "Hari ini",
