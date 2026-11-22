@@ -109,6 +109,24 @@ Sentry collects crashes and unexpected errors from the API, the outbox worker, t
 3. `deploy/prod.sh up -d api worker dashboard caddy`. Caddy needs the restart for the new CSP, which lets the dashboard reach `*.sentry.io`.
 4. For the app, build with the cashier project's DSN: `SENTRY_DSN=<dsn> apps/cashier/tool/build_release.sh https://api.zurupos.com`.
 5. In each project, add an alert rule that emails the developer on a new issue.
+6. Send a test event. Healthy services can leave Sentry empty for days, because only real failures are reported.
+   - API (change `api` to `worker` for the worker; it prints Sentry's status and reason):
+
+     ```sh
+     deploy/prod.sh exec -T api node --input-type=module -e '
+     const u = new URL(process.env.SENTRY_DSN)
+     const body = JSON.stringify({ dsn: u.href }) + "\n" + JSON.stringify({ type: "event" }) + "\n" +
+       JSON.stringify({ message: "Sentry test (api)", level: "error", platform: "node" }) + "\n"
+     const res = await fetch("https://" + u.host + "/api" + u.pathname + "/envelope/", {
+       method: "POST",
+       headers: { "Content-Type": "application/x-sentry-envelope",
+                  "X-Sentry-Auth": "Sentry sentry_version=7, sentry_key=" + u.username },
+       body })
+     console.log(res.status, await res.text())'
+     ```
+
+     `200` means the event arrived. `403` means Sentry refused it: the key is disabled, the key and project ID don't match, or the project or plan isn't active. The reply says which. No `SENTRY_DSN` in the container means `.env.prod` changed after it started; recreate it with `deploy/prod.sh up -d api worker`.
+   - Dashboard: in the browser console on the dashboard, `setTimeout(() => { throw new Error('Sentry test (dashboard)') })`. An error thrown directly in the console isn't reported.
 
 What is sent: the error, its stack trace, the request method and route, the request id (also in the `x-request-id` response header and the API logs), the shop's tenant id, and the browser or app version. What is never sent: request bodies (PINs, passwords, customer names), cookies, auth and device tokens, query strings, invite and reset tokens, IP addresses, emails, and screenshots. Expected failures (4xx answers, lost connections on the tablet) aren't reported.
 

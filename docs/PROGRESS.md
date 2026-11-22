@@ -230,3 +230,4 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 
 ### Monitoring live — 2026-11-22
 - Set up by the owner (D-052): a Healthchecks.io check for the nightly backup (`BACKUP_PING_URL` in `deploy/.env.prod`) and UptimeRobot monitors on `/healthz` and the dashboard login.
+- Sentry: the API project receives events (test event from the server). An earlier 403 was a setting on the Sentry side. The test command is in DEPLOY.md, "Error reporting".
