@@ -242,3 +242,8 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Run: one-time setup and release steps in `docs/DEPLOY.md` §5, "Automatic release".
 - Verified: the first tagged release built on GitHub and published to R2 (after fixing the signer-digest check for build-tools 37).
 - Landing page footer links to the latest APK ("Unduh aplikasi kasir (Android)"). Goes live with the next server update (DEPLOY.md §6).
+
+### New-owner guidance — 2026-11-24
+- Done (D-056): setup checklist on Home (signup lands there), teaching empty states on the menu, modifier, ingredient, stock, discount and device pages, and (?) help tips on settings, ingredient, modifier, item, staff and discount forms. The user guide mentions both.
+- Run: `pnpm --filter @zurupos/dashboard test` (checklist rules in `test/setup.test.ts`), `pnpm --filter @zurupos/dashboard test:e2e` (signup now expects Home with the checklist).
+- Tests: dashboard unit 43, e2e 5.

@@ -14,7 +14,9 @@ Ada dua bagian:
 1. Buka dashboard, pilih **Daftarkan toko**.
 2. Isi nama toko, nama Anda, email, kata sandi (minimal 8 karakter), dan **PIN** 4–6 angka.
    PIN dipakai untuk masuk di aplikasi kasir. PIN yang terlalu mudah ditolak: angka sama semua (`1111`), berurutan (`1234`, `4321`) atau pola umum (`1212`).
-3. Setelah daftar, Anda langsung masuk ke **Pengaturan**.
+3. Setelah daftar, Anda masuk ke **Beranda**. Di sana ada kartu **Siapkan toko Anda**: daftar langkah dari profil toko sampai pesanan percobaan pertama. Setiap langkah tercentang sendiri setelah selesai, dan kartunya hilang setelah langkah wajib selesai (bahan dan staf boleh dilewati).
+
+Tanda **(?)** di samping istilah seperti *Pergantian hari*, *Satuan dasar* atau *HPP rata-rata* membuka penjelasan singkat.
 
 ## 2. Pengaturan toko
 
