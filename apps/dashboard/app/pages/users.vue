@@ -183,6 +183,7 @@ const localeItems = [
             <UInput v-model="form.name" class="w-full" :maxlength="80" autofocus />
           </UFormField>
           <UFormField :label="t('users.role')" name="role">
+            <template #hint><HelpTip :text="t('help.role')" /></template>
             <USelect v-model="form.role" :items="roleItems" class="w-full" />
           </UFormField>
           <UFormField

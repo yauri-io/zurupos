@@ -22,8 +22,28 @@ const revoke = async (d: Device) => {
 
 <template>
   <PagePanel :title="t('nav.devices')">
+    <template #actions>
+      <UButton
+        :to="CASHIER_APK_URL"
+        external
+        icon="i-lucide-download"
+        variant="soft"
+        :label="t('devices.download')"
+      />
+    </template>
     <p class="text-sm text-muted mb-3">{{ t('devices.help') }}</p>
-    <p v-if="devices.length === 0" class="text-muted text-center py-12">{{ t('devices.empty') }}</p>
+    <EmptyState
+      v-if="devices.length === 0"
+      icon="i-lucide-tablet-smartphone"
+      :title="t('devices.empty_title')"
+    >
+      <ol class="list-decimal ps-5 text-sm text-muted text-start max-w-md flex flex-col gap-1">
+        <li>{{ t('devices.step_download') }}</li>
+        <li>{{ t('devices.step_login') }}</li>
+        <li>{{ t('devices.step_done') }}</li>
+      </ol>
+      <UButton :to="CASHIER_APK_URL" external icon="i-lucide-download" :label="t('devices.download')" />
+    </EmptyState>
     <div
       v-else
       class="flex flex-col divide-y divide-(--ui-border) border border-default rounded-md"

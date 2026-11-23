@@ -163,10 +163,14 @@ const colorItems = computed(() => ITEM_COLORS.map((c) => ({ label: t(`colors.${c
       <UButton icon="i-lucide-plus" :label="t('menu.add_category')" variant="soft" @click="editCategory()" />
     </template>
 
-    <div v-if="categories.length === 0" class="text-center py-16 flex flex-col items-center gap-3">
-      <p class="text-muted">{{ t('menu.empty_categories') }}</p>
+    <EmptyState
+      v-if="categories.length === 0"
+      icon="i-lucide-coffee"
+      :title="t('menu.empty_categories_title')"
+      :description="t('menu.empty_categories')"
+    >
       <UButton icon="i-lucide-plus" :label="t('menu.add_category')" @click="editCategory()" />
-    </div>
+    </EmptyState>
 
     <div v-else class="grid gap-6 lg:grid-cols-[16rem_1fr]">
       <div class="flex flex-col gap-1" data-testid="categories">
@@ -212,9 +216,12 @@ const colorItems = computed(() => ITEM_COLORS.map((c) => ({ label: t(`colors.${c
           <h2 class="font-semibold">{{ categories.find((c) => c.id === selected)?.name }}</h2>
           <UButton icon="i-lucide-plus" :label="t('menu.add_item')" @click="editItem()" />
         </div>
-        <p v-if="visibleItems.length === 0" class="text-muted py-8 text-center">
-          {{ t('menu.empty_items') }}
-        </p>
+        <EmptyState
+          v-if="visibleItems.length === 0"
+          icon="i-lucide-cup-soda"
+          :title="t('menu.empty_items')"
+          :description="t('menu.empty_items_help')"
+        />
         <div
           v-else
           class="flex flex-col divide-y divide-(--ui-border) border border-default rounded-md"

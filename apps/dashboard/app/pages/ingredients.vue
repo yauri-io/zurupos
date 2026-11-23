@@ -100,7 +100,14 @@ const unitItems = computed(() =>
       :placeholder="t('common.search')"
       class="mb-4 w-full sm:w-72"
     />
-    <p v-if="ingredients.length === 0" class="text-muted text-center py-16">{{ t('ingredients.empty') }}</p>
+    <EmptyState
+      v-if="ingredients.length === 0"
+      icon="i-lucide-package"
+      :title="t('ingredients.empty_title')"
+      :description="t('ingredients.empty_help')"
+    >
+      <UButton icon="i-lucide-plus" :label="t('ingredients.add')" @click="edit()" />
+    </EmptyState>
     <div
       v-else
       class="flex flex-col divide-y divide-(--ui-border) border border-default rounded-md"
@@ -132,6 +139,7 @@ const unitItems = computed(() =>
           </p>
           <p v-if="showCosts && i.avg_cost !== undefined" class="text-xs text-muted tabular-nums">
             {{ t('ingredients.avg_cost') }}: {{ formatQty(i.avg_cost) }} / {{ i.base_unit }}
+            <HelpTip :text="t('help.avg_cost')" />
           </p>
         </div>
         <UButton
@@ -163,6 +171,7 @@ const unitItems = computed(() =>
             :help="form.id ? t('ingredients.unit_fixed') : t('ingredients.unit_help')"
             name="base_unit"
           >
+            <template #hint><HelpTip :text="t('help.base_unit')" /></template>
             <USelect v-model="form.base_unit" :items="unitItems" :disabled="!!form.id" class="w-full" />
           </UFormField>
           <UFormField
@@ -178,6 +187,7 @@ const unitItems = computed(() =>
               :help="t('ingredients.purchase_unit_help')"
               name="purchase_unit_name"
             >
+              <template #hint><HelpTip :text="t('help.purchase_unit')" /></template>
               <UInput v-model="form.purchase_unit_name" class="w-full" />
             </UFormField>
             <UFormField

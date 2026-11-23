@@ -150,7 +150,7 @@ await refreshPreview()
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="font-semibold">{{ t('item.recipe') }}</h2>
+            <h2 class="font-semibold">{{ t('item.recipe') }} <HelpTip :text="t('help.recipe')" /></h2>
             <span class="text-sm text-muted">{{ t('item.recipe_per_unit') }}</span>
           </div>
         </template>
@@ -194,7 +194,9 @@ await refreshPreview()
 
       <UCard>
         <template #header>
-          <h2 class="font-semibold">{{ t('item.modifier_groups') }}</h2>
+          <h2 class="font-semibold">
+            {{ t('item.modifier_groups') }} <HelpTip :text="t('help.item_groups')" />
+          </h2>
         </template>
         <div class="flex flex-col gap-2" data-testid="item-groups">
           <p v-if="attached.length === 0" class="text-muted text-sm">{{ t('item.no_groups') }}</p>

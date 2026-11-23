@@ -209,7 +209,14 @@ const rule = (g: ModifierGroup) =>
       <UButton icon="i-lucide-plus" :label="t('modifiers.add_group')" @click="editGroup()" />
     </template>
 
-    <p v-if="groups.length === 0" class="text-muted text-center py-16">{{ t('modifiers.empty') }}</p>
+    <EmptyState
+      v-if="groups.length === 0"
+      icon="i-lucide-sliders-horizontal"
+      :title="t('modifiers.empty_title')"
+      :description="t('modifiers.empty')"
+    >
+      <UButton icon="i-lucide-plus" :label="t('modifiers.add_group')" @click="editGroup()" />
+    </EmptyState>
     <div class="grid gap-4 lg:grid-cols-2" data-testid="groups">
       <UCard v-for="g in groups" :key="g.id">
         <template #header>
@@ -317,6 +324,7 @@ const rule = (g: ModifierGroup) =>
             <UInput v-model="groupForm.name" class="w-full" autofocus />
           </UFormField>
           <UFormField :label="t('modifiers.selection')" name="selection">
+            <template #hint><HelpTip :text="t('help.selection')" /></template>
             <URadioGroup
               v-model="groupForm.selection"
               orientation="horizontal"
@@ -328,6 +336,7 @@ const rule = (g: ModifierGroup) =>
           </UFormField>
           <div class="grid grid-cols-2 gap-4">
             <UFormField :label="t('modifiers.min_select')" :help="t('modifiers.min_help')" name="min_select">
+              <template #hint><HelpTip :text="t('help.min_max')" /></template>
               <UInputNumber
                 v-model="groupForm.min_select"
                 :min="0"

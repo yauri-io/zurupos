@@ -78,7 +78,14 @@ const describe = (d: Discount) => (d.kind === 'percent' ? formatBps(d.value) : f
     <template #actions>
       <UButton icon="i-lucide-plus" :label="t('discounts.add')" @click="edit()" />
     </template>
-    <p v-if="discounts.length === 0" class="text-muted text-center py-16">{{ t('discounts.empty') }}</p>
+    <EmptyState
+      v-if="discounts.length === 0"
+      icon="i-lucide-percent"
+      :title="t('discounts.empty_title')"
+      :description="t('discounts.empty_help')"
+    >
+      <UButton icon="i-lucide-plus" :label="t('discounts.add')" @click="edit()" />
+    </EmptyState>
     <div
       v-else
       class="flex flex-col divide-y divide-(--ui-border) border border-default rounded-md"
@@ -118,6 +125,7 @@ const describe = (d: Discount) => (d.kind === 'percent' ? formatBps(d.value) : f
             <UInput v-model="form.name" class="w-full" autofocus />
           </UFormField>
           <UFormField :label="t('discounts.scope')" name="scope">
+            <template #hint><HelpTip :text="t('help.discount_scope')" /></template>
             <URadioGroup
               v-model="form.scope"
               orientation="horizontal"

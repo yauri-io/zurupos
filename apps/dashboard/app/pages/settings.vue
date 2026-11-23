@@ -119,6 +119,7 @@ const save = async () => {
               :help="t('settings.cutoff_help')"
               name="business_day_cutoff_hour"
             >
+              <template #hint><HelpTip :text="t('help.cutoff')" /></template>
               <UInputNumber v-model="form.business_day_cutoff_hour" :min="0" :max="6" class="w-full" />
             </UFormField>
           </div>
@@ -130,7 +131,10 @@ const save = async () => {
           ><h2 class="font-semibold">{{ t('settings.tax_service') }}</h2></template
         >
         <div class="flex flex-col gap-4">
-          <USwitch v-model="form.tax_enabled" :label="t('settings.tax_enabled')" />
+          <div class="flex items-center gap-1">
+            <USwitch v-model="form.tax_enabled" :label="t('settings.tax_enabled')" />
+            <HelpTip :text="t('help.tax')" />
+          </div>
           <div v-if="form.tax_enabled" class="grid sm:grid-cols-2 gap-4">
             <UFormField :label="t('settings.tax_name')" name="tax_name">
               <UInput v-model="form.tax_name" class="w-full" />
@@ -145,7 +149,10 @@ const save = async () => {
               </UInput>
             </UFormField>
           </div>
-          <USwitch v-model="form.service_charge_enabled" :label="t('settings.service_enabled')" />
+          <div class="flex items-center gap-1">
+            <USwitch v-model="form.service_charge_enabled" :label="t('settings.service_enabled')" />
+            <HelpTip :text="t('help.service')" />
+          </div>
           <UFormField
             v-if="form.service_charge_enabled"
             :label="t('settings.rate')"
@@ -156,11 +163,10 @@ const save = async () => {
               <template #trailing><span class="text-muted">%</span></template>
             </UInput>
           </UFormField>
-          <USwitch
-            v-if="form.tax_enabled && form.service_charge_enabled"
-            v-model="form.tax_on_service_charge"
-            :label="t('settings.tax_on_service')"
-          />
+          <div v-if="form.tax_enabled && form.service_charge_enabled" class="flex items-center gap-1">
+            <USwitch v-model="form.tax_on_service_charge" :label="t('settings.tax_on_service')" />
+            <HelpTip :text="t('help.tax_on_service')" />
+          </div>
           <p class="text-xs text-muted">{{ t('settings.prices_exclude_tax') }}</p>
           <dl
             class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 text-sm rounded-md bg-elevated p-3 max-w-sm"

@@ -50,7 +50,20 @@ const filterItems = computed(() => [
       <p v-if="stock" class="text-sm">
         {{ t('reports.stock_value') }}: <span class="font-semibold">{{ formatIdr(stock.total) }}</span>
       </p>
-      <p v-if="shown.length === 0" class="text-muted text-center py-12">{{ t('ingredients.empty') }}</p>
+      <EmptyState
+        v-if="ingredients.length === 0"
+        icon="i-lucide-warehouse"
+        :title="t('ingredients.empty_title')"
+        :description="t('inventory.empty_help')"
+      >
+        <UButton
+          v-if="can('menu.manage')"
+          to="/ingredients"
+          icon="i-lucide-plus"
+          :label="t('ingredients.add')"
+        />
+      </EmptyState>
+      <p v-else-if="shown.length === 0" class="text-muted text-center py-12">{{ t('ingredients.empty') }}</p>
       <div
         v-else
         class="flex flex-col divide-y divide-(--ui-border) border border-default rounded-md"
