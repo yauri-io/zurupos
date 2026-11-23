@@ -166,6 +166,71 @@ adb install apps/cashier/build/app/outputs/flutter-apk/app-release.apk
 
 Release builds only talk HTTPS. A tablet that has the **debug** app must uninstall it first, because the signatures differ. Before uninstalling, make sure **Pesanan hari ini** shows no unsent order, because uninstalling deletes the device pairing and any order still waiting on the tablet. Then pair the tablet again, and revoke its old entry in the dashboard under **Perangkat**.
 
+### Automatic release (GitHub Actions)
+
+`.github/workflows/cashier-release.yml` builds, signs and publishes the release APK when you push a tag like `cashier-v0.2.0` (D-055). Normal pushes never build a release. Downloads:
+
+- Latest: `https://dl.zurupos.com/cashier/zurupos-cashier.apk`
+- One version: `https://dl.zurupos.com/cashier/zurupos-cashier-0.2.0.apk` (kept for rollback), with a `.sha256` next to it
+- `https://dl.zurupos.com/cashier/latest.json`: version, version code, URL, size, SHA-256, date
+
+The same files are attached to a GitHub Release for the tag.
+
+**One-time setup**
+
+1. **R2 bucket** (Cloudflare → R2): create `zurupos-downloads`. Don't reuse the backup bucket, which must stay private.
+   - *Settings → Custom Domains → Connect domain* `dl.zurupos.com`. That makes the bucket readable at that address and nowhere else. Leave the `r2.dev` URL off.
+   - *R2 → Manage API tokens → Create API token*: **Object Read & Write**, limited to `zurupos-downloads` only. Note the Access Key ID, the Secret Access Key and your Account ID.
+2. **Signing certificate fingerprint**, from the same keystore as above:
+
+   ```sh
+   keytool -list -v -keystore ~/zurupos-keys/zurupos-release.jks -alias zurupos | grep SHA256
+   ```
+
+   The workflow refuses to publish an APK signed with any other key, because tablets would refuse it as an update.
+3. **GitHub environment** (repo → *Settings → Environments → New environment*): `production`.
+   - *Required reviewers*: yourself. Every release waits for your approval before the job can read the signing key.
+   - *Deployment branches and tags*: *Selected branches and tags*, add the tag rule `cashier-v*`.
+4. **Environment secrets** (in `production`):
+
+   | Secret | Value |
+   |---|---|
+   | `ANDROID_KEYSTORE_BASE64` | `base64 -i ~/zurupos-keys/zurupos-release.jks \| pbcopy`, then paste |
+   | `ANDROID_KEYSTORE_PASSWORD` | the keystore password |
+   | `ANDROID_KEY_ALIAS` | `zurupos` |
+   | `ANDROID_KEY_PASSWORD` | the key password |
+   | `R2_ACCOUNT_ID` | Cloudflare account ID |
+   | `R2_ACCESS_KEY_ID` | from step 1 |
+   | `R2_SECRET_ACCESS_KEY` | from step 1 |
+   | `CASHIER_SENTRY_DSN` | the cashier app's Sentry DSN (optional; leave it out for no crash reporting) |
+
+5. **Environment variables** (in `production`, not secret):
+
+   | Variable | Value |
+   |---|---|
+   | `R2_DOWNLOADS_BUCKET` | `zurupos-downloads` |
+   | `ANDROID_SIGNING_CERT_SHA256` | the SHA256 from step 2 (colons are fine) |
+
+6. **Tag protection** (repo → *Settings → Rules → Rulesets → New tag ruleset*): target `cashier-v*`, restrict creation, update and deletion to yourself.
+
+**Releasing**
+
+```sh
+git switch main && git pull
+git tag cashier-v0.2.0
+git push origin cashier-v0.2.0
+```
+
+Then approve the run under *Actions*. The version comes from the tag (`MAJOR.MINOR.PATCH`, minor and patch 0–99). The Android version code is `MAJOR*10000 + MINOR*100 + PATCH`, so `0.2.0` is 200. The run stops without publishing if:
+- the tagged commit isn't on `main`
+- that version is already in the bucket
+- `flutter analyze` or `flutter test` fails
+- the APK isn't signed with the release certificate
+
+To release again, bump the version; never move a tag.
+
+On the tablet, open the latest link in the browser and install over the old app. The first time, Android asks to allow installs from the browser.
+
 ## 6. Updates
 
 ```sh

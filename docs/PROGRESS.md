@@ -237,3 +237,7 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Add-on groups can be put on many items at once (D-054): *Pakai di menu* on each group opens the items by category with a tick-all per category; `PUT /v1/modifier-groups/:id/items` saves it in one transaction.
 - Tests: API catalog + RLS suites (287), dashboard e2e 5 (new `menu-setup.spec.ts`).
 
+### Release automation — 2026-11-23
+- Done: `.github/workflows/cashier-release.yml` builds, signs and publishes the cashier APK to R2 (`dl.zurupos.com`) and a GitHub Release when a `cashier-v*` tag is pushed (D-055). `build_release.sh` passes extra args (`--build-name`, `--build-number`) to `flutter build apk`.
+- Run: one-time setup and release steps in `docs/DEPLOY.md` §5, "Automatic release".
+- Known issues: not run on GitHub yet. The bucket, custom domain, environment and secrets still have to be created by the owner. The landing page has no download link yet.

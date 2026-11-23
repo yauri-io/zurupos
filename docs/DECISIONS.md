@@ -313,3 +313,14 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - Unknown, archived or other shops' items and an archived group → 404, and nothing changes. An item that would go over 20 groups (the `PUT /items/:id/modifier-groups` limit) → 400 `too_many_groups`.
 - The dashboard's add-ons page gets a "Pakai di menu" dialog per group: items listed by category with checkboxes, plus a tick-all per category.
 **Consequences:** One extra menu route; the RLS route table covers it. The tablet picks the change up through the bootstrap's `menu_version` like any other menu edit. The order of groups within an item is still set on the item's page.
+
+## D-055: Automatic production builds of the cashier APK, hosted on R2
+**Context:** On 2026-11-23 the owner asked for the release APK to be built automatically and downloadable from zurupos.com, for production builds only. Until now it was built by hand on the owner's computer (`build_release.sh`) and installed with `adb`.
+**Decision:**
+- A GitHub Actions workflow (`cashier-release.yml`) runs only for a `cashier-vMAJOR.MINOR.PATCH` tag on a commit that is on `main`. Normal pushes never build a release.
+- The signing keystore and passwords live as secrets in a `production` GitHub environment that needs the owner's approval. The job restores them for the build and deletes them right after.
+- The version comes from the tag. The version code is `MAJOR*10000 + MINOR*100 + PATCH`, so it grows with every version without anything to store. Minor and patch are capped at 99.
+- Before publishing, the workflow checks that the APK is signed with the release certificate (a fingerprint stored as an environment variable). A wrong key in the secrets would produce an APK that tablets refuse as an update.
+- The workflow publishes to its own public R2 bucket on `dl.zurupos.com`, not to the VPS. That way GitHub never holds an SSH key to the server, and a release doesn't touch Caddy or the landing page. The bucket token can write only that bucket. Versioned APKs are never overwritten (the workflow refuses an existing version) and are kept for rollback. `zurupos-cashier.apk` and `latest.json` point at the newest version and are uploaded last.
+- The download is public. The APK holds only the API URL and the Sentry DSN, both already public, and the app does nothing without a shop pairing.
+**Consequences:** Whoever can approve a run in the `production` environment can ship a signed update, so only the owner should be a required reviewer. If the key leaks from GitHub, the owner can't rotate it without reinstalling every tablet (Android has no key rotation for sideloaded APKs without v3 lineage). The offline copies stay the master. `latest.json` is published now so a later in-app "update available" check can use it, but that check isn't built.
