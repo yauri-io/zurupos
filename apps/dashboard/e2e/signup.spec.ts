@@ -1,4 +1,4 @@
-// A new owner registers the shop from the login page and lands on settings.
+// A new owner registers the shop from the login page and lands on Home, with the setup checklist.
 // The first try uses a weak PIN and must say why it failed.
 import { randomUUID } from 'node:crypto'
 import { expect, test } from '@playwright/test'
@@ -22,7 +22,8 @@ test('owner registers a shop in the dashboard', async ({ page }) => {
   await expect(page).toHaveURL(/\/signup$/)
   await page.getByLabel('PIN').fill('2580')
   await page.getByRole('button', { name: 'Daftar' }).click()
-  await expect(page).toHaveURL(/\/settings$/)
+  await expect(page).toHaveURL(/\/$/)
+  await expect(page.getByTestId('setup-checklist')).toContainText('Siapkan toko Anda')
   await expect(page.getByText('Kopi Daftar E2E').first()).toBeVisible()
 })
 

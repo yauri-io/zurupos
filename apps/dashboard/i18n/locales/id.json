@@ -41,7 +41,8 @@
     "active": "Aktif",
     "search": "Cari…",
     "move_up": "Naikkan",
-    "move_down": "Turunkan"
+    "move_down": "Turunkan",
+    "help": "Bantuan"
   },
   "auth": {
     "login_title": "Masuk ke dasbor",
@@ -86,7 +87,7 @@
     "edit_category": "Ubah kategori",
     "add_item": "Tambah menu",
     "edit_item": "Ubah menu",
-    "empty_categories": "Belum ada kategori. Mulai dengan kategori seperti Kopi atau Makanan.",
+    "empty_categories": "Mulai dengan kategori seperti Kopi, Non-kopi atau Makanan, lalu tambahkan menu ke dalamnya.",
     "empty_items": "Belum ada menu di kategori ini.",
     "price": "Harga",
     "price_help": "Harga sebelum pajak.",
@@ -97,7 +98,9 @@
     "recipe_and_modifiers": "Resep & pilihan",
     "n_modifier_groups": "{n} grup pilihan",
     "confirm_archive_category": "Arsipkan kategori \"{name}\"?",
-    "confirm_archive_item": "Arsipkan menu \"{name}\"? Riwayat penjualan tetap tersimpan."
+    "confirm_archive_item": "Arsipkan menu \"{name}\"? Riwayat penjualan tetap tersimpan.",
+    "empty_categories_title": "Belum ada menu",
+    "empty_items_help": "Isi nama dan harga. Setelah disimpan, buka menu itu untuk mengatur resep dan grup pilihan."
   },
   "item": {
     "recipe": "Resep",
@@ -120,7 +123,7 @@
     "edit_group": "Ubah grup",
     "add_option": "Tambah opsi",
     "edit_option": "Ubah opsi",
-    "empty": "Belum ada grup pilihan, misalnya Ukuran, Gula atau Susu.",
+    "empty": "Grup pilihan adalah pertanyaan saat memesan, misalnya Ukuran, Gula, Es atau Susu. Satu grup bisa dipakai di banyak menu.",
     "selection": "Jenis pilihan",
     "single": "Pilih satu",
     "multiple": "Boleh lebih dari satu",
@@ -143,7 +146,8 @@
     "items_help": "Centang menu yang menawarkan grup ini. Menu yang baru dicentang mendapat grup ini di urutan terakhir; urutannya bisa diubah di halaman menu itu.",
     "items_all": "Semua",
     "items_empty": "Belum ada menu. Tambahkan dulu di halaman Menu.",
-    "items_selected": "{n} menu dipilih"
+    "items_selected": "{n} menu dipilih",
+    "empty_title": "Belum ada grup pilihan"
   },
   "effects": {
     "button": "Efek bahan",
@@ -174,7 +178,9 @@
     "purchase_pair": "Isi nama dan ukuran satuan beli, atau kosongkan keduanya.",
     "avg_cost": "HPP rata-rata",
     "stock_note": "Stok berubah lewat stok masuk, pemakaian (waste), stok opname dan penjualan.",
-    "confirm_archive": "Arsipkan bahan \"{name}\"? Resep yang sudah memakainya tetap berjalan."
+    "confirm_archive": "Arsipkan bahan \"{name}\"? Resep yang sudah memakainya tetap berjalan.",
+    "empty_title": "Belum ada bahan",
+    "empty_help": "Bahan dipakai di resep menu; setiap penjualan mengurangi stok sesuai resep. Contoh: Biji kopi (g), Susu segar (ml), Cup (pcs)."
   },
   "units": {
     "g": "gram (g)",
@@ -195,7 +201,9 @@
     "amount": "Nominal",
     "per_unit": "Dipotong per porsi.",
     "note": "Diskon bebas (tanpa preset) hanya bisa diberikan oleh pemilik atau manajer di kasir.",
-    "confirm_archive": "Arsipkan diskon \"{name}\"?"
+    "confirm_archive": "Arsipkan diskon \"{name}\"?",
+    "empty_title": "Belum ada diskon",
+    "empty_help": "Diskon di sini muncul sebagai pilihan cepat di kasir, misalnya Promo pelajar 10% atau Potongan Rp 5.000."
   },
   "settings": {
     "profile": "Profil toko",
@@ -297,7 +305,7 @@
     "n_payments": "{n} pembayaran",
     "qty_sold": "{n} terjual",
     "net_note": "Penjualan bersih = setelah diskon, sebelum pajak dan biaya layanan. Pesanan batal tidak dihitung.",
-    "empty": "Belum ada data untuk periode ini.",
+    "empty": "Belum ada data untuk periode ini. Penjualan dari aplikasi kasir muncul di sini.",
     "by_item": "Per menu",
     "by_category": "Per kategori",
     "before_order_discount": "sebelum diskon pesanan",
@@ -320,7 +328,7 @@
     "status_voided": "Batal",
     "all_methods": "Semua metode",
     "search": "Cari no., nama, menu",
-    "empty": "Tidak ada pesanan.",
+    "empty": "Tidak ada pesanan pada periode ini. Pesanan dari aplikasi kasir muncul di sini.",
     "voided": "Batal",
     "load_more": "Muat lagi",
     "type_dine_in": "Makan di sini",
@@ -363,7 +371,8 @@
     "type_void_return": "Kembali dari pembatalan",
     "type_stock_in": "Stok masuk",
     "type_waste": "Terbuang",
-    "type_count_adjust": "Penyesuaian opname"
+    "type_count_adjust": "Penyesuaian opname",
+    "empty_help": "Stok dicatat per bahan. Tambahkan bahan dulu, lalu catat stok masuk."
   },
   "users": {
     "add": "Tambah staf",
@@ -386,11 +395,66 @@
   },
   "devices": {
     "help": "Perangkat kasir yang dipasangkan oleh pemilik atau manajer.",
-    "empty": "Belum ada perangkat.",
     "revoked": "Dicabut",
     "revoke": "Cabut",
     "paired_by": "Dipasangkan oleh {name}, {at}",
     "last_seen": "terakhir aktif {at}",
-    "confirm_revoke": "Cabut {name}? Staf di perangkat ini langsung keluar."
+    "confirm_revoke": "Cabut {name}? Staf di perangkat ini langsung keluar.",
+    "empty_title": "Belum ada tablet kasir",
+    "step_download": "Unduh dan pasang aplikasi kasir di tablet Android.",
+    "step_login": "Buka aplikasinya, lalu masuk dengan email dan kata sandi pemilik atau manajer.",
+    "step_done": "Tablet muncul di sini. Setelah itu staf cukup masuk dengan PIN.",
+    "download": "Unduh aplikasi kasir"
+  },
+  "setup": {
+    "title": "Siapkan toko Anda",
+    "progress": "{done} dari {total} langkah selesai",
+    "hide": "Sembunyikan",
+    "optional": "Opsional",
+    "download_apk": "Unduh aplikasi kasir (Android)",
+    "profile": {
+      "title": "Lengkapi profil toko",
+      "body": "Isi alamat dan telepon (tercetak di struk), lalu periksa pajak, biaya layanan dan metode pembayaran.",
+      "action": "Buka Pengaturan"
+    },
+    "menu": {
+      "title": "Buat menu",
+      "body": "Tambah kategori (misalnya Kopi, Non-kopi, Makanan), lalu menu dan harganya. Pilihan seperti Ukuran atau Gula diatur di Pilihan Menu.",
+      "action": "Buka Menu"
+    },
+    "ingredients": {
+      "title": "Tambah bahan dan resep",
+      "body": "Supaya stok berkurang otomatis setiap ada penjualan. Boleh dilewati dan diisi nanti.",
+      "action": "Buka Bahan"
+    },
+    "staff": {
+      "title": "Tambah staf",
+      "body": "Buat akun kasir atau karyawan, masing-masing dengan PIN sendiri. Anda juga bisa berjualan dengan PIN Anda.",
+      "action": "Buka Staf"
+    },
+    "device": {
+      "title": "Pasang tablet kasir",
+      "body": "Pasang aplikasi kasir di tablet Android, lalu masuk dengan email dan kata sandi pemilik untuk memasangkannya ke toko ini.",
+      "action": "Lihat perangkat"
+    },
+    "first_order": {
+      "title": "Coba satu pesanan",
+      "body": "Buat pesanan percobaan di tablet kasir dan cetak struknya untuk memastikan harga, pajak dan printer sudah benar. Batalkan setelahnya."
+    }
+  },
+  "help": {
+    "cutoff": "Untuk toko yang buka sampai lewat tengah malam. Contoh: isi 2, maka pesanan Sabtu jam 01.30 masuk ke laporan hari Jumat. Toko yang tutup sebelum tengah malam cukup isi 0.",
+    "tax": "PB1 (pajak restoran) biasanya 10%, sesuai aturan daerah Anda. Pajak ditambahkan di atas harga menu, karena harga menu belum termasuk pajak.",
+    "service": "Biaya layanan (service charge) adalah tambahan persen dari pesanan, misalnya 5%. Kebanyakan kedai kopi tidak memakainya.",
+    "tax_on_service": "Jika dinyalakan, pajak dihitung dari harga menu ditambah biaya layanan. Lihat contoh di bawah untuk hasilnya.",
+    "base_unit": "Satuan untuk menakar bahan: gram untuk kopi dan gula, ml untuk susu dan sirup, pcs untuk cup dan sedotan. Resep dan stok memakai satuan ini, dan satuan tidak bisa diubah nanti.",
+    "purchase_unit": "Satuan saat Anda membeli bahan, supaya stok masuk cepat diisi. Contoh: Karton susu = 1000 ml, Bal cup = 50 pcs.",
+    "avg_cost": "HPP (harga pokok) rata-rata per satuan dasar. Dihitung otomatis dari setiap stok masuk: harga beli baru dirata-rata dengan stok lama.",
+    "recipe": "Bahan yang dipakai untuk 1 porsi menu ini. Setiap kali menu terjual, stok bahan berkurang sesuai resep. Menu tanpa resep tetap bisa dijual.",
+    "item_groups": "Grup pilihan yang ditanyakan saat menu ini dipesan, misalnya Ukuran atau Gula. Grup dibuat di halaman Pilihan Menu.",
+    "selection": "Pilih satu: pelanggan memilih satu opsi, misalnya Ukuran (Regular atau Large).\nBoleh lebih dari satu: misalnya Topping, pelanggan boleh memilih beberapa.",
+    "min_max": "Minimal 0 = boleh dilewati. Minimal 1 = wajib dipilih. Maksimal membatasi berapa opsi yang boleh dipilih sekaligus.",
+    "role": "Pemilik: semua akses.\nManajer: menu, stok, diskon, pembatalan dan pasang tablet; masuk dashboard dengan email.\nKasir: terima pesanan dan pembayaran dengan PIN.\nKaryawan: lihat pesanan hari ini dan catat stok dengan PIN.",
+    "discount_scope": "Seluruh pesanan: dipotong dari total pesanan.\nPer menu: dipotong dari satu menu, untuk setiap porsi."
   }
 }

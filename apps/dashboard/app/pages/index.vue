@@ -21,7 +21,15 @@ const { data, refresh } = await useAsyncData('home', async () => {
   const low = ingredients.ingredients
     .filter((i) => i.is_low || i.stock_qty.startsWith('-'))
     .sort((a, b) => Number(b.stock_qty.startsWith('-')) - Number(a.stock_qty.startsWith('-')))
-  return { summary, items: items.items.slice(0, 5), payments, hours: hourly.hours, voids, low }
+  return {
+    summary,
+    items: items.items.slice(0, 5),
+    payments,
+    hours: hourly.hours,
+    voids,
+    low,
+    ingredientCount: ingredients.ingredients.length,
+  }
 })
 let timer: ReturnType<typeof setInterval> | undefined
 onMounted(() => {
@@ -34,6 +42,7 @@ onBeforeUnmount(() => clearInterval(timer))
   <PagePanel :title="t('nav.home')">
     <div v-if="data" class="flex flex-col gap-6">
       <p class="text-lg">{{ t('home.welcome', { name: me?.user.name ?? '' }) }}</p>
+      <SetupChecklist :ingredients="data.ingredientCount" :today="today" />
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3" data-testid="today">
         <StatCard :label="t('home.net_today')" :value="formatIdr(data.summary.net_sales)" />
         <StatCard :label="t('reports.orders')" :value="String(data.summary.orders)" />

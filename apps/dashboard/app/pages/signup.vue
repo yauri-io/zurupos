@@ -34,7 +34,7 @@ const submit = async () => {
       }),
     )
     await load(true)
-    await navigateTo('/settings')
+    await navigateTo('/')
   } catch (err) {
     if (err instanceof ApiFailure && err.status === 404) closed.value = true
     else notify.failed(err)

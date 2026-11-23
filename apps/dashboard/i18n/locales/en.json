@@ -41,7 +41,8 @@
     "active": "Active",
     "search": "Search…",
     "move_up": "Move up",
-    "move_down": "Move down"
+    "move_down": "Move down",
+    "help": "Help"
   },
   "auth": {
     "login_title": "Sign in to the dashboard",
@@ -86,7 +87,7 @@
     "edit_category": "Edit category",
     "add_item": "Add item",
     "edit_item": "Edit item",
-    "empty_categories": "No categories yet. Start with one like Coffee or Food.",
+    "empty_categories": "Start with categories such as Coffee, Non-coffee or Food, then add items to them.",
     "empty_items": "No items in this category yet.",
     "price": "Price",
     "price_help": "Price before tax.",
@@ -97,7 +98,9 @@
     "recipe_and_modifiers": "Recipe & modifiers",
     "n_modifier_groups": "{n} modifier groups",
     "confirm_archive_category": "Archive category \"{name}\"?",
-    "confirm_archive_item": "Archive item \"{name}\"? Sales history is kept."
+    "confirm_archive_item": "Archive item \"{name}\"? Sales history is kept.",
+    "empty_categories_title": "No menu yet",
+    "empty_items_help": "Enter a name and price. After saving, open the item to set its recipe and modifier groups."
   },
   "item": {
     "recipe": "Recipe",
@@ -120,7 +123,7 @@
     "edit_group": "Edit group",
     "add_option": "Add option",
     "edit_option": "Edit option",
-    "empty": "No modifier groups yet, e.g. Size, Sugar or Milk.",
+    "empty": "A modifier group is a question asked when ordering, e.g. Size, Sugar, Ice or Milk. One group can be used on many items.",
     "selection": "Selection",
     "single": "Pick one",
     "multiple": "Pick several",
@@ -143,7 +146,8 @@
     "items_help": "Tick the items that offer this group. Newly ticked items get it last; change the order on the item's page.",
     "items_all": "All",
     "items_empty": "No items yet. Add them on the Menu page first.",
-    "items_selected": "{n} items selected"
+    "items_selected": "{n} items selected",
+    "empty_title": "No modifier groups yet"
   },
   "effects": {
     "button": "Ingredient effects",
@@ -174,7 +178,9 @@
     "purchase_pair": "Fill in both the purchase unit name and size, or neither.",
     "avg_cost": "Average cost",
     "stock_note": "Stock changes through stock-in, waste, stock counts and sales.",
-    "confirm_archive": "Archive ingredient \"{name}\"? Recipes that use it keep working."
+    "confirm_archive": "Archive ingredient \"{name}\"? Recipes that use it keep working.",
+    "empty_title": "No ingredients yet",
+    "empty_help": "Ingredients are used in item recipes; each sale lowers stock by the recipe. E.g. Coffee beans (g), Fresh milk (ml), Cup (pcs)."
   },
   "units": {
     "g": "grams (g)",
@@ -195,7 +201,9 @@
     "amount": "Amount",
     "per_unit": "Taken off each unit.",
     "note": "Custom (non-preset) discounts can only be given by an owner or manager at the counter.",
-    "confirm_archive": "Archive discount \"{name}\"?"
+    "confirm_archive": "Archive discount \"{name}\"?",
+    "empty_title": "No discounts yet",
+    "empty_help": "Discounts here show up as quick choices at the counter, e.g. Student promo 10% or Rp 5.000 off."
   },
   "settings": {
     "profile": "Shop profile",
@@ -297,7 +305,7 @@
     "n_payments": "{n} payments",
     "qty_sold": "{n} sold",
     "net_note": "Net sales = after discounts, before tax and service charge. Voided orders are excluded.",
-    "empty": "No data for this period.",
+    "empty": "No data for this period yet. Sales from the cashier app show up here.",
     "by_item": "By item",
     "by_category": "By category",
     "before_order_discount": "before order discount",
@@ -320,7 +328,7 @@
     "status_voided": "Voided",
     "all_methods": "All methods",
     "search": "Search no., name, item",
-    "empty": "No orders.",
+    "empty": "No orders in this period. Orders from the cashier app show up here.",
     "voided": "Voided",
     "load_more": "Load more",
     "type_dine_in": "Dine in",
@@ -363,7 +371,8 @@
     "type_void_return": "Void return",
     "type_stock_in": "Stock in",
     "type_waste": "Waste",
-    "type_count_adjust": "Count adjustment"
+    "type_count_adjust": "Count adjustment",
+    "empty_help": "Stock is tracked per ingredient. Add ingredients first, then record stock in."
   },
   "users": {
     "add": "Add staff",
@@ -386,11 +395,66 @@
   },
   "devices": {
     "help": "Cashier devices paired by an owner or manager.",
-    "empty": "No devices yet.",
     "revoked": "Revoked",
     "revoke": "Revoke",
     "paired_by": "Paired by {name}, {at}",
     "last_seen": "last seen {at}",
-    "confirm_revoke": "Revoke {name}? Staff on it are signed out immediately."
+    "confirm_revoke": "Revoke {name}? Staff on it are signed out immediately.",
+    "empty_title": "No cashier tablet yet",
+    "step_download": "Download and install the cashier app on an Android tablet.",
+    "step_login": "Open the app and sign in with an owner or manager email and password.",
+    "step_done": "The tablet shows up here. After that, staff just sign in with their PIN.",
+    "download": "Download the cashier app"
+  },
+  "setup": {
+    "title": "Set up your shop",
+    "progress": "{done} of {total} steps done",
+    "hide": "Hide",
+    "optional": "Optional",
+    "download_apk": "Download the cashier app (Android)",
+    "profile": {
+      "title": "Complete the shop profile",
+      "body": "Fill in the address and phone (printed on receipts), then check tax, service charge and payment methods.",
+      "action": "Open Settings"
+    },
+    "menu": {
+      "title": "Build the menu",
+      "body": "Add categories (e.g. Coffee, Non-coffee, Food), then items and prices. Choices like Size or Sugar are set up under Modifiers.",
+      "action": "Open Menu"
+    },
+    "ingredients": {
+      "title": "Add ingredients and recipes",
+      "body": "So stock goes down automatically with every sale. You can skip this and do it later.",
+      "action": "Open Ingredients"
+    },
+    "staff": {
+      "title": "Add staff",
+      "body": "Create cashier or employee accounts, each with their own PIN. You can also sell with your own PIN.",
+      "action": "Open Staff"
+    },
+    "device": {
+      "title": "Set up the cashier tablet",
+      "body": "Install the cashier app on an Android tablet, then sign in with the owner email and password to pair it with this shop.",
+      "action": "View devices"
+    },
+    "first_order": {
+      "title": "Try one order",
+      "body": "Make a test order on the cashier tablet and print the receipt to check prices, tax and the printer. Void it afterwards."
+    }
+  },
+  "help": {
+    "cutoff": "For shops open past midnight. E.g. with 2, a Saturday 01:30 order counts in Friday's report. Shops that close before midnight can leave it at 0.",
+    "tax": "PB1 (restaurant tax) is usually 10%, depending on your local rules. Tax is added on top of menu prices, because menu prices exclude tax.",
+    "service": "Service charge is an extra percentage on the order, e.g. 5%. Most coffee shops don't use it.",
+    "tax_on_service": "When on, tax is calculated on menu prices plus the service charge. See the example below for the result.",
+    "base_unit": "The unit used to measure the ingredient: grams for coffee and sugar, ml for milk and syrup, pcs for cups and straws. Recipes and stock use this unit, and it can't be changed later.",
+    "purchase_unit": "The unit you buy in, to make stock in faster. E.g. Milk carton = 1000 ml, Cup pack = 50 pcs.",
+    "avg_cost": "Average cost (COGS) per base unit. Calculated automatically from every stock in: the new purchase price is averaged with the stock you already had.",
+    "recipe": "Ingredients used for 1 serving of this item. Every sale lowers stock by the recipe. Items without a recipe can still be sold.",
+    "item_groups": "Modifier groups asked when this item is ordered, e.g. Size or Sugar. Groups are created on the Modifiers page.",
+    "selection": "Pick one: the customer chooses one option, e.g. Size (Regular or Large).\nMore than one: e.g. Toppings, the customer may pick several.",
+    "min_max": "Minimum 0 = can be skipped. Minimum 1 = required. Maximum limits how many options can be picked at once.",
+    "role": "Owner: full access.\nManager: menu, stock, discounts, voids and pairing tablets; signs in to the dashboard with email.\nCashier: takes orders and payments with a PIN.\nEmployee: sees today's orders and records stock with a PIN.",
+    "discount_scope": "Whole order: taken off the order total.\nPer item: taken off one item, for every serving."
   }
 }
