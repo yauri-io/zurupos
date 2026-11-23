@@ -241,4 +241,4 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Done: `.github/workflows/cashier-release.yml` builds, signs and publishes the cashier APK to R2 (`dl.zurupos.com`) and a GitHub Release when a `cashier-v*` tag is pushed (D-055). `build_release.sh` passes extra args (`--build-name`, `--build-number`) to `flutter build apk`.
 - Run: one-time setup and release steps in `docs/DEPLOY.md` §5, "Automatic release".
 - Verified: the first tagged release built on GitHub and published to R2 (after fixing the signer-digest check for build-tools 37).
-- Known issues: the landing page has no download link yet.
+- Landing page footer links to the latest APK ("Unduh aplikasi kasir (Android)"). Goes live with the next server update (DEPLOY.md §6).
