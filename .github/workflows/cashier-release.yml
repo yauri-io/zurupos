@@ -123,8 +123,13 @@ jobs:
           apksigner=$(find "$ANDROID_HOME/build-tools" -mindepth 2 -maxdepth 2 -name apksigner | sort -V | tail -1)
           apk=build/app/outputs/flutter-apk/app-release.apk
           "$apksigner" verify "$apk"
+          # The label differs by build-tools version ("Signer #1 certificate ..." in
+          # older ones, "V2 Signer: certificate ..." in 37), so match any signer line.
           actual=$("$apksigner" verify --print-certs "$apk" \
-            | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | tr -d ':' | tr 'A-F' 'a-f')
+            | sed -n 's/^.*[Ss]igner.* certificate SHA-256 digest: //p' | tr -d ': ' | tr 'A-F' 'a-f' | sort -u)
+          [ -n "$actual" ] || { echo "::error::apksigner printed no certificate digest"; exit 1; }
+          [ "$(printf '%s\n' "$actual" | wc -l)" -eq 1 ] \
+            || { echo "::error::APK has more than one signer: $actual"; exit 1; }
           expected=$(printf '%s' "${{ vars.ANDROID_SIGNING_CERT_SHA256 }}" | tr -d ': ' | tr 'A-F' 'a-f')
           [ -n "$expected" ] || { echo "::error::Set the ANDROID_SIGNING_CERT_SHA256 variable"; exit 1; }
           [ "$actual" = "$expected" ] \
