@@ -23,6 +23,7 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 
 ## D-003: One plan, one flat price, no tiers or add-ons
 **Decision:** Single all-inclusive plan. Billing is not part of the MVP; the pilot is free.
+**Update (2026-11-24):** the price is set in D-058.
 
 ## D-004: Inventory and recipes are in the MVP
 **Decision:** Ingredient-level stock with recipes and modifier effects (add / remove / replace), weighted average cost, low-stock alerts.
@@ -345,3 +346,13 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - The dashboard server answers `GET /_version` (`no-store`). Each tab compares it with the version it loaded, every 5 minutes and whenever the tab becomes visible. When they differ, a toast that stays open offers **Muat ulang**. It never reloads by itself, because a form may be half filled in.
 - Sentry uses the version as the release unless `SENTRY_RELEASE` is set.
 **Consequences:** Every rebuild after a new commit changes the version, even a docs-only commit; that's honest, since the image was rebuilt. The cashier app keeps its own version from its release tag (D-055).
+
+## D-058: Price: Rp 120.000 per outlet per month, including PPN, shown as Rp 4.000 per day
+**Context:** On 2026-11-24 the owner set the price, after comparing Indonesian POS prices (November 2026, per outlet per month, before PPN): Majoo Starter Rp 249.000 (with ingredients and recipes), Moka Basic Rp 299.000, and Qasir Pro Rp 699.000 per year (retail-oriented, no recipes listed). The landing page needed a price section (D-003).
+**Decision:**
+- One plan, everything included, for **Rp 120.000 per outlet per month, PPN included**. No tiers, add-ons or per-transaction fees, and no limit on staff, PINs or cashier devices. A second outlet is a second subscription (multi-outlet isn't built anyway).
+- The landing page leads with **Rp 4.000 per hari** (120.000 / 30) and always shows the monthly amount and "Sudah termasuk PPN" in the same block, so the per-day figure never hides what is billed. That keeps the BRAND.md rule against pricing gimmicks.
+- A yearly plan exists but is offered privately by the owner. It isn't on the website, and its price isn't recorded here because this repository is public.
+- PPN is included in the price, not added on top. With PPN at 12% on a tax base of 11/12 (11% effective), Rp 120.000 is Rp 108.108 plus Rp 11.892 PPN. This only applies if the business is registered as PKP. Without PKP, PPN can't be charged, and the page shouldn't say "termasuk PPN".
+- Billing is still manual (invoice plus QRIS or bank transfer). Subscription billing stays a next-phase feature (CLAUDE.md rule 8).
+**Consequences:** Changing the price means changing the landing page and this entry together. The "termasuk PPN" text depends on the owner's PKP status.
