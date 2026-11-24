@@ -65,6 +65,8 @@ services:
     build:
       context: ..
       dockerfile: apps/api/Dockerfile
+      args:
+        ZURU_VERSION: ${ZURU_VERSION:-dev}
     restart: unless-stopped
     logging: *logging
     environment:
@@ -110,6 +112,8 @@ services:
     build:
       context: ..
       dockerfile: apps/dashboard/Dockerfile
+      args:
+        ZURU_VERSION: ${ZURU_VERSION:-dev}
     restart: unless-stopped
     logging: *logging
     environment:

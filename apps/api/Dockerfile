@@ -14,6 +14,9 @@ ENV NODE_ENV=production
 COPY --from=build /out/node_modules ./node_modules
 COPY --from=build /out/package.json ./package.json
 COPY --from=build /repo/apps/api/dist ./dist
+# Build version (D-057), passed by deploy/prod.sh. Last, so a new version only rebuilds this layer.
+ARG ZURU_VERSION=dev
+ENV ZURU_VERSION=$ZURU_VERSION
 USER node
 EXPOSE 4000
 CMD ["node", "dist/server.js"]

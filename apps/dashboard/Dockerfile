@@ -13,6 +13,9 @@ FROM node:22-alpine
 WORKDIR /app
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
 COPY --from=build /repo/apps/dashboard/.output ./.output
+# Build version (D-057), passed by deploy/prod.sh. Last, so a new version only rebuilds this layer.
+ARG ZURU_VERSION=dev
+ENV NUXT_PUBLIC_APP_VERSION=$ZURU_VERSION
 USER node
 EXPOSE 3000
 CMD ["node", ".output/server/index.mjs"]
