@@ -403,3 +403,8 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - The button hides once its printers have a job for this order. A failure shows *Retry* like any job; extra copies come from *Orders today*.
 - Tapping it counts as a touch: auto-return stays off for that screen (D-062). If the cashier doesn't tap it, the countdown returns to the menu without printing.
 **Consequences:** No permission check on the button: it's the first print of the sale the cashier just made, and every role may reprint receipts anyway.
+
+## D-061: The dashboard and API stay out of search engines
+**Context:** On 2026-11-24, while setting up Google Search Console, the owner asked that `app.zurupos.com` not be exposed in search. A search for "zurupos" could otherwise show the login page or API URLs above the landing page.
+**Decision:** Caddy sends `X-Robots-Tag: noindex, nofollow` on every response from the app and API domains. There is no `robots.txt` Disallow for them, because a crawler that is told not to fetch a page never sees its noindex header and can still list the bare URL.
+**Consequences:** This only affects search engines. Both domains stay publicly reachable, as they must be for owners on their phones and for the cashier app; access is still controlled by login and device tokens. If either domain was already indexed, it drops out after the next crawl, or sooner with a removal request in Search Console.

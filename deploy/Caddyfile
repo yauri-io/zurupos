@@ -69,6 +69,9 @@ www.{$SITE_DOMAIN} {
 		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
 		# cloudflareinsights.com: Cloudflare Web Analytics, which Cloudflare injects into the page.
 		# *.sentry.io: browser error reports (D-053), e.g. o123.ingest.us.sentry.io.
+		# Keep the dashboard out of search results (D-061). Not a robots.txt
+		# Disallow: that would stop crawlers from seeing this header.
+		X-Robots-Tag "noindex, nofollow"
 		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://{$API_DOMAIN} https://cloudflareinsights.com https://*.sentry.io; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 		-Server
 	}
@@ -83,7 +86,10 @@ www.{$SITE_DOMAIN} {
 {$API_DOMAIN} {
 	import common
 
-	header -Server
+	header {
+		-Server
+		X-Robots-Tag "noindex, nofollow"
+	}
 
 	# The API trusts X-Forwarded-For (TRUST_PROXY) for its rate limits, so it
 	# must carry only the client IP Caddy derived from CF-Connecting-IP.
