@@ -113,6 +113,10 @@ dart run build_runner build    # regenerate drift code after changing lib/data/d
 flutter run --dart-define=API_BASE_URL=http://<host-ip>:4000      # on a tablet (emulator default: 10.0.2.2)
 flutter build apk --debug
 
+# Landing site (apps/landing, static; D-059, D-060)
+node --test apps/landing/test/*.test.mjs   # HPP calculator math
+cd apps/landing && python3 -m http.server 8765   # preview at http://localhost:8765
+
 # Demo shop (dev database only; prints the logins and PINs; D-046)
 pnpm db:seed
 

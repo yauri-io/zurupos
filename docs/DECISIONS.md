@@ -367,3 +367,14 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - The final call to action shows three steps to get started, and its WhatsApp message is prefilled with *Jenis kedai / Jumlah kasir / Printer*. A message that starts that way came from the final button, and the hero/sticky buttons keep the short message.
 - `sitemap.xml` with a pointer to it in `robots.txt`.
 **Consequences:** Changing the price means changing the JSON-LD `Offer` too (D-058). The FAQ answers state product facts, so they change whenever those facts do (e.g. tables, offline).
+
+## D-060: A free HPP calculator on the landing site
+**Context:** The SEO review (D-059) found that the homepage alone can't rank for what small shop owners search before they want a POS. The owner chose a free HPP calculator (`zurupos.com/hitung-hpp/`) as the next acquisition page on 2026-11-24.
+**Decision:**
+- A static page under `apps/landing/hitung-hpp/`, no build step, like the rest of the landing site. The math is in `hpp-math.js` (pure functions, ES module) and the page wiring in `hpp.js`. Both are served from the site's own origin, so the CSP stays `script-src 'self'`.
+- The money rules match the product: whole rupiah and quantities in thousandths as `BigInt`, shares in basis points, half-up rounding, no floating point. Each ingredient's cost is kept in thousandths of a rupiah and the HPP is rounded once, so the shown row costs can differ from the total by Rp 1. The suggested price is the lowest price that meets the target, rounded up to Rp 500. Tests: `node --test apps/landing/test/*.test.mjs`.
+- Inputs are saved only in the visitor's browser (`localStorage`, best effort). Nothing is sent anywhere. The page says so.
+- Below the calculator, a short guide in Bahasa (what HPP is, how to count it, what share is reasonable, why it drifts) with the same worked example the calculator starts with. The "25–35%" figure is presented as a common rule of thumb, not a rule.
+- The page's pitch only claims what the product does: recipes per item, stock that follows recipes, COGS from the weighted-average purchase cost, and an HPP and margin report for the shop (not per item). Its WhatsApp message says it came from the calculator.
+- The homepage links to it from the stock card and the footer; it is in `sitemap.xml`. Caddy serves its HTML, CSS and JS with `no-cache` like the homepage.
+**Consequences:** If the product's price changes, this page's pitch changes too (D-058). If the margin report gains a per-item view, the pitch can say so.

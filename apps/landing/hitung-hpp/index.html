@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Free HPP calculator (D-060). Search term: "cara menghitung HPP kopi". -->
+    <title>Kalkulator HPP Kopi &amp; Menu Kafe, Gratis | ZuruPOS</title>
+    <meta
+      name="description"
+      content="Hitung HPP per cup dari resep dan harga beli bahan. Lihat persentase HPP, laba kotor, dan harga jual yang pas. Gratis, tanpa daftar, langsung di HP."
+    />
+    <meta name="theme-color" content="#F6F0E4" />
+    <link rel="canonical" href="https://zurupos.com/hitung-hpp/" />
+    <link rel="icon" href="/img/favicon.ico" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ZuruPOS" />
+    <meta property="og:url" content="https://zurupos.com/hitung-hpp/" />
+    <meta property="og:title" content="Kalkulator HPP kopi dan menu kafe" />
+    <meta
+      property="og:description"
+      content="Hitung HPP per cup dari resep dan harga beli bahan. Gratis, tanpa daftar."
+    />
+    <meta property="og:image" content="https://zurupos.com/img/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Logo ZuruPOS, juru catat kedaimu" />
+    <meta property="og:locale" content="id_ID" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": "Kalkulator HPP ZuruPOS",
+            "url": "https://zurupos.com/hitung-hpp/",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "id",
+            "isAccessibleForFree": true,
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "IDR" },
+            "publisher": { "@id": "https://zurupos.com/#org" }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "ZuruPOS", "item": "https://zurupos.com/" },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Kalkulator HPP",
+                "item": "https://zurupos.com/hitung-hpp/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <link rel="preload" href="/fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/hpp.css" />
+    <script src="/hpp.js" type="module"></script>
+  </head>
+  <body>
+    <a class="skip" href="#isi">Langsung ke isi</a>
+
+    <header class="site-header">
+      <div class="wrap header-row">
+        <a href="/" class="brand" aria-label="ZuruPOS, beranda">
+          <img src="/img/logo-lockup.png" alt="zuru" width="132" height="44" />
+        </a>
+        <nav class="header-nav" aria-label="Utama">
+          <a href="/#fitur">Fitur</a>
+          <a href="/#harga">Harga</a>
+          <a href="/#tanya">Tanya jawab</a>
+          <a href="https://app.zurupos.com/login">Masuk</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="isi">
+      <section class="hpp-hero">
+        <div class="wrap">
+          <p class="crumbs"><a href="/">ZuruPOS</a> / Kalkulator HPP</p>
+          <h1>Kalkulator HPP kopi dan menu kafe</h1>
+          <p class="lead">Berapa modal bahan untuk satu cup? Isi resep dan harga belinya, angkanya keluar.</p>
+          <p class="small">Gratis, tanpa daftar. Isianmu hanya tersimpan di browser ini.</p>
+        </div>
+      </section>
+
+      <section class="hpp-tool-section" aria-labelledby="alat-judul">
+        <div class="wrap hpp-grid">
+          <form class="hpp-tool" id="hpp-form" novalidate>
+            <h2 id="alat-judul" class="visually-hidden">Kalkulator</h2>
+            <label class="field field-wide">
+              <span>Nama menu</span>
+              <input name="menu" type="text" autocomplete="off" />
+            </label>
+
+            <fieldset class="ingredients">
+              <legend>Bahan untuk satu porsi</legend>
+              <p class="small hint">
+                Harga beli dan isi kemasan dari nota belanja. Takaran dalam satuan yang sama dengan isi
+                kemasan.
+              </p>
+              <ol class="ingredient-list" id="ingredient-list"></ol>
+              <button type="button" class="btn-plain" id="add-row">+ Tambah bahan</button>
+            </fieldset>
+
+            <div class="field-row">
+              <label class="field">
+                <span>Harga jual</span>
+                <span class="input-prefix"
+                  ><span aria-hidden="true">Rp</span
+                  ><input name="sell" type="text" inputmode="numeric" autocomplete="off"
+                /></span>
+              </label>
+              <label class="field">
+                <span>Target HPP</span>
+                <span class="input-suffix"
+                  ><input name="target" type="text" inputmode="decimal" autocomplete="off" /><span
+                    aria-hidden="true"
+                    >%</span
+                  ></span
+                >
+              </label>
+            </div>
+            <button type="button" class="btn-plain" id="reset">Kembalikan ke contoh</button>
+          </form>
+
+          <aside class="hpp-result" aria-labelledby="hasil-judul">
+            <h2 id="hasil-judul">Hasil <span id="r-menu" class="r-menu"></span></h2>
+            <dl aria-live="polite">
+              <div class="res-main">
+                <dt>HPP per porsi</dt>
+                <dd id="r-hpp">–</dd>
+              </div>
+              <div>
+                <dt>HPP dari harga jual</dt>
+                <dd id="r-share">–</dd>
+              </div>
+              <div>
+                <dt>Laba kotor per porsi</dt>
+                <dd id="r-profit">–</dd>
+              </div>
+              <div>
+                <dt>Harga jual untuk target <span id="r-target"></span></dt>
+                <dd id="r-suggested">–</dd>
+              </div>
+            </dl>
+            <p class="small" id="r-note">Harga saran dibulatkan ke atas ke Rp 500.</p>
+            <noscript><p>Kalkulator ini perlu JavaScript. Contoh hitungannya ada di bawah.</p></noscript>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Phones: the result card is below the form, so a bar keeps the total in view (hpp.js). -->
+      <a class="hpp-bar" id="hpp-bar" href="#hasil-judul" hidden>
+        <span>HPP per porsi</span> <strong id="bar-hpp">–</strong> <span id="bar-share"></span>
+      </a>
+
+      <template id="row-template">
+        <li class="ingredient">
+          <label class="field field-name">
+            <span>Bahan</span>
+            <input data-k="name" type="text" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>Harga beli</span>
+            <span class="input-prefix"
+              ><span aria-hidden="true">Rp</span
+              ><input data-k="price" type="text" inputmode="numeric" autocomplete="off"
+            /></span>
+          </label>
+          <label class="field">
+            <span>Isi kemasan</span>
+            <input data-k="pack" type="text" inputmode="decimal" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>Satuan</span>
+            <select data-k="unit">
+              <option value="g">gram</option>
+              <option value="ml">ml</option>
+              <option value="pcs">pcs</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Takaran per porsi</span>
+            <input data-k="use" type="text" inputmode="decimal" autocomplete="off" />
+          </label>
+          <p class="row-cost"><span>Biaya</span> <output data-k="cost">–</output></p>
+          <button type="button" class="row-remove" data-k="remove">Hapus</button>
+        </li>
+      </template>
+
+      <article class="section hpp-guide">
+        <div class="wrap prose">
+          <h2>Apa itu HPP?</h2>
+          <p>
+            HPP (harga pokok penjualan) adalah biaya bahan untuk membuat satu porsi menu. Untuk segelas kopi
+            susu: kopi, susu, gula, es, cup, tutup, dan sedotan. Sewa, gaji, dan listrik tidak masuk HPP per
+            porsi. Itu biaya operasional, yang dibayar dari laba kotor.
+          </p>
+
+          <h2>Cara menghitung HPP kopi</h2>
+          <ol>
+            <li>Tulis resep satu porsi: bahan apa saja dan berapa takarannya.</li>
+            <li>Untuk tiap bahan, hitung biayanya: <strong>harga beli ÷ isi kemasan × takaran</strong>.</li>
+            <li>Jumlahkan semua biaya bahan. Itu HPP per porsi.</li>
+            <li>Bagi HPP dengan harga jual untuk melihat persentase HPP.</li>
+          </ol>
+
+          <h3>Contoh: Kopi Susu Gula Aren</h3>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Bahan</th>
+                  <th scope="col">Harga beli</th>
+                  <th scope="col">Isi</th>
+                  <th scope="col">Takaran</th>
+                  <th scope="col">Biaya</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Kopi bubuk</td>
+                  <td>Rp 150.000</td>
+                  <td>1.000 g</td>
+                  <td>18 g</td>
+                  <td>Rp 2.700</td>
+                </tr>
+                <tr>
+                  <td>Susu UHT</td>
+                  <td>Rp 20.000</td>
+                  <td>1.000 ml</td>
+                  <td>150 ml</td>
+                  <td>Rp 3.000</td>
+                </tr>
+                <tr>
+                  <td>Gula aren cair</td>
+                  <td>Rp 40.000</td>
+                  <td>1.000 ml</td>
+                  <td>25 ml</td>
+                  <td>Rp 1.000</td>
+                </tr>
+                <tr>
+                  <td>Es batu</td>
+                  <td>Rp 10.000</td>
+                  <td>5.000 g</td>
+                  <td>150 g</td>
+                  <td>Rp 300</td>
+                </tr>
+                <tr>
+                  <td>Cup, tutup, sedotan</td>
+                  <td>Rp 60.000</td>
+                  <td>50 pcs</td>
+                  <td>1 pcs</td>
+                  <td>Rp 1.200</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th scope="row" colspan="4">HPP per porsi</th>
+                  <td>Rp 8.200</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <p class="small">Harga contoh. Pakai harga dari nota belanjamu sendiri.</p>
+          <p>
+            Dijual Rp 22.000, HPP-nya 37,3% dari harga jual, dan laba kotornya Rp 13.800 per cup. Dari laba
+            kotor itulah sewa, gaji, listrik, dan untungmu dibayar.
+          </p>
+
+          <h2>Berapa persen HPP yang wajar?</h2>
+          <p>
+            Tidak ada angka resmi. Banyak kedai minuman memakai patokan sekitar 25–35% dari harga jual, tapi
+            itu patokan, bukan aturan. Kedai dengan sewa mahal perlu HPP lebih rendah; kedai yang ramai bisa
+            hidup dengan HPP lebih tinggi. Yang penting, laba kotor sebulan cukup untuk semua biaya tetap.
+          </p>
+          <p>
+            Di contoh tadi, supaya HPP-nya 30%, harga jualnya perlu sekitar Rp 27.500. Atau takarannya yang
+            diubah, atau cari pemasok yang lebih murah.
+          </p>
+          <p>
+            Kalau harga di menu sudah termasuk PB1, hitung persentasenya dari harga sebelum pajak. Pajaknya
+            bukan milik kedai.
+          </p>
+
+          <h2>Kenapa HPP berubah-ubah?</h2>
+          <ul>
+            <li>
+              <strong>Harga beli naik.</strong> Susu dan kopi jarang bertahan di harga yang sama setahun.
+            </li>
+            <li><strong>Takaran berbeda.</strong> Barista yang menuang 200 ml susu, bukan 150 ml.</li>
+            <li><strong>Bahan terbuang.</strong> Susu basi dan kopi tumpah juga dibayar dari laba.</li>
+          </ul>
+          <p>Jadi hitung ulang HPP tiap kali harga belanja berubah, bukan sekali saat buka kedai.</p>
+        </div>
+      </article>
+
+      <section class="section final" aria-labelledby="zuru-judul">
+        <div class="wrap final-box">
+          <h2 id="zuru-judul">Biar HPP dihitung sendiri</h2>
+          <p>
+            Di Zuru, tiap menu punya resep. Kasir mencatat penjualan, stok bahan berkurang sesuai resep, dan
+            HPP dihitung dari harga beli rata-rata bahanmu. Laporan HPP dan margin kedaimu ada di HP, kapan
+            saja. Rp 120.000 per bulan, semua fitur.
+          </p>
+          <a
+            class="btn btn-wa"
+            href="https://wa.me/6285190095200?text=Halo%20Zuru%2C%20saya%20habis%20pakai%20kalkulator%20HPP.%20Saya%20mau%20tanya%20tentang%20ZuruPOS%20untuk%20kedai%20saya."
+          >
+            <svg class="wa-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.4Z"
+              />
+            </svg>
+            Chat via WhatsApp
+          </a>
+          <p class="small"><a href="/#fitur">Lihat semua fitur Zuru</a></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-row">
+        <img src="/img/logo-mark.png" alt="ZuruPOS" width="32" height="32" />
+        <p>© 2026 ZuruPOS. Dicatat oleh Zuru.</p>
+        <a href="/hitung-hpp/">Kalkulator HPP</a>
+        <a href="https://dl.zurupos.com/cashier/zurupos-cashier.apk">Unduh aplikasi kasir (Android)</a>
+        <a href="https://app.zurupos.com/login">Masuk dashboard</a>
+      </div>
+    </footer>
+  </body>
+</html>

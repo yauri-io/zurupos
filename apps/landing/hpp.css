@@ -1,0 +1,395 @@
+/* HPP calculator page (D-060). Builds on styles.css tokens and components. */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.hpp-hero {
+  padding: 24px 0 32px;
+}
+
+.hpp-hero h1 {
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
+  max-width: 14em;
+}
+
+.crumbs {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.hpp-tool-section {
+  padding-bottom: 56px;
+}
+
+.hpp-grid {
+  display: grid;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (min-width: 980px) {
+  .hpp-grid {
+    grid-template-columns: 1fr 340px;
+    gap: 32px;
+  }
+
+  .hpp-result {
+    position: sticky;
+    top: 16px;
+  }
+}
+
+.hpp-tool,
+.hpp-result {
+  background: var(--paper-light);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+}
+
+@media (min-width: 720px) {
+  .hpp-tool,
+  .hpp-result {
+    padding: 28px;
+  }
+}
+
+/* ---------- Fields ---------- */
+
+.field {
+  display: grid;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  min-width: 0;
+}
+
+.field input,
+.field select {
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  width: 100%;
+  min-height: 46px;
+  padding: 8px 12px;
+  color: var(--ink);
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.btn-plain:focus-visible,
+.row-remove:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.field input[aria-invalid='true'] {
+  border-color: #b3261e;
+  background: #fdf1ef;
+}
+
+.field-wide {
+  margin-bottom: 20px;
+}
+
+.input-prefix,
+.input-suffix {
+  position: relative;
+  display: block;
+}
+
+.input-prefix > span,
+.input-suffix > span {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.input-prefix > span {
+  left: 12px;
+}
+
+.input-prefix input {
+  padding-left: 40px;
+}
+
+.input-suffix > span {
+  right: 12px;
+}
+
+.input-suffix input {
+  padding-right: 32px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 20px 0 12px;
+}
+
+/* ---------- Ingredient rows ---------- */
+
+.ingredients {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.ingredients legend {
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 0;
+}
+
+.hint {
+  margin: 4px 0 12px;
+}
+
+.ingredient-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.ingredient {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+  padding: 14px 0;
+  border-bottom: 2px dashed rgba(26, 26, 26, 0.2);
+}
+
+.ingredient .field-name {
+  grid-column: 1 / -1;
+}
+
+.row-cost {
+  margin: 0;
+  align-self: center;
+  font-weight: 800;
+}
+
+.row-cost span {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+@media (min-width: 760px) {
+  .ingredient {
+    grid-template-columns: 1.5fr 1.2fr 0.9fr 0.8fr 0.9fr;
+    align-items: end;
+  }
+
+  .ingredient .field-name {
+    grid-column: auto;
+  }
+
+  .row-cost {
+    grid-column: 1 / 3;
+  }
+
+  .row-remove {
+    grid-column: 5;
+  }
+}
+
+.btn-plain,
+.row-remove {
+  font: inherit;
+  font-weight: 700;
+  color: var(--amber-dark);
+  background: none;
+  border: 0;
+  padding: 8px 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.row-remove {
+  justify-self: end;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* ---------- Result ---------- */
+
+.hpp-result h2 {
+  font-size: 1.3rem;
+}
+
+.r-menu {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.hpp-result dl {
+  margin: 0 0 12px;
+}
+
+.hpp-result dl > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 2px dashed rgba(26, 26, 26, 0.2);
+}
+
+.hpp-result dt {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.hpp-result dd {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+.hpp-result .res-main dd {
+  font-size: 1.8rem;
+}
+
+.hpp-result .res-main dt {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.is-negative {
+  color: #b3261e;
+}
+
+/* ---------- Guide ---------- */
+
+.hpp-guide {
+  background: var(--paper-deep);
+}
+
+.prose {
+  max-width: 760px;
+}
+
+.prose h2 {
+  margin-top: 1.6em;
+}
+
+.prose h2:first-child {
+  margin-top: 0;
+}
+
+.prose h3 {
+  margin-top: 1.4em;
+}
+
+.prose ol,
+.prose ul {
+  padding-left: 1.3em;
+  margin: 0 0 1em;
+}
+
+.prose li {
+  margin-bottom: 0.4em;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  margin-bottom: 8px;
+}
+
+.prose table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  background: var(--paper-light);
+  border: 2px solid var(--ink);
+  font-size: 0.95rem;
+}
+
+.prose th,
+.prose td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.15);
+}
+
+.prose td:last-child,
+.prose tfoot td {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.prose tfoot th,
+.prose tfoot td {
+  font-weight: 800;
+  border-top: 2px solid var(--ink);
+}
+
+/* ---------- Result bar on phones ---------- */
+
+.hpp-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
+  background: var(--ink);
+  color: var(--paper);
+  text-decoration: none;
+  transform: translateY(100%);
+  visibility: hidden;
+  transition:
+    transform 200ms var(--ease-in),
+    visibility 0s linear 200ms;
+}
+
+.hpp-bar strong {
+  font-size: 1.2rem;
+}
+
+.hpp-bar.is-shown {
+  transform: none;
+  visibility: visible;
+  transition: transform 320ms var(--ease);
+}
+
+@media (min-width: 980px) {
+  .hpp-bar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hpp-bar,
+  .hpp-bar.is-shown {
+    transition: none;
+  }
+}
+
+/* Room under the footer so the bar never covers it. */
+@media (max-width: 979px) {
+  body:has(.hpp-bar) {
+    padding-bottom: 64px;
+  }
+}
