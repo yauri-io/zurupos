@@ -428,3 +428,11 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - Dark mode: Ink background, `--ui-primary` is brand amber. Light-mode overrides are scoped to `:root:not(.dark)` so they don't beat Nuxt UI's `.dark` tokens.
 - Success, warning and error colours stay Nuxt UI defaults: they carry meaning, not brand.
 **Consequences:** No layout or component changes. Charts use `--ui-chart-1` = primary, so the first series is amber dark (light) or amber (dark).
+
+## D-066: User guide PDFs on the landing site
+**Context:** On 2026-11-25 the owner asked for the user guide PDFs in `docs/user/` to be downloadable from the landing site. That folder also holds *ZuruPOS — Panduan Sales*, a deck for the sales team.
+**Decision:**
+- A static page at `zurupos.com/panduan/` lists the three guide parts (who each is for, what's inside, page count and size) with a download button each. Linked from the footer of every landing page and listed in the sitemap.
+- The PDFs are hosted in the R2 downloads bucket behind `dl.zurupos.com` (the one the cashier APK uses, D-055), under `panduan/`, with URL-safe names: `zurupos-panduan-1-pengantar-persiapan.pdf`, `zurupos-panduan-2-di-kasir.pdf`, `zurupos-panduan-3-stok-laporan.pdf`. They stay out of git and off the VPS.
+- The sales deck is not published: the owner chose to keep it off the public site.
+**Consequences:** Uploading is manual (Cloudflare dashboard → R2 → `zurupos-downloads` → `panduan/`). When the guide changes, upload over the same names and update the page counts and sizes on the page. Cloudflare may serve the old copy until its cache expires; purge `dl.zurupos.com/panduan/*` after replacing a file.

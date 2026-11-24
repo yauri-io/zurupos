@@ -45,7 +45,7 @@
 	}
 	@assets path /img/* /fonts/*
 	header @assets Cache-Control "public, max-age=604800"
-	@pages path / /index.html /styles.css /main.js /hitung-hpp/ /hitung-hpp/index.html /hpp.css /hpp.js /hpp-math.js /sitemap.xml /robots.txt
+	@pages path / /index.html /styles.css /main.js /hitung-hpp/ /hitung-hpp/index.html /hpp.css /hpp.js /hpp-math.js /panduan/ /panduan/index.html /panduan.css /sitemap.xml /robots.txt
 	header @pages Cache-Control "no-cache"
 
 	root * /srv/landing

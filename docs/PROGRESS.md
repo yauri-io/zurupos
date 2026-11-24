@@ -254,3 +254,8 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Run: `pnpm --filter @zurupos/dashboard test:e2e` (`version.spec.ts`), `pnpm --filter @zurupos/api test test/health.test.ts test/observability`. Verified on the local rehearsal stack.
 - Deployed 2026-11-24 12:54 WIB (backup `zuru-20261124-1254.dump` first): `/healthz` and the dashboard report `2026.11.24-4b2fce6`. `SENTRY_RELEASE` is still set in the server's `deploy/.env.prod`, so Sentry keeps that value until it is emptied.
 - 2026-11-24 13:37 WIB: deployed `2026.11.24-851308f` (help tips green and next to their labels; backup `zuru-20261124-1337.dump` first).
+
+### User guide downloads — 2026-11-25
+- Done (D-066): `zurupos.com/panduan/` with download buttons for the three user guide PDFs, hosted on R2 at `dl.zurupos.com/panduan/`. Footer link on all landing pages, sitemap entry. The sales deck stays off the site.
+- Run: `cd apps/landing && python3 -m http.server 8765`, open `/panduan/`.
+- Not live yet: upload the three PDFs to R2 (D-066), then deploy the landing page (DEPLOY.md §6).

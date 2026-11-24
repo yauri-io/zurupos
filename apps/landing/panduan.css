@@ -1,0 +1,103 @@
+/* User guide downloads (D-066). Builds on styles.css tokens and components. */
+
+.guide-hero {
+  padding: 24px 0 32px;
+}
+
+.guide-hero h1 {
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
+  max-width: 14em;
+}
+
+.crumbs {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.guide-section {
+  padding-bottom: 56px;
+}
+
+.guides {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.guide {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 18px;
+  align-items: start;
+  background: var(--paper-light);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+
+.guide-num {
+  margin: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--amber);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+
+.guide-body h2 {
+  margin: 6px 0 4px;
+  font-size: 1.35rem;
+}
+
+.guide-body p {
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+
+.guide-body .guide-for {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.guide-btn {
+  grid-column: 1 / -1;
+  justify-self: start;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.guide-btn:hover {
+  transform: translateY(-2px);
+}
+
+.guide-meta {
+  font-weight: 600;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.guide-note {
+  margin-top: 20px;
+}
+
+@media (min-width: 760px) {
+  .guide {
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    padding: 26px 28px;
+  }
+
+  .guide-btn {
+    grid-column: auto;
+    margin-top: 0;
+  }
+}
