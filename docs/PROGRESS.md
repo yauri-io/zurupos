@@ -36,7 +36,7 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Done:
   - Roles (D-014). Migrations for every SPEC §4 table, with money identities as CHECK constraints. ENABLE + FORCE RLS and the `tenant_isolation` policy on all 22 tenant tables. Grants per D-015. The four `auth.*` SECURITY DEFINER functions, plus the D-024 lookup policy.
   - `withTenant` and `request.tenantTx`. Raw `db` is not reachable from route handlers.
-  - Auth (SPEC §5.1–5.3): signup (flag-gated), login/logout/me, CSRF, password reset and manager invite (enqueued to outbox), device pairing/list/revoke, staff picker, PIN sessions with per-device lockout, heartbeat, in-memory rate limits.
+  - Auth (SPEC §5.1–5.3): signup (flag-gated), login/logout/me, CSRF, password reset and manager invite (enqueued to outbox), device pairing/list/revoke, staff picker, PIN sessions with per-device lockout, heartbeat, in-memory rate limits. Since 2026-11-24: optional Cloudflare Turnstile on dashboard login, off until `TURNSTILE_SECRET_KEY` and the site key are set (D-064; DEPLOY.md "Login bot check"). Not yet turned on in production.
   - `permissions.ts` (PRD §6 matrix) with one route guard, the audit log helper, and the users API (create, update, reset PIN, deactivate).
 - Tests: 253 passing (`pnpm --filter @zurupos/api test`):
   - RLS suite (`test/rls`, all of SPEC §3.6 #1–#8), 190 tests.

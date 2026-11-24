@@ -23,6 +23,8 @@ export type Config = {
   dashboardUrl: string
   cookieSecure: boolean
   signupEnabled: boolean
+  // Cloudflare Turnstile on dashboard login (D-064). Unset means no check.
+  turnstileSecretKey: string | undefined
   email: {
     provider: EmailProvider
     from: string
@@ -122,6 +124,7 @@ export const loadConfig = (env: Env = process.env): Config => {
     dashboardUrl: required(env, 'DASHBOARD_URL'),
     cookieSecure: bool(env, 'COOKIE_SECURE', true),
     signupEnabled: bool(env, 'SIGNUP_ENABLED', false),
+    turnstileSecretKey: env['TURNSTILE_SECRET_KEY'] || undefined,
     email: loadEmail(env),
     sentry: loadSentry(env, nodeEnv),
   }

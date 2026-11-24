@@ -69,7 +69,8 @@
     "have_account": "Sudah punya akun? Masuk",
     "your_name": "Nama Anda",
     "owner_pin_help": "4–6 angka, untuk masuk di aplikasi kasir. Tidak boleh angka sama semua (1111), berurutan (1234, 4321) atau pola umum (1212).",
-    "signup_closed": "Pendaftaran toko baru sedang ditutup. Hubungi ZuruPOS."
+    "signup_closed": "Pendaftaran toko baru sedang ditutup. Hubungi ZuruPOS.",
+    "captcha_unavailable": "Verifikasi keamanan tidak bisa dimuat. Muat ulang halaman, atau coba jaringan lain."
   },
   "home": {
     "welcome": "Halo, {name}!",
@@ -274,7 +275,8 @@
     "password_too_short": "Kata sandi minimal 8 karakter.",
     "password_too_long": "Kata sandi maksimal 128 karakter.",
     "password_common": "Kata sandi terlalu umum. Pilih kata sandi lain.",
-    "too_many_groups": "Salah satu menu sudah punya 20 grup pilihan, batas maksimalnya. Lepas grup lain dari menu itu dulu."
+    "too_many_groups": "Salah satu menu sudah punya 20 grup pilihan, batas maksimalnya. Lepas grup lain dari menu itu dulu.",
+    "captcha_failed": "Verifikasi keamanan gagal. Tunggu centang hijau, lalu coba lagi."
   },
   "range": {
     "today": "Hari ini",

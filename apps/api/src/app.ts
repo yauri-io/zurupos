@@ -11,6 +11,7 @@ import { errorHandler, notFoundHandler } from './http/error-handler.js'
 import type { App } from './http/types.js'
 import { registerAuth } from './auth/plugin.js'
 import { createLimiters, type Limiters } from './http/rate-limit.js'
+import { createTurnstileVerifier, type TurnstileVerifier } from './auth/turnstile.js'
 import { authRoutes } from './modules/auth/routes.js'
 import { deviceRoutes } from './modules/devices/routes.js'
 import { healthRoutes } from './modules/health/routes.js'
@@ -28,7 +29,13 @@ import { adminRoutes } from './modules/admin/routes.js'
 import { bootstrapRoutes } from './modules/bootstrap/routes.js'
 import { reportRoutes } from './modules/reports/routes.js'
 
-export type AppDeps = { config: Config; db: Database; limiters?: Limiters }
+export type AppDeps = {
+  config: Config
+  db: Database
+  limiters?: Limiters
+  // Tests pass a fake; otherwise built from TURNSTILE_SECRET_KEY, if set (D-064).
+  turnstile?: TurnstileVerifier | null
+}
 
 // Never log secrets: PINs, passwords and tokens are redacted wherever they appear.
 const REDACT = [
@@ -38,7 +45,12 @@ const REDACT = [
   'res.headers["set-cookie"]',
 ]
 
-export const buildApp = async ({ config, db, limiters = createLimiters() }: AppDeps): Promise<App> => {
+export const buildApp = async ({
+  config,
+  db,
+  limiters = createLimiters(),
+  turnstile = config.turnstileSecretKey ? createTurnstileVerifier(config.turnstileSecretKey) : null,
+}: AppDeps): Promise<App> => {
   const app = Fastify({
     logger: config.nodeEnv === 'test' ? false : { level: config.logLevel, redact: REDACT },
     trustProxy: config.trustProxy,
@@ -87,7 +99,7 @@ export const buildApp = async ({ config, db, limiters = createLimiters() }: AppD
   await app.register(healthRoutes, { db, version: config.version })
   await app.register(
     async (v1) => {
-      await v1.register(authRoutes, { db, config, limiters })
+      await v1.register(authRoutes, { db, config, limiters, turnstile })
       await v1.register(deviceRoutes, { db, limiters })
       await v1.register(userRoutes, { config })
       await v1.register(settingsRoutes)

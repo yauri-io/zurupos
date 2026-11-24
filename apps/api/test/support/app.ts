@@ -3,6 +3,7 @@ import type { LightMyRequestResponse } from 'fastify'
 import { buildApp } from '../../src/app.js'
 import { createDb, type Database } from '../../src/db/kysely.js'
 import { createLimiters, type Limiters } from '../../src/http/rate-limit.js'
+import type { TurnstileVerifier } from '../../src/auth/turnstile.js'
 import type { App } from '../../src/http/types.js'
 import { testConfig } from '../helpers.js'
 import { ignoreIdleError, workerPool } from './pg.js'
@@ -10,11 +11,22 @@ import { ignoreIdleError, workerPool } from './pg.js'
 export type TestApp = { app: App; db: Database; close: () => Promise<void> }
 
 export const createTestApp = async (
-  opts: { poolMax?: number; limiters?: Limiters; signupEnabled?: boolean } = {},
+  opts: {
+    poolMax?: number
+    limiters?: Limiters
+    signupEnabled?: boolean
+    turnstile?: TurnstileVerifier
+  } = {},
 ): Promise<TestApp> => {
   const config = testConfig(opts.signupEnabled === undefined ? {} : { signupEnabled: opts.signupEnabled })
   const db = createDb(config.databaseUrl, opts.poolMax ?? 4, ignoreIdleError)
-  const app = await buildApp({ config, db, limiters: opts.limiters ?? createLimiters(1000) })
+  // Tests never call Cloudflare: Turnstile is off unless a fake verifier is passed (D-064).
+  const app = await buildApp({
+    config,
+    db,
+    limiters: opts.limiters ?? createLimiters(1000),
+    turnstile: opts.turnstile ?? null,
+  })
   await app.ready()
   return {
     app,

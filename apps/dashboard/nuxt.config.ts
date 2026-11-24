@@ -26,6 +26,9 @@ export default defineNuxtConfig({
       sentryDsn: '',
       sentryEnvironment: 'development',
       sentryRelease: '',
+      // Cloudflare Turnstile on login (D-064): NUXT_PUBLIC_TURNSTILE_SITE_KEY.
+      // Empty shows no widget; the API's TURNSTILE_SECRET_KEY must match.
+      turnstileSiteKey: '',
     },
   },
   icon: {

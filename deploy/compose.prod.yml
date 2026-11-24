@@ -83,6 +83,7 @@ services:
       DASHBOARD_URL: https://${APP_DOMAIN}
       COOKIE_SECURE: 'true'
       SIGNUP_ENABLED: ${SIGNUP_ENABLED:-false}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
     healthcheck:
       test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:4000/healthz >/dev/null || exit 1']
       interval: 10s
@@ -121,6 +122,7 @@ services:
       NUXT_PUBLIC_SENTRY_DSN: ${NUXT_PUBLIC_SENTRY_DSN:-}
       NUXT_PUBLIC_SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
       NUXT_PUBLIC_SENTRY_RELEASE: ${SENTRY_RELEASE:-}
+      NUXT_PUBLIC_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
     depends_on:
       - api
 

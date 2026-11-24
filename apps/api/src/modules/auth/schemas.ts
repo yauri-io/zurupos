@@ -10,7 +10,12 @@ export const SignupBody = Body({
   locale: Type.Optional(Locale),
 })
 
-export const LoginBody = Body({ email: Email, password: Password })
+export const LoginBody = Body({
+  email: Email,
+  password: Password,
+  // Required when the API has a Turnstile secret key (D-064). Cloudflare caps tokens at 2048 chars.
+  turnstile_token: Type.Optional(Type.String({ minLength: 1, maxLength: 2048 })),
+})
 
 export const ForgotBody = Body({ email: Email })
 

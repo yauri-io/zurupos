@@ -130,6 +130,17 @@ Sentry collects crashes and unexpected errors from the API, the outbox worker, t
 
 What is sent: the error, its stack trace, the request method and route, the request id (also in the `x-request-id` response header and the API logs), the shop's tenant id, and the browser or app version. What is never sent: request bodies (PINs, passwords, customer names), cookies, auth and device tokens, query strings, invite and reset tokens, IP addresses, emails, and screenshots. Expected failures (4xx answers, lost connections on the tablet) aren't reported.
 
+### Login bot check: Cloudflare Turnstile (optional)
+
+The dashboard login can require a Cloudflare Turnstile challenge (D-064). It's off until both keys are set. Only dashboard login is checked: signup, password reset and the cashier app are not.
+
+1. In Cloudflare, **Turnstile → Add widget**: name `zurupos-dashboard`, hostname `app.zurupos.com` (add `localhost` only for a rehearsal), mode **Managed**. Copy the site key and the secret key.
+2. In `deploy/.env.prod` set `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`. Set both or neither: with only the secret, every login is refused.
+3. `deploy/prod.sh up -d api dashboard caddy`. Caddy needs the restart for the new CSP, which lets the login page load the Turnstile script and its iframe.
+4. Sign out and back in at `https://app.zurupos.com/login`. The widget shows above *Masuk* and the button stays disabled until it passes.
+
+The check fails closed: if the API can't reach Cloudflare, logins are refused and the API logs `turnstile siteverify unavailable`. To turn it off in an emergency, empty `TURNSTILE_SECRET_KEY` and `TURNSTILE_SITE_KEY` and run step 3 again.
+
 ## 5. Cashier app
 
 ### Release key (once, on your computer)

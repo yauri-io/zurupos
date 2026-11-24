@@ -408,3 +408,13 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 **Context:** On 2026-11-24, while setting up Google Search Console, the owner asked that `app.zurupos.com` not be exposed in search. A search for "zurupos" could otherwise show the login page or API URLs above the landing page.
 **Decision:** Caddy sends `X-Robots-Tag: noindex, nofollow` on every response from the app and API domains. There is no `robots.txt` Disallow for them, because a crawler that is told not to fetch a page never sees its noindex header and can still list the bare URL.
 **Consequences:** This only affects search engines. Both domains stay publicly reachable, as they must be for owners on their phones and for the cashier app; access is still controlled by login and device tokens. If either domain was already indexed, it drops out after the next crawl, or sooner with a removal request in Search Console.
+
+## D-064: Cloudflare Turnstile on dashboard login
+**Context:** On 2026-11-24 the owner asked for Cloudflare Turnstile on the dashboard login page. Login already has per-IP and per-email rate limits (D-019); Turnstile adds a bot check before a password is ever tried.
+**Decision:**
+- Off unless configured. The API reads `TURNSTILE_SECRET_KEY`; the dashboard reads `NUXT_PUBLIC_TURNSTILE_SITE_KEY` (`TURNSTILE_SITE_KEY` in `deploy/.env.prod`). Local dev and every API test run without it and never call Cloudflare.
+- When the secret is set, `POST /v1/auth/login` requires `turnstile_token` and checks it with Cloudflare's siteverify (with the client IP) after the rate limits and before the password. A missing, rejected or uncheckable token is `400 VALIDATION` with `{ field: 'turnstile_token', problem: 'captcha_failed' }`, so the response never says whether the password was right.
+- Fails closed: if siteverify can't be reached within 5 s, the login is refused and logged. Simpler and safer than letting logins through unchecked; the widget itself can't load during a Cloudflare outage anyway.
+- Login only. Signup is off in production (D-017), password reset never reveals whether an account exists, and the cashier app uses device and staff tokens, not this endpoint.
+- The dashboard loads the script from `challenges.cloudflare.com` only on the login page (Cloudflare requires that exact URL), keeps *Masuk* disabled until the widget passes, and resets the widget after every attempt because tokens are single-use. The app domain's CSP allows that origin for `script-src` and `frame-src`.
+**Consequences:** Setting only the secret locks every owner out of the dashboard; `.env.example`, `env.prod.example` and DEPLOY.md say to set both or neither. Turning it off is emptying both keys and recreating the api, dashboard and caddy containers.

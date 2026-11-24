@@ -2,6 +2,7 @@ import type { FastifyRequest } from 'fastify'
 import { clearSessionCookie, setSessionCookie } from '../../auth/cookies.js'
 import { assertPasswordAllowed, assertPinAllowed } from '../../auth/policy-errors.js'
 import { hashSecret } from '../../auth/secrets.js'
+import type { TurnstileVerifier } from '../../auth/turnstile.js'
 import type { Config } from '../../config/env.js'
 import type { Database } from '../../db/kysely.js'
 import { apiError } from '../../http/errors.js'
@@ -11,7 +12,7 @@ import type { App } from '../../http/types.js'
 import { ForgotBody, LoginBody, MeResponse, SignupBody, TokenPasswordBody } from './schemas.js'
 import * as service from './service.js'
 
-type Deps = { db: Database; config: Config; limiters: Limiters }
+type Deps = { db: Database; config: Config; limiters: Limiters; turnstile: TurnstileVerifier | null }
 
 const limit = (limiter: Limiter, key: string) => {
   if (!limiter.hit(key)) throw apiError('RATE_LIMITED')
@@ -19,7 +20,7 @@ const limit = (limiter: Limiter, key: string) => {
 
 const ipOf = (request: FastifyRequest) => request.ip
 
-export const authRoutes = async (app: App, { db, config, limiters }: Deps) => {
+export const authRoutes = async (app: App, { db, config, limiters, turnstile }: Deps) => {
   app.post(
     '/auth/signup',
     { config: { auth: 'none' }, schema: { tags: ['auth'], body: SignupBody, response: { 201: NoContent } } },
@@ -49,6 +50,15 @@ export const authRoutes = async (app: App, { db, config, limiters }: Deps) => {
     async (request, reply) => {
       limit(limiters.loginByIp, ipOf(request))
       limit(limiters.loginByEmail, request.body.email.toLowerCase())
+      if (turnstile) {
+        // Checked before the password, so a bot never learns whether it was right (D-064).
+        const result = request.body.turnstile_token
+          ? await turnstile(request.body.turnstile_token, ipOf(request))
+          : 'rejected'
+        if (result === 'unavailable') request.log.warn('turnstile siteverify unavailable; login refused')
+        if (result !== 'ok')
+          throw apiError('VALIDATION', { field: 'turnstile_token', problem: 'captcha_failed' })
+      }
       const { token } = await service.login(db, request.body.email, request.body.password)
       setSessionCookie(reply, config, token)
       return reply.status(204).send(null)

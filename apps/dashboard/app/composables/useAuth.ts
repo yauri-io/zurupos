@@ -20,8 +20,9 @@ export const useAuth = () => {
     return me.value
   }
 
-  const login = async (email: string, password: string) => {
-    await unwrap(api.POST('/v1/auth/login', { body: { email, password } }))
+  const login = async (email: string, password: string, turnstileToken?: string) => {
+    const body = turnstileToken ? { email, password, turnstile_token: turnstileToken } : { email, password }
+    await unwrap(api.POST('/v1/auth/login', { body }))
     return load(true)
   }
 

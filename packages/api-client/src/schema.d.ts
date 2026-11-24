@@ -71,6 +71,7 @@ export interface paths {
             /** Format: email */
             email: string
             password: string
+            turnstile_token?: string
           }
         }
       }

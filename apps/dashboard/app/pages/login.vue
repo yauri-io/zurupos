@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'auth', public: true })
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { login, can } = useAuth()
 const notify = useNotify()
 const route = useRoute()
@@ -8,10 +8,15 @@ const route = useRoute()
 const form = reactive({ email: '', password: '' })
 const busy = ref(false)
 
+// Cloudflare Turnstile (D-064): on when a site key is configured.
+const siteKey = useRuntimeConfig().public.turnstileSiteKey
+const captchaToken = ref('')
+const captcha = useTemplateRef('captcha')
+
 const submit = async () => {
   busy.value = true
   try {
-    await login(form.email.trim(), form.password)
+    await login(form.email.trim(), form.password, siteKey ? captchaToken.value : undefined)
     const next =
       typeof route.query.next === 'string' && route.query.next.startsWith('/') ? route.query.next : null
     await navigateTo(next ?? (can('reports.view') ? '/' : '/menu'))
@@ -21,6 +26,8 @@ const submit = async () => {
       err,
       err instanceof ApiFailure && err.status === 401 ? t('auth.invalid_credentials') : undefined,
     )
+    // The token was spent on this attempt, right or wrong.
+    captcha.value?.reset()
   } finally {
     busy.value = false
   }
@@ -36,7 +43,21 @@ const submit = async () => {
     <UFormField :label="t('auth.password')" name="password" required>
       <UInput v-model="form.password" type="password" autocomplete="current-password" class="w-full" />
     </UFormField>
-    <UButton type="submit" block :loading="busy" :label="t('auth.login')" />
+    <TurnstileWidget
+      v-if="siteKey"
+      ref="captcha"
+      :key="locale"
+      v-model="captchaToken"
+      :site-key="siteKey"
+      action="login"
+    />
+    <UButton
+      type="submit"
+      block
+      :loading="busy"
+      :disabled="!!siteKey && !captchaToken"
+      :label="t('auth.login')"
+    />
     <ULink to="/forgot" class="text-sm text-center">{{ t('auth.forgot_link') }}</ULink>
     <ULink to="/signup" class="text-sm text-center">{{ t('auth.signup_link') }}</ULink>
   </UForm>

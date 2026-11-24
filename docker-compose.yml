@@ -55,6 +55,7 @@ services:
       DASHBOARD_URL: ${DASHBOARD_URL:-http://localhost:3000}
       COOKIE_SECURE: 'false'
       SIGNUP_ENABLED: ${SIGNUP_ENABLED:-true}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
       EMAIL_PROVIDER: smtp
       EMAIL_FROM: ${EMAIL_FROM:-ZuruPOS <no-reply@zurupos.local>}
       SMTP_URL: smtp://mailpit:1025
@@ -94,6 +95,7 @@ services:
       dockerfile: apps/dashboard/Dockerfile
     environment:
       NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-http://localhost:4000}
+      NUXT_PUBLIC_TURNSTILE_SITE_KEY: ${NUXT_PUBLIC_TURNSTILE_SITE_KEY:-}
     ports:
       - '3000:3000'
     depends_on:
