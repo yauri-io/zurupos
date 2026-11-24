@@ -394,3 +394,12 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - *New order* always leaves at once. Printing carries on in the background, and *Orders today* still has reprint.
 - No extra cap: each job ends within the 10 s print timeout, so the wait always ends.
 **Consequences:** With a slow or failing printer the cashier sees the screen longer, or has to tap *New order*. The manual print button (next) follows the same rule: tapping it is a touch, so the countdown stays off.
+
+## D-063: Manual print buttons on the Done screen
+**Context:** With auto-print off (D-061 makes that the default for new printers), the cashier had no way to print a sale's first receipt or ticket from the Done screen. The owner asked for a manual print button on 2026-11-24.
+**Decision:**
+- For each role (receipt, ticket) that has a printer which doesn't auto-print it, the Done screen shows *Cetak struk* / *Cetak tiket*. With every role on auto, or no printers, there's no button.
+- The button prints only on those manual printers, never on a printer that already auto-printed the role, so nothing prints twice. Same queue, timeout and rule as auto-print: printing never touches the order (SPEC §11.3).
+- The button hides once its printers have a job for this order. A failure shows *Retry* like any job; extra copies come from *Orders today*.
+- Tapping it counts as a touch: auto-return stays off for that screen (D-062). If the cashier doesn't tap it, the countdown returns to the menu without printing.
+**Consequences:** No permission check on the button: it's the first print of the sale the cashier just made, and every role may reprint receipts anyway.

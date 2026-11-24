@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../api/models.dart';
 import '../../domain/money.dart';
 import '../../printing/print_job.dart';
+import '../../printing/printer_config.dart';
 import '../../state/printing.dart';
 import '../common.dart';
 import '../widgets/print_status.dart';
@@ -70,6 +71,12 @@ class _DoneScreenState extends ConsumerState<DoneScreen> {
     _update(() => _stopped = true);
   }
 
+  void _printManual(PrintKind kind) {
+    // Tapping is a touch: the countdown stays off afterwards (D-063).
+    _stop();
+    ref.read(printQueueProvider.notifier).printManual(widget.order, kind);
+  }
+
   void _close() {
     _timer?.cancel();
     if (mounted && Navigator.of(context).canPop()) Navigator.of(context).pop();
@@ -86,6 +93,18 @@ class _DoneScreenState extends ConsumerState<DoneScreen> {
     final l = context.l10n;
     final theme = Theme.of(context);
     final o = widget.order;
+    final printers = ref.watch(printersProvider);
+    // A role's button hides once its manual printers have a job for this order
+    // (an auto-print job on another printer doesn't count); Retry and Orders
+    // today's reprint cover the rest.
+    final printed = {
+      for (final j in ref.watch(printQueueProvider))
+        if (j.orderId == o.id) (j.printerId, j.kind),
+    };
+    final manual = [
+      for (final k in [PrintKind.receipt, PrintKind.ticket])
+        if (manualPrinters(printers, k).any((p) => !printed.contains((p.id, k)))) k,
+    ];
     return Scaffold(
       body: GestureDetector(
         // Any touch stops the countdown.
@@ -115,6 +134,22 @@ class _DoneScreenState extends ConsumerState<DoneScreen> {
                   constraints: const BoxConstraints(maxWidth: 480),
                   child: PrintStatusList(orderId: o.id),
                 ),
+                if (manual.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 12,
+                    children: [
+                      for (final k in manual)
+                        OutlinedButton.icon(
+                          key: Key('done-print-${k.name}'),
+                          style: OutlinedButton.styleFrom(minimumSize: const Size(160, 56)),
+                          onPressed: () => _printManual(k),
+                          icon: const Icon(Icons.print),
+                          label: Text(k == PrintKind.receipt ? l.donePrintReceipt : l.donePrintTicket),
+                        ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 16),
                 FilledButton(
                   key: const Key('done-new'),

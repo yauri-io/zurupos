@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import '../api/models.dart';
 import 'escpos.dart';
+import 'print_job.dart';
 
 enum TransportKind { bluetooth, network }
 
@@ -99,6 +100,18 @@ class PrinterConfig {
     'drawer_kick': drawerKick,
   };
 }
+
+/// Printers with the [kind] role that don't auto-print it: the Done screen's
+/// manual print goes only to these, so nothing prints twice (D-063).
+List<PrinterConfig> manualPrinters(List<PrinterConfig> printers, PrintKind kind) => [
+  for (final p in printers)
+    if (switch (kind) {
+      PrintKind.receipt => p.receipt && !p.autoReceipt,
+      PrintKind.ticket => p.ticket && !p.autoTicket,
+      PrintKind.test => false,
+    })
+      p,
+];
 
 String encodePrinters(List<PrinterConfig> printers) => jsonEncode([for (final p in printers) p.toJson()]);
 

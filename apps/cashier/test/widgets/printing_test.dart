@@ -414,6 +414,74 @@ void main() {
     });
   });
 
+  group('Done screen manual print (D-063)', () {
+    final receiptButton = find.byKey(const Key('done-print-receipt'));
+    final ticketButton = find.byKey(const Key('done-print-ticket'));
+
+    testWidgets('a role without auto-print gets a button; tapping prints it and keeps the screen', (
+      tester,
+    ) async {
+      final h = await _start(tester, printers: [receiptBt.copyWith(autoReceipt: false), ticketLan]);
+      await _sellAmericanoCash(tester);
+      // The ticket auto-printed, so the countdown runs and only the receipt has a button.
+      expect(h.printers.printed['192.168.1.50'], hasLength(1));
+      expect(h.printers.printed['AA:BB:CC:DD:EE:FF'], isNull);
+      expect(find.text('Kembali otomatis dalam 5 detik'), findsOneWidget);
+      expect(find.text('Cetak struk'), findsOneWidget);
+      expect(ticketButton, findsNothing);
+
+      await tester.tap(receiptButton);
+      await tester.pumpAndSettle();
+      expect(h.printers.printed['AA:BB:CC:DD:EE:FF'], hasLength(1));
+      expect(find.text('Tercetak'), findsNWidgets(2));
+      expect(receiptButton, findsNothing);
+      expect(find.byKey(const Key('done-auto-return')), findsNothing);
+      await tester.pump(const Duration(seconds: 10));
+      expect(find.text('No. 1'), findsOneWidget);
+      await h.dispose(tester);
+    });
+
+    testWidgets('manual print goes only to the printer that didn’t auto-print', (tester) async {
+      const counter = PrinterConfig(
+        id: 'p-counter',
+        name: 'Meja LAN',
+        transport: TransportKind.network,
+        address: '192.168.1.70',
+      );
+      final h = await _start(tester, printers: [receiptBt, counter]);
+      await _sellAmericanoCash(tester);
+      expect(h.printers.printed['AA:BB:CC:DD:EE:FF'], hasLength(1));
+      await tester.tap(receiptButton);
+      await tester.pumpAndSettle();
+      expect(h.printers.printed['AA:BB:CC:DD:EE:FF'], hasLength(1));
+      expect(h.printers.printed['192.168.1.70'], hasLength(1));
+      await h.dispose(tester);
+    });
+
+    testWidgets('both roles manual: two buttons; not tapping returns without printing', (tester) async {
+      final h = await _start(
+        tester,
+        printers: [receiptBt.copyWith(autoReceipt: false), ticketLan.copyWith(autoTicket: false)],
+      );
+      await _sellAmericanoCash(tester);
+      expect(find.text('Cetak struk'), findsOneWidget);
+      expect(find.text('Cetak tiket'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('item-americano')), findsOneWidget);
+      expect(h.printers.printed, isEmpty);
+      await h.dispose(tester);
+    });
+
+    testWidgets('everything auto-prints: no manual buttons', (tester) async {
+      final h = await _start(tester);
+      await _sellAmericanoCash(tester);
+      expect(receiptButton, findsNothing);
+      expect(ticketButton, findsNothing);
+      await h.dispose(tester);
+    });
+  });
+
   testWidgets('auto-return off: the Done screen stays', (tester) async {
     final h = Harness();
     await h.store.setSetting('auto_return_seconds', '0');

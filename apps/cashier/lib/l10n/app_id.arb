@@ -217,6 +217,8 @@
   "doneChange": "Kembalian",
   "doneNoChange": "Tanpa kembalian",
   "doneNewOrder": "Pesanan baru",
+  "donePrintReceipt": "Cetak struk",
+  "donePrintTicket": "Cetak tiket",
   "doneAutoReturnAfterPrint": "Kembali otomatis setelah selesai mencetak",
   "doneAutoReturn": "Kembali otomatis dalam {seconds} detik",
   "@doneAutoReturn": {

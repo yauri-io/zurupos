@@ -96,6 +96,20 @@ class PrintQueue extends Notifier<List<PrintJob>> {
     }
   }
 
+  /// Done screen's manual print: the printers that didn't auto-print [kind].
+  void printManual(Order o, PrintKind kind) {
+    for (final p in manualPrinters(ref.read(printersProvider), kind)) {
+      switch (kind) {
+        case PrintKind.receipt:
+          _enqueue(p, kind, o.id, _receipt(o, p));
+        case PrintKind.ticket:
+          _enqueue(p, kind, o.id, _ticket(TicketData.fromOrder(o), o.paidAt, p));
+        case PrintKind.test:
+          break;
+      }
+    }
+  }
+
   /// Reprint on every printer with the role. Returns how many jobs were queued.
   int reprintReceipt(Order o) {
     final printers = ref.read(printersProvider).where((p) => p.receipt).toList();
