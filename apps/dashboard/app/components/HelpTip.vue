@@ -8,10 +8,10 @@ const { t } = useI18n()
   <UPopover :content="{ side: 'top' }">
     <UButton
       icon="i-lucide-circle-help"
-      color="neutral"
+      color="primary"
       variant="link"
-      size="xs"
-      class="p-0 align-middle text-muted"
+      size="sm"
+      class="p-0 align-middle"
       :aria-label="t('common.help')"
     />
     <template #content>
