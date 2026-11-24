@@ -418,3 +418,13 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - Login only. Signup is off in production (D-017), password reset never reveals whether an account exists, and the cashier app uses device and staff tokens, not this endpoint.
 - The dashboard loads the script from `challenges.cloudflare.com` only on the login page (Cloudflare requires that exact URL), keeps *Masuk* disabled until the widget passes, and resets the widget after every attempt because tokens are single-use. The app domain's CSP allows that origin for `script-src` and `frame-src`.
 **Consequences:** Setting only the secret locks every owner out of the dashboard; `.env.example`, `env.prod.example` and DEPLOY.md say to set both or neither. Turning it off is emptying both keys and recreating the api, dashboard and caddy containers.
+
+## D-065: Dashboard theme follows the brand colours
+**Context:** On 2026-11-25 the owner asked for the dashboard theme to follow `docs/BRAND.md` §5. It still used Nuxt UI's default green and grey.
+**Decision:**
+- Two Tailwind scales in `apps/dashboard/app/assets/css/main.css`: `gula` (500 = amber `#C8873A`, 700 = amber dark `#8F5B1E`) and `kertas`, warm neutrals from Paper (100, `#F6F0E4`) to Ink (900, `#1A1A1A`). `app.config.ts` sets them as Nuxt UI's `primary` and `neutral`.
+- Light mode: Paper background. `--ui-primary` is amber dark, because Nuxt UI uses primary for links, text, rings and small fills, and brand amber on paper (2.7:1) is decoration only. Muted text (`kertas-500`) keeps 4.5:1 on paper.
+- Solid primary buttons are brand amber with an ink label (5.8:1) in both modes, like the landing page, via a `button` compound-variant override.
+- Dark mode: Ink background, `--ui-primary` is brand amber. Light-mode overrides are scoped to `:root:not(.dark)` so they don't beat Nuxt UI's `.dark` tokens.
+- Success, warning and error colours stay Nuxt UI defaults: they carry meaning, not brand.
+**Consequences:** No layout or component changes. Charts use `--ui-chart-1` = primary, so the first series is amber dark (light) or amber (dark).

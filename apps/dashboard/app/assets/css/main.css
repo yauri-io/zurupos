@@ -1,2 +1,56 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
+
+/* Brand colours (docs/BRAND.md §5): mostly paper and ink, gula aren amber as
+   the one warm accent, amber dark for text and links. Wired into Nuxt UI as
+   `primary: 'gula'` and `neutral: 'kertas'` in app.config.ts (D-065). */
+@theme static {
+  /* Gula aren amber. 500 is the brand amber (#C8873A), 700 is amber dark (#8F5B1E). */
+  --color-gula-50: #fbf4ea;
+  --color-gula-100: #f5e5cf;
+  --color-gula-200: #ebcb9f;
+  --color-gula-300: #dfae6e;
+  --color-gula-400: #d4994f;
+  --color-gula-500: #c8873a;
+  --color-gula-600: #ac6f2a;
+  --color-gula-700: #8f5b1e;
+  --color-gula-800: #6e4618;
+  --color-gula-900: #523413;
+  --color-gula-950: #2e1d0a;
+
+  /* Warm neutrals from receipt paper to ink. 100 is Paper (#F6F0E4), 900 is Ink
+     (#1A1A1A). 500 (muted text) keeps 4.5:1 on paper. */
+  --color-kertas-50: #fbf8f1;
+  --color-kertas-100: #f6f0e4;
+  --color-kertas-200: #ede4d1;
+  --color-kertas-300: #ddd2bc;
+  --color-kertas-400: #a89d86;
+  --color-kertas-500: #756c5c;
+  --color-kertas-600: #5c564c;
+  --color-kertas-700: #423d36;
+  --color-kertas-800: #2b2824;
+  --color-kertas-900: #1a1a1a;
+  --color-kertas-950: #111110;
+}
+
+/* Light only: unlayered rules here would otherwise override Nuxt UI's `.dark`. */
+:root:not(.dark) {
+  /* Primary as text, links, rings, checkboxes and badges: amber dark, 5.0:1 on
+     paper and 5.7:1 under white text. Brand amber on paper is 2.7:1, so it is
+     only used as a fill behind ink (solid buttons, app.config.ts). */
+  --ui-primary: var(--ui-color-primary-700);
+
+  /* Paper background with slightly lighter cards, like the landing page. */
+  --ui-bg: var(--ui-color-neutral-100);
+  --ui-bg-muted: var(--ui-color-neutral-50);
+  --ui-bg-elevated: var(--ui-color-neutral-200);
+  --ui-bg-accented: var(--ui-color-neutral-300);
+  --ui-border: var(--ui-color-neutral-300);
+  --ui-border-muted: var(--ui-color-neutral-200);
+  --ui-border-accented: var(--ui-color-neutral-400);
+}
+
+.dark {
+  /* Ink background; brand amber reads 5.8:1 against it, with ink text on it. */
+  --ui-primary: var(--ui-color-primary-500);
+}
