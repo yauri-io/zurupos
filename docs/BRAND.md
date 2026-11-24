@@ -21,11 +21,11 @@ The Z keeps the name ownable (*juru* is an everyday word) while still sounding f
 
 | Use | Line |
 |---|---|
-| Main tagline (Bahasa) | **Juru catat warungmu.** |
+| Main tagline (Bahasa) | **Juru catat kedaimu.** |
 | Receipt footer | **Dicatat oleh Zuru** |
 | Secondary, English / founder story | **The unfair advantage for small shops.** |
 
-**About the secondary line:** in Japanese, *zurui* (ずるい) means sly or unfair, but it is also said playfully when someone has an advantage that feels unfair. We use that: chains pay for big systems with tiers and add-ons; a warung gets everything for one low flat price.
+**About the secondary line:** in Japanese, *zurui* (ずるい) means sly or unfair, but it is also said playfully when someone has an advantage that feels unfair. We use that: chains pay for big systems with tiers and add-ons; a small kedai gets everything for one low flat price.
 
 **Rule:** the "unfair" is always about **price and value**, never about money handling. Never joke about cheating near cash, voids, payments or reports. In those places Zuru means only *honest and exact*.
 
