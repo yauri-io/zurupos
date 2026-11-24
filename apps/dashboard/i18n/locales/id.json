@@ -456,5 +456,11 @@
     "min_max": "Minimal 0 = boleh dilewati. Minimal 1 = wajib dipilih. Maksimal membatasi berapa opsi yang boleh dipilih sekaligus.",
     "role": "Pemilik: semua akses.\nManajer: menu, stok, diskon, pembatalan dan pasang tablet; masuk dashboard dengan email.\nKasir: terima pesanan dan pembayaran dengan PIN.\nKaryawan: lihat pesanan hari ini dan catat stok dengan PIN.",
     "discount_scope": "Seluruh pesanan: dipotong dari total pesanan.\nPer menu: dipotong dari satu menu, untuk setiap porsi."
+  },
+  "version": {
+    "label": "Versi {version}",
+    "new_title": "Versi baru tersedia",
+    "new_body": "Muat ulang halaman untuk memakai versi terbaru. Simpan dulu isian yang belum disimpan.",
+    "reload": "Muat ulang"
   }
 }

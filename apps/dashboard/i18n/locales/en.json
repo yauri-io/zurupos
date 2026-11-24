@@ -456,5 +456,11 @@
     "min_max": "Minimum 0 = can be skipped. Minimum 1 = required. Maximum limits how many options can be picked at once.",
     "role": "Owner: full access.\nManager: menu, stock, discounts, voids and pairing tablets; signs in to the dashboard with email.\nCashier: takes orders and payments with a PIN.\nEmployee: sees today's orders and records stock with a PIN.",
     "discount_scope": "Whole order: taken off the order total.\nPer item: taken off one item, for every serving."
+  },
+  "version": {
+    "label": "Version {version}",
+    "new_title": "New version available",
+    "new_body": "Reload the page to use the latest version. Save any unsaved changes first.",
+    "reload": "Reload"
   }
 }

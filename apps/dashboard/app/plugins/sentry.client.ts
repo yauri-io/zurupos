@@ -6,14 +6,16 @@ import { ApiFailure } from '~/composables/useApi'
 import { scrubBreadcrumb, scrubEvent } from '~/utils/sentry-scrub'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const { sentryDsn, sentryEnvironment, sentryRelease } = useRuntimeConfig().public
+  const { sentryDsn, sentryEnvironment, sentryRelease, appVersion } = useRuntimeConfig().public
+  // An explicit release wins; otherwise the build version (D-057), unless it's a local build.
+  const release = sentryRelease || (appVersion !== 'dev' ? appVersion : '')
   if (!sentryDsn) return
 
   Sentry.init({
     app: nuxtApp.vueApp,
     dsn: sentryDsn,
     environment: sentryEnvironment,
-    ...(sentryRelease ? { release: sentryRelease } : {}),
+    ...(release ? { release } : {}),
     dataCollection: {
       userInfo: false,
       cookies: false,

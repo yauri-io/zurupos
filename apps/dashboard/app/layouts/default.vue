@@ -74,6 +74,7 @@ const items = computed<NavigationMenuItem[]>(() =>
               @click="logout"
             />
           </div>
+          <AppVersion v-if="!collapsed" />
         </div>
       </template>
     </UDashboardSidebar>

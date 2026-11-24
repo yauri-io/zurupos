@@ -11,6 +11,7 @@ const { t } = useI18n()
         <slot />
       </UCard>
       <LocaleSwitch class="mt-4 justify-center" />
+      <AppVersion class="mt-2 text-center" />
     </div>
   </div>
 </template>
