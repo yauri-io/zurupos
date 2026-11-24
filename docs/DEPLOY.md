@@ -297,6 +297,6 @@ Mail from the rehearsal is at http://localhost:18025.
 
 ## Landing page
 
-`apps/landing/` is the static site at `zurupos.com`: plain HTML, CSS and one small script, with the font and images hosted alongside it. Caddy serves the folder directly (mounted read-only), so a `git pull` publishes changes to it; only a change to the Caddyfile needs `deploy/prod.sh up -d caddy`. `www.zurupos.com` redirects to `zurupos.com`. Its images come from `python3 docs/brand/generate_icons.py` (BRAND.md).
+`apps/landing/` is the static site at `zurupos.com`: plain HTML, CSS and one small script, with the font and images hosted alongside it. Caddy serves the folder directly (mounted read-only), so a `git pull` publishes changes to it; only a change to the Caddyfile needs Caddy to reload it. The Caddyfile is a single-file bind mount, and `git pull` replaces the file rather than editing it, so the running container can keep seeing the old one: check with `deploy/prod.sh exec -T caddy cat /etc/caddy/Caddyfile`, then `deploy/prod.sh exec -T caddy caddy reload --config /etc/caddy/Caddyfile` if it is current, or `deploy/prod.sh up -d --force-recreate caddy` if not (a few seconds offline for all three domains). `www.zurupos.com` redirects to `zurupos.com`. Its images come from `python3 docs/brand/generate_icons.py` (BRAND.md).
 
 To preview it on your computer: `python3 -m http.server -d apps/landing 8765`, then open http://localhost:8765.
