@@ -253,3 +253,4 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Done (D-057): `deploy/prod.sh` names each build `YYYY.MM.DD-<sha>` from git and bakes it into the API and dashboard images; `/healthz` returns it, the dashboard shows it (sidebar footer, login page), and open tabs offer **Muat ulang** when the server runs a newer build. Sentry's release defaults to it.
 - Run: `pnpm --filter @zurupos/dashboard test:e2e` (`version.spec.ts`), `pnpm --filter @zurupos/api test test/health.test.ts test/observability`. Verified on the local rehearsal stack.
 - Deployed 2026-11-24 12:54 WIB (backup `zuru-20261124-1254.dump` first): `/healthz` and the dashboard report `2026.11.24-4b2fce6`. `SENTRY_RELEASE` is still set in the server's `deploy/.env.prod`, so Sentry keeps that value until it is emptied.
+- 2026-11-24 13:37 WIB: deployed `2026.11.24-851308f` (help tips green and next to their labels; backup `zuru-20261124-1337.dump` first).
