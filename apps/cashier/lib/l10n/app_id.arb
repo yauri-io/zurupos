@@ -217,6 +217,7 @@
   "doneChange": "Kembalian",
   "doneNoChange": "Tanpa kembalian",
   "doneNewOrder": "Pesanan baru",
+  "doneAutoReturnAfterPrint": "Kembali otomatis setelah selesai mencetak",
   "doneAutoReturn": "Kembali otomatis dalam {seconds} detik",
   "@doneAutoReturn": {
     "placeholders": {

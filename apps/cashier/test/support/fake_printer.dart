@@ -10,6 +10,9 @@ class FakePrinters {
   final Set<String> unreachable = {};
   final Set<String> hanging = {};
 
+  /// Connecting waits until the test completes the address's completer.
+  final Map<String, Completer<void>> held = {};
+
   PrinterTransport transport(PrinterConfig c) => _FakeTransport(this, c.address);
 }
 
@@ -23,6 +26,7 @@ class _FakeTransport implements PrinterTransport {
   @override
   Future<void> connect() async {
     if (printers.hanging.contains(address)) await Completer<void>().future;
+    await printers.held[address]?.future;
     if (printers.unreachable.contains(address)) throw const PrinterException('connect_failed');
     _open = true;
   }

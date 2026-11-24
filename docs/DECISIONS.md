@@ -385,3 +385,12 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - `PrinterConfig` defaults `autoReceipt` and `autoTicket` to `false`, so a newly added printer prints only when switched on. Saved printers keep their stored values; nothing is migrated.
 - Settings → printers lists each role with "(otomatis)" / "(automatic)" when that role auto-prints, so a role that is still on can be seen without opening the printer.
 **Consequences:** After adding a printer, the owner has to switch on auto-print for it to print after *Complete*. The Done screen's manual print button (planned next) covers roles that don't auto-print.
+
+## D-062: The Done screen's auto-return waits for printing
+**Context:** On 2026-11-24 the owner reported that the Done screen went back to the menu before printing finished. The countdown (default 5 s) started when the screen opened, while one print job can take up to 10 s and jobs run one after another. Printing carried on in the background, but a failure after the screen closed was never seen, because *Retry* is only on the Done screen. This refines SPEC §11.1 #6.
+**Decision:**
+- The countdown starts only when all of this order's print jobs have printed, or right away if there are none. Until then the screen says "Kembali otomatis setelah selesai mencetak".
+- If any job fails, auto-return is off for that screen, even if other jobs are still printing. The cashier leaves with *New order*. A successful *Retry* does not restart the countdown (owner's choice), and neither does any touch.
+- *New order* always leaves at once. Printing carries on in the background, and *Orders today* still has reprint.
+- No extra cap: each job ends within the 10 s print timeout, so the wait always ends.
+**Consequences:** With a slow or failing printer the cashier sees the screen longer, or has to tap *New order*. The manual print button (next) follows the same rule: tapping it is a touch, so the countdown stays off.

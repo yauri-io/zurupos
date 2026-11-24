@@ -1,5 +1,6 @@
 // SPEC §11.3 / M5: auto-print after commit, failures never block an order,
 // retry, reprint, drawer kick, test print, printer settings.
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -312,6 +313,105 @@ void main() {
     expect(h.printers.printed, isEmpty);
     expect(find.text('Tercetak'), findsNothing);
     await h.dispose(tester);
+  });
+
+  group('Done screen auto-return waits for printing (D-062)', () {
+    Future<void> sellWhilePrinting(WidgetTester tester) async {
+      await tester.tap(find.byKey(const Key('item-americano')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('pay')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('quick-50000')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('pay-complete')));
+      // The print spinner never settles; pump frames instead.
+      for (var i = 0; i < 5; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+    }
+
+    final onMenu = find.byKey(const Key('item-americano'));
+
+    testWidgets('no countdown while printing; it starts once everything printed', (tester) async {
+      final h = await _start(tester, printers: [receiptBt]);
+      final gate = h.printers.held['AA:BB:CC:DD:EE:FF'] = Completer<void>();
+      await sellWhilePrinting(tester);
+      expect(find.text('Mencetak…'), findsOneWidget);
+      expect(find.text('Kembali otomatis setelah selesai mencetak'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 7));
+      expect(find.text('No. 1'), findsOneWidget);
+
+      gate.complete();
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('Tercetak'), findsOneWidget);
+      expect(find.text('Kembali otomatis dalam 5 detik'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
+      expect(find.text('Kembali otomatis dalam 2 detik'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+      expect(find.text('No. 1'), findsNothing);
+      expect(onMenu, findsOneWidget);
+      await h.dispose(tester);
+    });
+
+    testWidgets('a failure keeps the screen; a successful Retry doesn’t restart the countdown', (
+      tester,
+    ) async {
+      final h = await _start(tester, printers: [receiptBt]);
+      h.printers.unreachable.add('AA:BB:CC:DD:EE:FF');
+      await _sellAmericanoCash(tester);
+      expect(find.text('Gagal: Tidak bisa terhubung ke printer.'), findsOneWidget);
+      expect(find.byKey(const Key('done-auto-return')), findsNothing);
+      await tester.pump(const Duration(seconds: 10));
+      expect(find.text('No. 1'), findsOneWidget);
+
+      h.printers.unreachable.clear();
+      await tester.tap(find.textContaining('Coba lagi'));
+      await tester.pumpAndSettle();
+      expect(find.text('Tercetak'), findsOneWidget);
+      expect(find.byKey(const Key('done-auto-return')), findsNothing);
+      await tester.pump(const Duration(seconds: 10));
+      expect(find.text('No. 1'), findsOneWidget);
+      await h.dispose(tester);
+    });
+
+    testWidgets('one printer failing stops the countdown even while the other still prints', (tester) async {
+      final h = await _start(tester);
+      h.printers.unreachable.add('AA:BB:CC:DD:EE:FF');
+      final gate = h.printers.held['192.168.1.50'] = Completer<void>();
+      await sellWhilePrinting(tester);
+      expect(find.text('Gagal: Tidak bisa terhubung ke printer.'), findsOneWidget);
+      gate.complete();
+      await tester.pumpAndSettle();
+      expect(find.text('Tercetak'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 10));
+      expect(find.text('No. 1'), findsOneWidget);
+      await h.dispose(tester);
+    });
+
+    testWidgets('nothing to print: the countdown starts at once', (tester) async {
+      final h = await _start(tester, printers: const []);
+      await _sellAmericanoCash(tester);
+      expect(find.text('Kembali otomatis dalam 5 detik'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+      expect(onMenu, findsOneWidget);
+      await h.dispose(tester);
+    });
+
+    testWidgets('New order leaves at once; printing carries on in the background', (tester) async {
+      final h = await _start(tester, printers: [receiptBt]);
+      final gate = h.printers.held['AA:BB:CC:DD:EE:FF'] = Completer<void>();
+      await sellWhilePrinting(tester);
+      await tester.tap(find.byKey(const Key('done-new')));
+      await tester.pumpAndSettle();
+      expect(onMenu, findsOneWidget);
+      gate.complete();
+      await tester.pumpAndSettle();
+      expect(h.printers.printed['AA:BB:CC:DD:EE:FF'], hasLength(1));
+      await h.dispose(tester);
+    });
   });
 
   testWidgets('auto-return off: the Done screen stays', (tester) async {

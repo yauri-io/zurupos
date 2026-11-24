@@ -106,6 +106,7 @@
   "doneChange": "Change",
   "doneNoChange": "No change",
   "doneNewOrder": "New order",
+  "doneAutoReturnAfterPrint": "Returning after printing finishes",
   "doneAutoReturn": "Returning in {seconds} s",
   "todayEmpty": "No orders yet today.",
   "todaySearch": "Search number, name or item",

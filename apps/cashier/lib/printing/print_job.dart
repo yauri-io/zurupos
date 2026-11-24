@@ -42,3 +42,14 @@ class PrintJob {
     error: error,
   );
 }
+
+/// Where an order's print jobs stand, for the Done screen's auto-return (D-062).
+enum PrintPhase { none, printing, done, failed }
+
+/// A failure wins over jobs still running, so the screen stops at once.
+PrintPhase printPhase(Iterable<PrintJob> jobs) {
+  if (jobs.isEmpty) return PrintPhase.none;
+  if (jobs.any((j) => j.status == JobStatus.failed)) return PrintPhase.failed;
+  if (jobs.every((j) => j.status == JobStatus.done)) return PrintPhase.done;
+  return PrintPhase.printing;
+}
