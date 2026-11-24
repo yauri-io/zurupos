@@ -41,6 +41,7 @@
         '.principles > li',
         '.plain-list > li',
         '.check-list > li',
+        '.price-main',
         '.story-mark',
         '.story > div',
         '.final-box > *',

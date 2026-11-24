@@ -574,6 +574,54 @@ a:focus-visible,
     center / 16px no-repeat;
 }
 
+/* ---------- Price ---------- */
+
+.price-box {
+  display: grid;
+  gap: 8px 48px;
+  max-width: 960px;
+  background: var(--paper-light);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 28px 22px 14px;
+}
+
+@media (min-width: 860px) {
+  .price-box {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 36px 40px 26px;
+  }
+}
+
+.price-figure {
+  margin: 0 0 8px;
+  line-height: 1.1;
+}
+
+.price-amount {
+  font-size: clamp(2.6rem, 9vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.price-unit {
+  margin-left: 0.2em;
+  font-size: 1.25rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.price-billing {
+  color: var(--muted);
+  margin: 0;
+}
+
+.price-list {
+  margin: 12px 0 0;
+}
+
 .section-paper-deep {
   background: var(--paper-deep);
 }
