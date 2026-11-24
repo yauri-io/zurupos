@@ -3,10 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ZuruPOS · Juru catat kedaimu</title>
+    <!-- SEO (D-059): the title and h1 carry the search term "aplikasi kasir"; the tagline stays in og:title. -->
+    <title>Aplikasi Kasir Kedai Kopi, Kafe &amp; Bakery | ZuruPOS</title>
     <meta
       name="description"
-      content="Aplikasi kasir untuk kedai kopi, warung kopi, boba, dan bakery. Catat penjualan, cek stok, lihat laporan dari HP. Satu harga, semua fitur."
+      content="Aplikasi kasir Android untuk kedai kopi, kafe, boba, dan bakery. Catat penjualan, stok bahan ikut resep, laporan dari HP. Rp 120.000/bulan, semua fitur."
     />
     <meta name="theme-color" content="#F6F0E4" />
     <link rel="canonical" href="https://zurupos.com/" />
@@ -15,11 +16,120 @@
     <link rel="manifest" href="/site.webmanifest" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://zurupos.com/" />
+    <meta property="og:site_name" content="ZuruPOS" />
     <meta property="og:title" content="ZuruPOS · Juru catat kedaimu" />
-    <meta property="og:description" content="Catat penjualan, cek stok, lihat laporan dari HP. Itu saja." />
+    <meta
+      property="og:description"
+      content="Aplikasi kasir untuk kedai kopi, kafe, boba, dan bakery. Catat penjualan, cek stok, lihat laporan dari HP. Rp 4.000 per hari."
+    />
     <meta property="og:image" content="https://zurupos.com/img/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Logo ZuruPOS, juru catat kedaimu" />
     <meta property="og:locale" content="id_ID" />
     <meta name="twitter:card" content="summary_large_image" />
+    <!-- Structured data (D-059). Facts only: no ratings or reviews until real ones exist.
+         The FAQ answers must match the visible #tanya section word for word. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://zurupos.com/#org",
+            "name": "ZuruPOS",
+            "url": "https://zurupos.com/",
+            "logo": "https://zurupos.com/img/icon-512.png"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "name": "ZuruPOS",
+            "url": "https://zurupos.com/",
+            "applicationCategory": "BusinessApplication",
+            "applicationSubCategory": "Point of sale",
+            "operatingSystem": "Android",
+            "inLanguage": "id",
+            "description": "Aplikasi kasir untuk kedai kopi, kafe, boba, dan bakery: catat penjualan, stok bahan ikut resep, dan laporan dari HP.",
+            "publisher": { "@id": "https://zurupos.com/#org" },
+            "offers": {
+              "@type": "Offer",
+              "price": "120000",
+              "priceCurrency": "IDR",
+              "description": "Per kedai per bulan, sudah termasuk PPN. Semua fitur."
+            }
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Apakah Zuru memproses pembayaran QRIS atau kartu?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Tidak. Zuru hanya mencatat. Pelanggan tetap bayar lewat stiker QRIS, mesin EDC, atau tunai seperti sekarang, dan uangnya langsung masuk ke rekeningmu. Tidak ada potongan MDR dari kami."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Berapa harga aplikasi kasir Zuru?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Rp 120.000 per bulan per kedai, sudah termasuk PPN. Itu sekitar Rp 4.000 per hari. Semua fitur sudah termasuk, tanpa add-on dan tanpa potongan per transaksi."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Perangkat apa yang dibutuhkan?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Tablet atau HP Android untuk kasir, koneksi internet di kedai, dan HP pemilik untuk membuka laporan. Kalau mau cetak struk, printer thermal Bluetooth atau jaringan, 58 atau 80 mm."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Bagaimana kalau internet putus?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Zuru perlu internet. Kalau sinyal putus saat pembayaran, pesanan ditahan di tablet dan dikirim ulang begitu online lagi."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Apakah stok bahan berkurang otomatis?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Ya. Tiap menu punya resep, jadi satu Kopi Susu mengurangi kopi, susu, gula aren, dan cup sesuai takarannya. Kalau bahan menipis, pemilik dapat email. Laporan juga menunjukkan HPP dan margin per menu."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Bisa dipakai lebih dari satu kasir?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Bisa. Staf, PIN, dan tablet kasir sebanyak yang kamu perlu, tanpa biaya tambahan. Tiap staf punya PIN dan haknya sendiri."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Bisa untuk restoran dengan meja dan open bill?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Belum. Zuru dibuat untuk alur di konter: pesan, bayar, lalu dibuat. Cocok untuk kedai kopi, kafe kecil, warung kopi, boba, dan bakery."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Bagaimana cara mulai?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Chat kami lewat WhatsApp. Kami buatkan akun kedaimu, lalu kamu isi menu dan resep dari dashboard, pasang aplikasi kasir di tablet Android, dan mulai mencatat."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
     <link rel="preload" href="/fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/styles.css" />
     <script src="/main.js" defer></script>
@@ -36,6 +146,7 @@
           <a href="#fitur">Fitur</a>
           <a href="#harga">Harga</a>
           <a href="#terus-terang">Batasan</a>
+          <a href="#tanya">Tanya jawab</a>
           <a href="https://app.zurupos.com/login">Masuk</a>
         </nav>
       </div>
@@ -46,8 +157,10 @@
       <section class="hero">
         <div class="wrap hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">Aplikasi kasir untuk kedai kopi, warung kopi, boba, dan bakery</p>
-            <h1>Juru catat kedaimu.</h1>
+            <h1>
+              <span class="eyebrow">Aplikasi kasir untuk kedai kopi, kafe, boba, dan bakery</span>
+              Juru catat kedaimu.
+            </h1>
             <p class="lead">Catat penjualan, cek stok, lihat laporan dari HP. Itu saja.</p>
             <p>
               Kasir mencatat pesanan di tablet. Stok bahan berkurang sesuai resep. Pemilik melihat angkanya
@@ -63,7 +176,7 @@
                     d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.4Z"
                   />
                 </svg>
-                Chat via Whatsapp
+                Chat via WhatsApp
               </a>
               <a class="text-link" href="#fitur">Lihat fiturnya</a>
             </div>
@@ -105,7 +218,7 @@
       <!-- Features -->
       <section class="section" id="fitur" aria-labelledby="fitur-judul">
         <div class="wrap">
-          <h2 id="fitur-judul">Yang Zuru kerjakan</h2>
+          <h2 id="fitur-judul">Fitur aplikasi kasir Zuru</h2>
           <p class="section-lead">Semua ini ada di satu paket. Tidak ada fitur yang dikunci.</p>
           <ul class="cards">
             <li class="card">
@@ -176,7 +289,8 @@
             <li>
               <h3>Untuk kedai kecil, bukan untuk semua.</h3>
               <p>
-                Dibuat untuk alur di konter: pesan, bayar, lalu dibuat. Kedai kopi, warung kopi, boba, bakery.
+                Dibuat untuk alur di konter: pesan, bayar, lalu dibuat. Kedai kopi, kafe kecil, warung kopi,
+                boba, bakery.
               </p>
             </li>
           </ol>
@@ -237,6 +351,70 @@
         </div>
       </section>
 
+      <!-- FAQ (D-059). Same text as the FAQPage JSON-LD in <head>; change both together. -->
+      <section class="section" id="tanya" aria-labelledby="tanya-judul">
+        <div class="wrap faq">
+          <h2 id="tanya-judul">Tanya jawab</h2>
+          <details>
+            <summary>Apakah Zuru memproses pembayaran QRIS atau kartu?</summary>
+            <p>
+              Tidak. Zuru hanya mencatat. Pelanggan tetap bayar lewat stiker QRIS, mesin EDC, atau tunai
+              seperti sekarang, dan uangnya langsung masuk ke rekeningmu. Tidak ada potongan MDR dari kami.
+            </p>
+          </details>
+          <details>
+            <summary>Berapa harga aplikasi kasir Zuru?</summary>
+            <p>
+              Rp 120.000 per bulan per kedai, sudah termasuk PPN. Itu sekitar Rp 4.000 per hari. Semua fitur
+              sudah termasuk, tanpa add-on dan tanpa potongan per transaksi.
+            </p>
+          </details>
+          <details>
+            <summary>Perangkat apa yang dibutuhkan?</summary>
+            <p>
+              Tablet atau HP Android untuk kasir, koneksi internet di kedai, dan HP pemilik untuk membuka
+              laporan. Kalau mau cetak struk, printer thermal Bluetooth atau jaringan, 58 atau 80 mm.
+            </p>
+          </details>
+          <details>
+            <summary>Bagaimana kalau internet putus?</summary>
+            <p>
+              Zuru perlu internet. Kalau sinyal putus saat pembayaran, pesanan ditahan di tablet dan dikirim
+              ulang begitu online lagi.
+            </p>
+          </details>
+          <details>
+            <summary>Apakah stok bahan berkurang otomatis?</summary>
+            <p>
+              Ya. Tiap menu punya resep, jadi satu Kopi Susu mengurangi kopi, susu, gula aren, dan cup sesuai
+              takarannya. Kalau bahan menipis, pemilik dapat email. Laporan juga menunjukkan HPP dan margin
+              per menu.
+            </p>
+          </details>
+          <details>
+            <summary>Bisa dipakai lebih dari satu kasir?</summary>
+            <p>
+              Bisa. Staf, PIN, dan tablet kasir sebanyak yang kamu perlu, tanpa biaya tambahan. Tiap staf
+              punya PIN dan haknya sendiri.
+            </p>
+          </details>
+          <details>
+            <summary>Bisa untuk restoran dengan meja dan open bill?</summary>
+            <p>
+              Belum. Zuru dibuat untuk alur di konter: pesan, bayar, lalu dibuat. Cocok untuk kedai kopi, kafe
+              kecil, warung kopi, boba, dan bakery.
+            </p>
+          </details>
+          <details>
+            <summary>Bagaimana cara mulai?</summary>
+            <p>
+              Chat kami lewat WhatsApp. Kami buatkan akun kedaimu, lalu kamu isi menu dan resep dari
+              dashboard, pasang aplikasi kasir di tablet Android, dan mulai mencatat.
+            </p>
+          </details>
+        </div>
+      </section>
+
       <!-- Name story -->
       <section class="section section-paper-deep" aria-labelledby="nama-judul">
         <div class="wrap story">
@@ -263,17 +441,28 @@
       <section class="section final" aria-labelledby="akhir-judul">
         <div class="wrap final-box">
           <h2 id="akhir-judul">Mau coba di kedaimu?</h2>
-          <p>Ceritakan sedikit lewat WhatsApp: jenis kedai, berapa kasir, dan printer yang dipakai.</p>
+          <ol class="steps">
+            <li>
+              <strong>Chat kami.</strong> Ceritakan jenis kedai, berapa kasir, dan printer yang dipakai.
+            </li>
+            <li>
+              <strong>Kami buatkan akunnya.</strong> Kamu isi menu, resep, dan stok awal dari dashboard.
+            </li>
+            <li>
+              <strong>Pasang di tablet.</strong> Unduh aplikasi kasir, sambungkan printer, mulai mencatat.
+            </li>
+          </ol>
+          <!-- Prefilled with the questions above, so the first message already answers them. -->
           <a
             class="btn btn-wa"
-            href="https://wa.me/6285190095200?text=Halo%20Zuru%2C%20saya%20mau%20tanya%20tentang%20ZuruPOS%20untuk%20kedai%20saya."
+            href="https://wa.me/6285190095200?text=Halo%20Zuru%2C%20saya%20mau%20coba%20ZuruPOS.%0AJenis%20kedai%3A%20%0AJumlah%20kasir%3A%20%0APrinter%3A%20"
           >
             <svg class="wa-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.4Z"
               />
             </svg>
-            Chat via Whatsapp
+            Chat via WhatsApp
           </a>
         </div>
       </section>
@@ -300,7 +489,7 @@
             d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.4Z"
           />
         </svg>
-        Chat via Whatsapp
+        Chat via WhatsApp
       </a>
     </div>
   </body>

@@ -355,4 +355,15 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - A yearly plan exists but is offered privately by the owner. It isn't on the website, and its price isn't recorded here because this repository is public.
 - PPN is included in the price, not added on top. With PPN at 12% on a tax base of 11/12 (11% effective), Rp 120.000 is Rp 108.108 plus Rp 11.892 PPN. This only applies if the business is registered as PKP. Without PKP, PPN can't be charged, and the page shouldn't say "termasuk PPN".
 - Billing is still manual (invoice plus QRIS or bank transfer). Subscription billing stays a next-phase feature (CLAUDE.md rule 8).
-**Consequences:** Changing the price means changing the landing page and this entry together. The "termasuk PPN" text depends on the owner's PKP status.
+**Consequences:** Changing the price means changing the landing page (including the JSON-LD offer and FAQ, D-059) and this entry together. The "termasuk PPN" text depends on the owner's PKP status.
+
+## D-059: Landing page SEO and lead capture
+**Context:** On 2026-11-24 the owner asked for an SEO review of zurupos.com aimed at getting shops to sign up. Shops arrive through WhatsApp, since public signup stays off (D-050). The page ranked for nothing useful: the title and h1 were only the tagline, and "kafe/cafe", a common search word, wasn't on the page.
+**Decision:**
+- The `<title>` and the h1 contain the search term: *Aplikasi Kasir Kedai Kopi, Kafe & Bakery*. The h1 wraps the eyebrow line, so the page looks the same; the tagline stays in og:title.
+- "kafe" sits next to "kedai kopi" where the page lists the kinds of shops. The shop is still a *kedai* in the tagline (BRAND.md).
+- A visible **Tanya jawab** section answers the questions owners ask before they chat (QRIS, price, hardware, internet, stock, more cashiers, tables, how to start). The same text goes in `FAQPage` JSON-LD; the two must change together.
+- JSON-LD `Organization` and `SoftwareApplication` with the real price (`Offer`, IDR 120000). **No `aggregateRating` or reviews** until there are real ones, since made-up ratings break Google's rules and the brand rule on honesty.
+- The final call to action shows three steps to get started, and its WhatsApp message is prefilled with *Jenis kedai / Jumlah kasir / Printer*. A message that starts that way came from the final button, and the hero/sticky buttons keep the short message.
+- `sitemap.xml` with a pointer to it in `robots.txt`.
+**Consequences:** Changing the price means changing the JSON-LD `Offer` too (D-058). The FAQ answers state product facts, so they change whenever those facts do (e.g. tables, offline).

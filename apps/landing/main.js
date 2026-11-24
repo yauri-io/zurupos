@@ -45,6 +45,7 @@
         '.story-mark',
         '.story > div',
         '.final-box > *',
+        '.faq details',
       ].join(','),
     )
     const seen = new Map()
