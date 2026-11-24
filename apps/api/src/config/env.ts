@@ -11,6 +11,8 @@ export type SentryConfig = {
 
 export type Config = {
   nodeEnv: 'development' | 'test' | 'production'
+  // Build version (D-057), baked into the image by deploy/prod.sh; 'dev' elsewhere.
+  version: string
   host: string
   port: number
   logLevel: string
@@ -84,7 +86,8 @@ const loadEmail = (env: Env): Config['email'] => {
 export const loadSentry = (env: Env, fallbackEnvironment: string): SentryConfig => ({
   dsn: env['SENTRY_DSN'] || undefined,
   environment: optional(env, 'SENTRY_ENVIRONMENT', fallbackEnvironment),
-  release: env['SENTRY_RELEASE'] || undefined,
+  // An explicit SENTRY_RELEASE wins; otherwise the build version (D-057), if any.
+  release: env['SENTRY_RELEASE'] || env['ZURU_VERSION'] || undefined,
 })
 
 // The outbox worker (SPEC §10) connects as zuru_worker and only needs email settings.
@@ -108,6 +111,7 @@ export const loadConfig = (env: Env = process.env): Config => {
   const nodeEnv = oneOf(env, 'NODE_ENV', ['development', 'test', 'production'] as const, 'development')
   const config: Config = {
     nodeEnv,
+    version: optional(env, 'ZURU_VERSION', 'dev'),
     host: optional(env, 'API_HOST', '0.0.0.0'),
     port: int(env, 'API_PORT', 4000),
     logLevel: optional(env, 'LOG_LEVEL', 'info'),

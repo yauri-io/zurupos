@@ -84,7 +84,7 @@ export const buildApp = async ({ config, db, limiters = createLimiters() }: AppD
 
   registerAuth(app, { db, config })
 
-  await app.register(healthRoutes, { db })
+  await app.register(healthRoutes, { db, version: config.version })
   await app.register(
     async (v1) => {
       await v1.register(authRoutes, { db, config, limiters })

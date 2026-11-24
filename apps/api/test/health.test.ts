@@ -18,10 +18,10 @@ describe('GET /healthz', () => {
     await db.destroy()
   })
 
-  it('pings the database', async () => {
+  it('pings the database and reports the build version', async () => {
     const res = await app.inject({ method: 'GET', url: '/healthz' })
     expect(res.statusCode).toBe(200)
-    expect(res.json()).toEqual({ status: 'ok', db: 'ok' })
+    expect(res.json()).toEqual({ status: 'ok', db: 'ok', version: config.version })
     expect(res.headers['x-request-id']).toBeTruthy()
   })
 

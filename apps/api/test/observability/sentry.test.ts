@@ -14,6 +14,15 @@ describe('Sentry config', () => {
     expect(loadSentry({ SENTRY_DSN: '' }, 'test').dsn).toBeUndefined()
   })
 
+  it('uses the build version as the release unless SENTRY_RELEASE is set', () => {
+    expect(loadSentry({ ZURU_VERSION: '2026.11.24-debc0cb' }, 'production').release).toBe(
+      '2026.11.24-debc0cb',
+    )
+    expect(
+      loadSentry({ ZURU_VERSION: '2026.11.24-debc0cb', SENTRY_RELEASE: 'abc123' }, 'production').release,
+    ).toBe('abc123')
+  })
+
   it('reads the DSN, environment and release', () => {
     expect(
       loadSentry(
