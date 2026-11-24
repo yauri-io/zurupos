@@ -335,3 +335,13 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - Empty lists (menu, items in a category, modifier groups, ingredients, stock, discounts, devices) explain what the page is for, with an example, and offer the first action. The devices page links the release APK (D-055) and lists the three pairing steps.
 - A (?) next to terms owners may not know (day cutoff, tax, service charge, tax on service, base and purchase unit, average cost, recipe, modifier selection and min/max, staff role, discount scope) opens a short explanation. The text lives in the i18n files (`help.*`), in Bahasa and English.
 **Consequences:** Home (owner-only) makes five more small requests on each load, unless the card was hidden in that browser. A shop older than a year with no recent order would see the "first order" step again, which is harmless.
+
+## D-057: Build version, shown in the dashboard, with a reload offer after a deploy
+**Context:** On 2026-11-24 the owner couldn't tell whether they were seeing the new dashboard after a deploy. A tab opened before a deploy keeps running the old build until it's reloaded, and nothing showed which version was running.
+**Decision:**
+- The version is the deployed commit's date (Asia/Jakarta) and short hash, e.g. `2026.11.24-debc0cb`. `deploy/prod.sh` works it out from git on every call, so nobody bumps a number by hand. It adds `-modified` if tracked files on the server differ from the commit.
+- It's passed as a build argument and baked into the API and dashboard images (`ZURU_VERSION`, `NUXT_PUBLIC_APP_VERSION`). It's set at build time, not as a runtime env var: that way `prod.sh up -d` without `--build` after a pull can't show a new version on old code. Local builds are `dev`.
+- The API returns it in `/healthz`. The dashboard shows it in the sidebar footer and on the login page.
+- The dashboard server answers `GET /_version` (`no-store`). Each tab compares it with the version it loaded, every 5 minutes and whenever the tab becomes visible. When they differ, a toast that stays open offers **Muat ulang**. It never reloads by itself, because a form may be half filled in.
+- Sentry uses the version as the release unless `SENTRY_RELEASE` is set.
+**Consequences:** Every rebuild after a new commit changes the version, even a docs-only commit; that's honest, since the image was rebuilt. The cashier app keeps its own version from its release tag (D-055).

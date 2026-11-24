@@ -68,7 +68,7 @@ openssl rand -base64 32 | tr -d '/+='
 mkdir -p deploy/certs   # origin.pem + origin.key from step 1.4
 deploy/prod.sh up -d --build --wait
 deploy/prod.sh ps
-curl -s https://api.zurupos.com/healthz     # {"status":"ok","db":"ok"}
+curl -s https://api.zurupos.com/healthz     # {"status":"ok","db":"ok","version":"2026.11.24-debc0cb"}
 ```
 
 The first start creates the database roles (`db/init/00-roles.sh` with `ZURU_DATABASES=zuru`) and runs the migrations. Postgres keeps its data in the `zurupos-prod_pgdata` volume.
@@ -105,7 +105,7 @@ Logs: `deploy/prod.sh logs -f api worker`. Each container keeps at most 50 MB of
 Sentry collects crashes and unexpected errors from the API, the outbox worker, the dashboard and the cashier app (D-053). Everything stays off until a DSN is set.
 
 1. In Sentry, create three projects: **zurupos-api** (Node.js), **zurupos-dashboard** (Vue) and **zurupos-cashier** (Flutter). Copy each project's DSN (*Settings → Client Keys (DSN)*).
-2. In `deploy/.env.prod` set `SENTRY_DSN` (the API project; the worker uses it too) and `NUXT_PUBLIC_SENTRY_DSN` (the dashboard project). Optionally set `SENTRY_RELEASE` to the commit you deploy.
+2. In `deploy/.env.prod` set `SENTRY_DSN` (the API project; the worker uses it too) and `NUXT_PUBLIC_SENTRY_DSN` (the dashboard project). Leave `SENTRY_RELEASE` empty: errors are tagged with the build version (D-057).
 3. `deploy/prod.sh up -d api worker dashboard caddy`. Caddy needs the restart for the new CSP, which lets the dashboard reach `*.sentry.io`.
 4. For the app, build with the cashier project's DSN: `SENTRY_DSN=<dsn> apps/cashier/tool/build_release.sh https://api.zurupos.com`.
 5. In each project, add an alert rule that emails the developer on a new issue.
@@ -239,6 +239,14 @@ deploy/prod.sh exec backup /bin/sh /backup/backup-loop.sh now   # backup first
 git pull
 deploy/prod.sh up -d --build --wait
 ```
+
+`deploy/prod.sh` names the build after the commit: its date and short hash, e.g. `2026.11.24-debc0cb` (`-modified` if tracked files were changed on the server). The version is baked into the images, so check it after an update:
+
+```sh
+curl -s https://api.zurupos.com/healthz   # "version":"2026.11.24-debc0cb"
+```
+
+The dashboard shows it under the user's name in the sidebar and below the login form. Open dashboard tabs notice the new version within 5 minutes, or when the tab is shown again, and offer **Muat ulang**.
 
 Migrations run automatically (the `migrate` service) before the API starts. They're forward-only: if an update goes wrong, check out the previous commit, rebuild, and if a migration changed data, restore the backup taken just before.
 

@@ -248,3 +248,7 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Run: `pnpm --filter @zurupos/dashboard test` (checklist rules in `test/setup.test.ts`), `pnpm --filter @zurupos/dashboard test:e2e` (signup now expects Home with the checklist).
 - Tests: dashboard unit 43, e2e 5.
 - Deployed 2026-11-24 00:30 WIB (backup `zuru-20261124-0030.dump` first). The dashboard rebuild also shipped the 2026-11-23 menu setup changes.
+
+### Build version — 2026-11-24
+- Done (D-057): `deploy/prod.sh` names each build `YYYY.MM.DD-<sha>` from git and bakes it into the API and dashboard images; `/healthz` returns it, the dashboard shows it (sidebar footer, login page), and open tabs offer **Muat ulang** when the server runs a newer build. Sentry's release defaults to it.
+- Run: `pnpm --filter @zurupos/dashboard test:e2e` (`version.spec.ts`), `pnpm --filter @zurupos/api test test/health.test.ts test/observability`. Verified on the local rehearsal stack.
