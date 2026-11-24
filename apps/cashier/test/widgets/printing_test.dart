@@ -15,6 +15,7 @@ const receiptBt = PrinterConfig(
   name: 'Kasir BT',
   transport: TransportKind.bluetooth,
   address: 'AA:BB:CC:DD:EE:FF',
+  autoReceipt: true,
   drawerKick: true,
 );
 const ticketLan = PrinterConfig(
@@ -25,6 +26,7 @@ const ticketLan = PrinterConfig(
   paper: Paper.mm80,
   receipt: false,
   ticket: true,
+  autoTicket: true,
 );
 
 Future<Harness> _start(
@@ -217,10 +219,14 @@ void main() {
     await tester.tap(find.byKey(const Key('printer-save')));
     await tester.pumpAndSettle();
     final saved = decodePrinters(await h.store.setting('printers'));
-    expect(saved.map((p) => (p.name, p.address, p.paper, p.receipt, p.ticket)), [
-      ('Kasir BT', 'AA:BB:CC:DD:EE:FF', Paper.mm58, true, false),
-      ('Bar', '192.168.1.60:9101', Paper.mm80, false, true),
+    expect(saved.map((p) => (p.name, p.address, p.paper, p.receipt, p.ticket, p.autoReceipt, p.autoTicket)), [
+      ('Kasir BT', 'AA:BB:CC:DD:EE:FF', Paper.mm58, true, false, true, false),
+      // A new printer doesn't auto-print until it's switched on (D-061).
+      ('Bar', '192.168.1.60:9101', Paper.mm80, false, true, false, false),
     ]);
+    // The list marks the roles that print automatically.
+    expect(find.text('AA:BB:CC:DD:EE:FF · 58 mm · Struk pelanggan (otomatis)'), findsOneWidget);
+    expect(find.text('192.168.1.60:9101 · 80 mm · Tiket barista'), findsOneWidget);
     expect(saved[1].hostPort, (host: '192.168.1.60', port: 9101));
     expect(find.text('Maksimal 2 printer per perangkat.'), findsOneWidget);
     expect(tester.widget<TextButton>(find.byKey(const Key('printer-add'))).onPressed, isNull);
@@ -293,6 +299,18 @@ void main() {
     await tester.pumpAndSettle();
     final saved = decodePrinters(await h.store.setting('printers')).single;
     expect([saved.name, saved.address, saved.transport.name], ['RPP02N', 'AA:BB:CC:DD:EE:FF', 'bluetooth']);
+    await h.dispose(tester);
+  });
+
+  testWidgets('auto-print off: Complete prints nothing', (tester) async {
+    final h = await _start(
+      tester,
+      printers: [receiptBt.copyWith(autoReceipt: false), ticketLan.copyWith(autoTicket: false)],
+    );
+    await _sellAmericanoCash(tester);
+    expect(find.text('No. 1'), findsOneWidget);
+    expect(h.printers.printed, isEmpty);
+    expect(find.text('Tercetak'), findsNothing);
     await h.dispose(tester);
   });
 

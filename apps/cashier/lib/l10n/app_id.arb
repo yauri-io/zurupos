@@ -360,6 +360,14 @@
   "printerRoleTicket": "Tiket barista",
   "printerAutoReceipt": "Cetak struk otomatis",
   "printerAutoTicket": "Cetak tiket otomatis",
+  "printerRoleAuto": "{role} (otomatis)",
+  "@printerRoleAuto": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
   "printerDrawerKick": "Buka laci kas setelah struk tunai",
   "printerTest": "Tes cetak",
   "printerDelete": "Hapus printer",

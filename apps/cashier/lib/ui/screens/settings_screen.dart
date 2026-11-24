@@ -56,8 +56,8 @@ class SettingsScreen extends ConsumerWidget {
               [
                 p.address,
                 '${p.paper.mm} mm',
-                if (p.receipt) l.printerRoleReceipt,
-                if (p.ticket) l.printerRoleTicket,
+                if (p.receipt) p.autoReceipt ? l.printerRoleAuto(l.printerRoleReceipt) : l.printerRoleReceipt,
+                if (p.ticket) p.autoTicket ? l.printerRoleAuto(l.printerRoleTicket) : l.printerRoleTicket,
               ].join(' · '),
             ),
             trailing: const Icon(Icons.chevron_right),

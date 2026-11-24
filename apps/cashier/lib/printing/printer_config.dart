@@ -18,8 +18,9 @@ class PrinterConfig {
     this.paper = Paper.mm58,
     this.receipt = true,
     this.ticket = false,
-    this.autoReceipt = true,
-    this.autoTicket = true,
+    // A new printer prints only when asked (D-061); saved configs keep their own value.
+    this.autoReceipt = false,
+    this.autoTicket = false,
     this.drawerKick = false,
   });
 

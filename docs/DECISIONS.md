@@ -378,3 +378,10 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - The page's pitch only claims what the product does: recipes per item, stock that follows recipes, COGS from the weighted-average purchase cost, and an HPP and margin report for the shop (not per item). Its WhatsApp message says it came from the calculator.
 - The homepage links to it from the stock card and the footer; it is in `sitemap.xml`. Caddy serves its HTML, CSS and JS with `no-cache` like the homepage.
 **Consequences:** If the product's price changes, this page's pitch changes too (D-058). If the margin report gains a per-item view, the pitch can say so.
+
+## D-061: New printers don't auto-print; the printer list shows which roles do
+**Context:** On 2026-11-24 the owner reported that receipts still printed after a sale with auto-print switched off. It didn't reproduce: a saved "off" setting is respected. The likely causes are a change left without tapping *Simpan*, the separate ticket switch (which started ON), or a second printer still set to auto-print.
+**Decision:**
+- `PrinterConfig` defaults `autoReceipt` and `autoTicket` to `false`, so a newly added printer prints only when switched on. Saved printers keep their stored values; nothing is migrated.
+- Settings → printers lists each role with "(otomatis)" / "(automatic)" when that role auto-prints, so a role that is still on can be seen without opening the printer.
+**Consequences:** After adding a printer, the owner has to switch on auto-print for it to print after *Complete*. The Done screen's manual print button (planned next) covers roles that don't auto-print.
