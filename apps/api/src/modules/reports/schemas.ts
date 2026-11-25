@@ -117,6 +117,68 @@ export const HeatmapResponse = Type.Object({
   insight: Type.Object({ orders: Insight, net_sales: Insight }),
 })
 
+// SPEC §12.5.
+export const MenuMatrixQuery = Body({ from: Day, to: Day, category_id: Type.Optional(Uuid) })
+
+export const MenuMatrixResponse = Type.Object({
+  from: Day,
+  to: Day,
+  // The category shown: the requested one, or the one with the highest net sales; null without sales.
+  category_id: Nullable(Uuid),
+  // Categories with sales in range, for the picker (highest net sales first).
+  categories: Type.Array(Type.Object({ id: Uuid, name: Type.String(), net: Int })),
+  state: Type.Union([
+    Type.Literal('ok'),
+    Type.Literal('incomplete_costs'),
+    Type.Literal('too_few_items'),
+    Type.Literal('no_sales'),
+  ]),
+  // Net sales of cost-complete items as basis points of the category's; null without net sales.
+  coverage_bps: Nullable(Int),
+  avg_margin_per_portion: Nullable(Int),
+  items: Type.Array(
+    Type.Object({
+      item_id: Uuid,
+      name: Type.String(),
+      archived: Type.Boolean(),
+      qty: Int,
+      net: Int,
+      cogs: Int,
+      margin: Int,
+      margin_per_portion: Int,
+      // Null unless state is ok.
+      quadrant: Nullable(
+        Type.Union([
+          Type.Literal('andalan'),
+          Type.Literal('naikkan_harga'),
+          Type.Literal('promosikan'),
+          Type.Literal('evaluasi'),
+        ]),
+      ),
+      // naikkan_harga only: whole Rp 1.000 to close the gap to the average, and what it
+      // would add over 30 days if the number sold stayed the same.
+      suggested_increase: Nullable(Int),
+      extra_30d: Nullable(Int),
+    }),
+  ),
+  incomplete: Type.Array(
+    Type.Object({
+      item_id: Uuid,
+      name: Type.String(),
+      archived: Type.Boolean(),
+      net: Int,
+      reasons: Type.Array(
+        Type.Union([
+          Type.Literal('no_recipe'),
+          Type.Literal('ingredient_without_cost'),
+          Type.Literal('sold_without_cost'),
+        ]),
+      ),
+      ingredients: Type.Array(Type.String()),
+    }),
+  ),
+})
+
 const UserRef = Type.Object({ id: Uuid, name: Type.String() })
 
 export const VoidsResponse = Type.Object({

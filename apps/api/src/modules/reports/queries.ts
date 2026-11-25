@@ -192,6 +192,77 @@ export const tradingDays = (trx: Tx, r: Range) =>
       group by 1`,
   )
 
+// SPEC §12.5: categories (current category of each item) with sales in range.
+export const matrixCategories = (trx: Tx, r: Range) =>
+  rows(
+    trx,
+    sql<{ id: string; name: string; net: bigint }>`
+      with a as (${allocatedLines(r)})
+      select c.id, c.name, sum(a.net_after)::bigint as net
+      from a
+      join items i on i.tenant_id = ${r.tenantId} and i.id = a.item_id
+      join categories c on c.tenant_id = i.tenant_id and c.id = i.category_id
+      group by c.id, c.name
+      order by net desc, c.name, c.id`,
+  )
+
+export const categoryExists = async (trx: Tx, tenantId: string, id: string) =>
+  (await trx
+    .selectFrom('categories')
+    .select('id')
+    .where('tenant_id', '=', tenantId)
+    .where('id', '=', id)
+    .executeTakeFirst()) !== undefined
+
+// Per item of one (current) category: sales in range plus the cost checks of
+// SPEC §12.5 on today's recipe, linked modifiers and ingredient costs.
+export const matrixItems = (trx: Tx, r: Range, categoryId: string) =>
+  rows(
+    trx,
+    sql<{
+      item_id: string
+      name: string
+      archived: boolean
+      qty: bigint
+      net: bigint
+      cogs: bigint
+      zero_cogs_lines: number
+      has_recipe: boolean
+      uncosted: string[]
+    }>`
+      with a as (${allocatedLines(r)}),
+      sold as (
+        select a.item_id, sum(a.qty)::bigint as qty, sum(a.net_after)::bigint as net,
+               round(sum(a.cogs))::bigint as cogs, (count(*) filter (where a.cogs = 0))::int as zero_cogs_lines
+        from a group by a.item_id
+      )
+      select i.id as item_id, i.name, i.archived_at is not null as archived,
+             s.qty, s.net, s.cogs, s.zero_cogs_lines,
+             exists (select 1 from recipe_lines rl where rl.tenant_id = i.tenant_id and rl.item_id = i.id)
+               as has_recipe,
+             coalesce((
+               select array_agg(distinct u.name order by u.name) from (
+                 select ing.name
+                 from recipe_lines rl
+                 join ingredients ing on ing.tenant_id = rl.tenant_id and ing.id = rl.ingredient_id
+                 where rl.tenant_id = i.tenant_id and rl.item_id = i.id and ing.avg_cost <= 0
+                 union
+                 select ing.name
+                 from item_modifier_groups img
+                 join modifier_groups mg
+                   on mg.tenant_id = img.tenant_id and mg.id = img.group_id and mg.archived_at is null
+                 join modifier_options mo on mo.tenant_id = mg.tenant_id and mo.group_id = mg.id
+                   and mo.is_active and mo.archived_at is null
+                 join modifier_option_effects e on e.tenant_id = mo.tenant_id and e.option_id = mo.id
+                 join ingredients ing on ing.tenant_id = e.tenant_id and ing.id = e.ingredient_id
+                 where img.tenant_id = i.tenant_id and img.item_id = i.id and ing.avg_cost <= 0
+               ) u
+             ), '{}') as uncosted
+      from sold s
+      join items i on i.tenant_id = ${r.tenantId} and i.id = s.item_id
+      where i.category_id = ${categoryId}`,
+  )
+
 export const tenantDay = async (trx: Tx, tenantId: string) =>
   trx
     .selectFrom('tenants')

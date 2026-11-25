@@ -156,6 +156,7 @@ const SCAN_ROUTES: Record<string, Caller[]> = {
   'GET /v1/reports/categories': ['dashboard'],
   'GET /v1/reports/margin': ['dashboard'],
   'GET /v1/reports/stock-value': ['dashboard'],
+  'GET /v1/reports/menu-matrix': ['dashboard'],
   'GET /v1/orders': ['dashboard'],
 }
 
@@ -404,6 +405,20 @@ describe("reads as A never contain B's data", () => {
     expect(leakedSecrets(res.body, b)).toEqual([])
     // Sanity: the scan would notice A's own data, so it is not vacuous.
     expect(leakedSecrets(res.body, a).length).toBeGreaterThan(0)
+  })
+})
+
+describe("A's credentials + B's ids in the query string → 404", () => {
+  it('GET /v1/reports/menu-matrix?category_id', async () => {
+    const path = (shop: FullShop) =>
+      `/v1/reports/menu-matrix?from=${today}&to=${today}&category_id=${idOf(shop, 'category')}`
+    const res = await call('GET /v1/reports/menu-matrix', a.dashboard, path(b))
+    expect(res.statusCode, res.body).toBe(404)
+    expect(res.json()).toMatchObject({ error: { code: 'NOT_FOUND' } })
+    expect(leakedSecrets(res.body, b)).toEqual([])
+    // Positive control: A's own category answers, without B's data.
+    const own = expectStatus(await call('GET /v1/reports/menu-matrix', a.dashboard, path(a)), 200)
+    expect(leakedSecrets(own.body, b)).toEqual([])
   })
 })
 

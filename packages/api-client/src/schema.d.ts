@@ -4019,6 +4019,81 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/reports/menu-matrix': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query: {
+          from: string
+          to: string
+          category_id?: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              from: string
+              to: string
+              category_id: string | null
+              categories: {
+                /** Format: uuid */
+                id: string
+                name: string
+                net: number
+              }[]
+              state: 'ok' | 'incomplete_costs' | 'too_few_items' | 'no_sales'
+              coverage_bps: number | null
+              avg_margin_per_portion: number | null
+              items: {
+                /** Format: uuid */
+                item_id: string
+                name: string
+                archived: boolean
+                qty: number
+                net: number
+                cogs: number
+                margin: number
+                margin_per_portion: number
+                quadrant: ('andalan' | 'naikkan_harga' | 'promosikan' | 'evaluasi') | null
+                suggested_increase: number | null
+                extra_30d: number | null
+              }[]
+              incomplete: {
+                /** Format: uuid */
+                item_id: string
+                name: string
+                archived: boolean
+                net: number
+                reasons: ('no_recipe' | 'ingredient_without_cost' | 'sold_without_cost')[]
+                ingredients: string[]
+              }[]
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/reports/voids': {
     parameters: {
       query?: never

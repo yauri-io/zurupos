@@ -2,6 +2,8 @@ import type { AuthContext } from '../../auth/context.js'
 import type { Tx } from '../../db/with-tenant.js'
 import { divHalfUp } from '../../domain/decimal.js'
 import { buildHeatmap, type Insight } from '../../domain/heatmap.js'
+import { buildMenuMatrix } from '../../domain/menu-matrix.js'
+import { apiError } from '../../http/errors.js'
 import { checkRange, type DateRange } from '../../http/date-range.js'
 import { iso, money } from '../../http/serialize.js'
 import * as q from './queries.js'
@@ -99,6 +101,69 @@ export const heatmap = async (trx: Tx, auth: AuthContext, query: { from: string;
     weeks_of_data: h.weeksOfData,
     reliable: h.reliable,
     insight: { orders: insight(h.insight.orders), net_sales: insight(h.insight.netSales) },
+  }
+}
+
+const DAY_MS = 86_400_000
+const daysIn = (r: { from: string; to: string }) =>
+  (Date.parse(`${r.to}T00:00:00Z`) - Date.parse(`${r.from}T00:00:00Z`)) / DAY_MS + 1
+const nullableMoney = (v: bigint | null) => (v === null ? null : money(v))
+
+export const menuMatrix = async (
+  trx: Tx,
+  auth: AuthContext,
+  query: { from: string; to: string; category_id?: string },
+) => {
+  const r: q.Range = { tenantId: auth.tenantId, ...checkRange(query, HEATMAP_MAX_DAYS) }
+  if (query.category_id && !(await q.categoryExists(trx, auth.tenantId, query.category_id))) {
+    throw apiError('NOT_FOUND')
+  }
+  const categories = await q.matrixCategories(trx, r)
+  const categoryId = query.category_id ?? categories[0]?.id ?? null
+  const rows = categoryId ? await q.matrixItems(trx, r, categoryId) : []
+  const m = buildMenuMatrix(
+    rows.map((i) => ({
+      itemId: i.item_id,
+      name: i.name,
+      archived: i.archived,
+      qty: i.qty,
+      net: i.net,
+      cogs: i.cogs,
+      zeroCogsLines: i.zero_cogs_lines,
+      hasRecipe: i.has_recipe,
+      uncostedIngredients: i.uncosted,
+    })),
+    daysIn(r),
+  )
+  return {
+    from: r.from,
+    to: r.to,
+    category_id: categoryId,
+    categories: categories.map((c) => ({ id: c.id, name: c.name, net: money(c.net) })),
+    state: m.state,
+    coverage_bps: m.coverageBps === null ? null : Number(m.coverageBps),
+    avg_margin_per_portion: nullableMoney(m.avgMarginPerPortion),
+    items: m.items.map((i) => ({
+      item_id: i.itemId,
+      name: i.name,
+      archived: i.archived,
+      qty: Number(i.qty),
+      net: money(i.net),
+      cogs: money(i.cogs),
+      margin: money(i.margin),
+      margin_per_portion: money(i.marginPerPortion),
+      quadrant: i.quadrant,
+      suggested_increase: nullableMoney(i.suggestedIncrease),
+      extra_30d: nullableMoney(i.extra30d),
+    })),
+    incomplete: m.incomplete.map((i) => ({
+      item_id: i.itemId,
+      name: i.name,
+      archived: i.archived,
+      net: money(i.net),
+      reasons: i.reasons,
+      ingredients: i.ingredients,
+    })),
   }
 }
 

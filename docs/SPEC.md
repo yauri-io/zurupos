@@ -701,7 +701,7 @@ It equals `pct` (§6.1) for non-negative values. No floating point.
 
 ### 12.5 Menu matrix (PRD F16, D-073)
 
-`GET /v1/reports/menu-matrix?from&to&category_id` (owner). Same range rules as §12.4; the page defaults to the 30 business days ending yesterday and to the category with the highest net sales. Items are grouped by their **current** category (archived items still appear if they sold in range).
+`GET /v1/reports/menu-matrix?from&to[&category_id]` (owner, `costs.view`). Same range rules as §12.4; the page defaults to the 30 business days ending yesterday. Without `category_id` the API picks the category with the highest net sales; an id that isn't the shop's is `404 NOT_FOUND`. Items are grouped by their **current** category (archived items still appear if they sold in range).
 
 - **Lines:** order lines of paid orders in range with the order discount allocated (§12.2, "Item net sales after order discount"). Per item: `qty` = Σ qty, `net` = Σ net after order discount, `cogs` = round(Σ `cogs`), `margin = net − cogs` (may be negative), `margin_per_portion = div(margin, qty)`.
 - **Cost complete** (all three must hold, otherwise the item goes to `incomplete` with every reason that applies):
@@ -710,11 +710,11 @@ It equals `pct` (§6.1) for non-negative values. No floating point.
   3. no line of the item in range has `cogs = 0` (else `sold_without_cost`).
 - **Included set I** = cost-complete items with `qty > 0`. `N = |I|`, `Q = Σ qty`, `M = Σ margin` over I.
 - `coverage_bps = div(Σ net over I × 10000, Σ net over all items sold in the category)`; `null` when that total is 0.
-- `state`: `incomplete_costs` if `coverage_bps < 5000`; else `too_few_items` if `N < 3`; else `ok`. Only `ok` returns quadrants.
+- `state`: `no_sales` if nothing in the category sold in range; else `incomplete_costs` if `Σ net over I × 2 < Σ net over all items sold` (compared exactly, so 49,999 % never rounds past the guard); else `too_few_items` if `N < 3`; else `ok`. Only `ok` returns quadrants.
 - **Popular** iff `qty_i × N × 10 ≥ Q × 7` (share ≥ 70% of an equal share). **High margin** iff `margin_i × Q ≥ M × qty_i` (margin per portion ≥ the weighted average, cross-multiplied, no division).
 - **Quadrant:** `andalan` (popular, high), `naikkan_harga` (popular, low), `promosikan` (not popular, high), `evaluasi` (not popular, low). UI labels *Andalan*, *Naikkan harga*, *Promosikan*, *Evaluasi*, each with a one-line explanation (i18n). Never the classic English names.
 - `avg_margin_per_portion = div(M, Q)`. For `naikkan_harga` items only: `gap = max(avg_margin_per_portion − margin_per_portion, 0)`, `suggested_increase` = `gap` rounded **up** to a multiple of Rp 1.000, at least Rp 1.000; `extra_30d = div(suggested_increase × qty × 30, days_in_range)`. The UI labels it as an estimate "jika jumlah terjual tetap".
-- Response: `{ from, to, category_id, state, coverage_bps, avg_margin_per_portion, items: [{ item_id, name, archived, qty, net, cogs, margin, margin_per_portion, quadrant, suggested_increase?, extra_30d? }], incomplete: [{ item_id, name, net, reasons: [...], ingredients: [names] }] }`.
+- Response: `{ from, to, category_id (null without sales), categories: [{ id, name, net }] (categories with sales, highest first, for the picker), state, coverage_bps, avg_margin_per_portion, items: [{ item_id, name, archived, qty, net, cogs, margin, margin_per_portion, quadrant, suggested_increase?, extra_30d? }], incomplete: [{ item_id, name, net, reasons: [...], ingredients: [names] }] }`.
 - **Page:** a category picker, the coverage line ("HPP lengkap untuk X dari Y menu, Z% dari penjualan"), the four groups as lists (a scatter chart is optional; the lists are the source of truth and work at 375 px), and the *HPP belum lengkap* list linking to each item's recipe. `incomplete_costs` shows *Lengkapi HPP dulu* with that list instead of the groups.
 
 ### 12.6 Report emails (PRD F17, D-074, D-075)

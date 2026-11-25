@@ -40,3 +40,13 @@ export const divHalfUp = (numerator: bigint, denominator: bigint): bigint => {
   if (numerator < 0n) throw new Error('divHalfUp: numerator must be non-negative')
   return (numerator * 2n + denominator) / (denominator * 2n)
 }
+
+// SPEC §12.4 `div` for any sign: floor((2a + b) / 2b), so halves round towards
+// +∞ (−2.5 → −2) and negative margins round consistently with positive ones.
+export const divRound = (numerator: bigint, denominator: bigint): bigint => {
+  if (denominator <= 0n) throw new Error('divRound: denominator must be positive')
+  const n = numerator * 2n + denominator
+  const d = denominator * 2n
+  const q = n / d // truncates towards zero
+  return n < 0n && q * d !== n ? q - 1n : q
+}

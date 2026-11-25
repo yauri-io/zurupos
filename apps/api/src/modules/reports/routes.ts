@@ -7,6 +7,8 @@ import {
   HourlyResponse,
   ItemsResponse,
   MarginResponse,
+  MenuMatrixQuery,
+  MenuMatrixResponse,
   PaymentsResponse,
   RangeQuery,
   StockValueResponse,
@@ -69,6 +71,15 @@ export const reportRoutes = async (app: App) => {
     },
     async (request) =>
       request.tenantTx((trx) => service.margin(trx, requireAuth(request.auth), request.query)),
+  )
+  app.get(
+    '/reports/menu-matrix',
+    {
+      config: { auth: 'user', permission: 'costs.view' },
+      schema: { tags, querystring: MenuMatrixQuery, response: { 200: MenuMatrixResponse } },
+    },
+    async (request) =>
+      request.tenantTx((trx) => service.menuMatrix(trx, requireAuth(request.auth), request.query)),
   )
   app.get(
     '/reports/voids',
