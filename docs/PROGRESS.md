@@ -12,6 +12,9 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M5 | Printing (Bluetooth + network) | ✅ Done (manual printer test pending) | Manual printer test by user |
 | M6 | Dashboard reports and remaining pages | ✅ Done | |
 | M7 | Hardening, demo seed, user guide, UAT | 🔍 Awaiting UAT with the owner | UAT with the shop owner |
+| R1 | Operational heatmap (SPEC §12.4) | ⬜ Not started | |
+| R2 | Menu matrix (SPEC §12.5) | ⬜ Not started | |
+| R3 | Report emails (SPEC §12.6) | ⬜ Not started | **User approval of D-075 first** |
 
 Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · ✅ Done
 
@@ -264,3 +267,7 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Fixed (D-068): on Android 15+ the system navigation bar covered the bottom of the cashier app (modifier sheet *Tambah*, tablet *Bayar*, printer *Tes cetak*/*Simpan*, the end of long lists). The whole app now lays out above it.
 - Run: `cd apps/cashier && flutter test test/widgets/system_insets_test.dart`.
 - Tests: cashier 165 passed. Ships with the next cashier release (`cashier-v*` tag, DEPLOY.md §5); worth a look on the pilot tablet with 3-button navigation.
+
+### Post-pilot reporting scope — 2026-11-25
+- Done (docs only): PRD F15–F17 and roadmap, SPEC §12.4–12.6 and milestones R1–R3, D-069 to D-075. QR table ordering is deferred (D-069).
+- Open: D-075 (a fifth `auth.*` function for the report scheduler) needs the user's approval before R3. R1 and R2 don't depend on it.

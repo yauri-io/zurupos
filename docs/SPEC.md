@@ -193,7 +193,7 @@ Login and token verification happen before a tenant is known. These use a small 
 
 Because §3.2 forces RLS on the owner too, each looked-up table (`users`, `sessions`, `devices`, `password_resets`) has one extra policy, `auth_definer_lookup`: `for select to zuru_owner using (true)`. It is SELECT-only and only for the NOLOGIN owner role; `zuru_app` is never a member of `zuru_owner` (see D-024).
 
-After the lookup, all further work (PIN check, session creation, etc.) runs inside `withTenant`. These four functions are the **complete** list of exceptions; adding one requires a `DECISIONS.md` entry and an isolation test.
+After the lookup, all further work (PIN check, session creation, etc.) runs inside `withTenant`. These four functions are the **complete** list of exceptions; adding one requires a `DECISIONS.md` entry and an isolation test. (Proposed, not approved: a fifth, `auth.report_schedule()`, for the report email scheduler, D-075.)
 
 ### 3.5 System tables (no tenant RLS)
 
@@ -246,6 +246,7 @@ Conventions:
 | low_stock_alerts_enabled | bool | default true |
 | alert_extra_emails | text[] | default `{}` |
 | idle_lock_minutes | smallint | default 15; 0 = off |
+| daily_summary_enabled, weekly_summary_enabled | bool | default true; report emails (§12.6, R3) |
 
 **users**
 | column | type | notes |
@@ -568,7 +569,7 @@ Auth headers: dashboard = cookie; cashier app = `X-Device-Token` + `Authorizatio
 | Stock | `POST /stock/in`, `POST /stock/waste`, `POST /stock/count` (owner, manager, employee) |
 | Discounts | CRUD `/discounts` (owner, manager) |
 | Orders | `POST /orders` (owner, manager, cashier), `GET /orders` (filters: date range, status, method, user, q), `GET /orders/:id`, `POST /orders/:id/void`, `GET /orders/today` (device: all roles, employee gets no money fields beyond totals) |
-| Reports (owner) | `GET /reports/summary?from&to`, `/reports/daily`, `/reports/hourly`, `/reports/items`, `/reports/categories`, `/reports/payments`, `/reports/margin`, `/reports/voids`, `/reports/stock-value` |
+| Reports (owner) | `GET /reports/summary?from&to`, `/reports/daily`, `/reports/hourly`, `/reports/items`, `/reports/categories`, `/reports/payments`, `/reports/margin`, `/reports/voids`, `/reports/stock-value`, `/reports/heatmap` (§12.4), `/reports/menu-matrix` (§12.5) |
 | Admin | `GET /admin/stock-invariant` (owner; returns ingredients where Σ movements ≠ stock_qty — should always be empty) |
 
 `POST /orders` request:
@@ -597,7 +598,7 @@ Auth headers: dashboard = cookie; cashier app = `X-Device-Token` + `Authorizatio
 - `enqueueEmail(trx, {tenantId, kind, to, subject, html, text})` inserts into `outbox` inside the caller's transaction (atomic with the business change).
 - Worker loop (every 5 s): `select … from outbox where status='pending' and next_attempt_at <= now() order by created_at limit 10 for update skip locked` → send via `EmailProvider` → `sent` or retry with backoff (1 m, 5 m, 30 m, 2 h, 6 h) → `failed` after 6 attempts (logged at error).
 - Templates in `apps/api/src/outbox/templates/` as plain functions returning `{subject, html, text}`; Bahasa Indonesia default, English if the recipient user's locale is `en`.
-- Kinds in MVP: `low_stock`, `password_reset`, `manager_invite`.
+- Kinds in MVP: `low_stock`, `password_reset`, `manager_invite`. Post-pilot (R3, §12.6): `daily_summary`, `weekly_summary`.
 - Local dev: SMTP to Mailpit. Config via env: `EMAIL_PROVIDER=resend|smtp`, `EMAIL_FROM`, `RESEND_API_KEY`, `SMTP_URL`.
 
 ## 11. Cashier app (Flutter)
@@ -667,6 +668,7 @@ Role determines navigation; the API enforces it regardless.
 - `/login`, `/forgot`, `/reset`, `/invite/:token`
 - `/` Home (today; auto-refresh 60 s) — owner; managers land on `/menu`
 - `/reports/sales`, `/reports/payments`, `/reports/items`, `/reports/margin`, `/reports/voids` — owner
+- `/reports/heatmap` (§12.4, R1), `/reports/menu` (§12.5, R2) — owner
 - `/orders`, `/orders/:id` — owner
 - `/inventory` (levels), `/inventory/:id` (movements), `/inventory/stock-in`, `/inventory/waste`, `/inventory/count` — owner, manager
 - `/menu` (categories + items), `/menu/items/:id` (details, modifier groups, recipe with preview), `/menu/modifiers` (groups, options, effects) — owner, manager
@@ -676,6 +678,62 @@ Role determines navigation; the API enforces it regardless.
 - `/settings` — owner (profile, tax & service with live example calculation, payment methods, receipt text, alerts, business day cutoff, timezone)
 
 Mobile-first: every page usable at 375 px width; tables collapse to cards. Use Nuxt UI components; date range picker with presets (Hari ini, Kemarin, 7 hari, Bulan ini, Bulan lalu).
+
+### 12.4 Operational heatmap (PRD F15, D-071)
+
+`GET /v1/reports/heatmap?from&to` (owner). `from`/`to` are business dates, inclusive, at most 92 days apart. The page defaults to the 28 business days ending yesterday, with presets 4, 8 and 12 weeks.
+
+Integer division with half-up rounding, used in §12.4–12.6:
+```
+div(a, b) = floor((2·a + b) / (2·b))   // b > 0; floor, not truncation, so negative a rounds correctly
+```
+It equals `pct` (§6.1) for non-negative values. No floating point.
+
+- **Source:** paid orders with `business_date` in range.
+- **Row:** ISO weekday of `business_date` (1 = Monday … 7 = Sunday). **Column:** local hour of `paid_at` in the tenant timezone.
+- **Hour order:** `cutoff_hour … 23`, then `0 … cutoff_hour − 1`, so orders after midnight that belong to the previous business day sit at the end of that day's row. Only hours from the first to the last one with any order in range are returned; empty hours in between are 0.
+- `trading_days[w]` = number of distinct business dates in range with weekday `w` and at least one paid order. Closed days don't lower the averages.
+- **Cell** (`w`, `h`): `orders` = count, `net_sales` = Σ `net_sales`, `avg_orders_x10 = div(orders × 10, trading_days[w])` (one decimal, as tenths), `avg_net_sales = div(net_sales, trading_days[w])`. A weekday with `trading_days = 0` has all cells `null` ("tidak ada data").
+- `weeks_of_data` = min of `trading_days[w]` over weekdays with `trading_days > 0`; `reliable = weeks_of_data ≥ 3`.
+- **Insight**, per metric, only when `reliable`: `busiest` = the cell with the highest average, `quietest` = the cell with the lowest **non-zero** average (ties: earlier weekday, then earlier hour in display order); `ratio = div(busiest avg, quietest avg)`, shown only when ≥ 2. The dashboard renders the sentence from these fields through i18n keys.
+- Response: `{ from, to, cutoff_hour, hours: int[], weekdays: [{ weekday, trading_days, cells: [{ hour, orders, net_sales, avg_orders_x10, avg_net_sales } | null] }], weeks_of_data, reliable, insight: { orders, net_sales } }` with `insight.*` = `{ busiest: { weekday, hour, avg }, quietest: { weekday, hour, avg }, ratio } | null`.
+- **Page:** grid with a metric switch (*Jumlah pesanan* / *Penjualan bersih*), the sentence above it, "berdasarkan N Sabtu" per row, and a banner when not `reliable`. At 375 px the grid scrolls sideways inside its card (the page itself doesn't), with the weekday column pinned.
+
+### 12.5 Menu matrix (PRD F16, D-073)
+
+`GET /v1/reports/menu-matrix?from&to&category_id` (owner). Same range rules as §12.4; the page defaults to the 30 business days ending yesterday and to the category with the highest net sales. Items are grouped by their **current** category (archived items still appear if they sold in range).
+
+- **Lines:** order lines of paid orders in range with the order discount allocated (§12.2, "Item net sales after order discount"). Per item: `qty` = Σ qty, `net` = Σ net after order discount, `cogs` = round(Σ `cogs`), `margin = net − cogs` (may be negative), `margin_per_portion = div(margin, qty)`.
+- **Cost complete** (all three must hold, otherwise the item goes to `incomplete` with every reason that applies):
+  1. the item has at least one `recipe_lines` row now (else `no_recipe`);
+  2. every ingredient in its recipe, and every `ingredient_id` in the effects of the active options of the modifier groups currently linked to it, has `avg_cost > 0` (else `ingredient_without_cost`, with those ingredient names);
+  3. no line of the item in range has `cogs = 0` (else `sold_without_cost`).
+- **Included set I** = cost-complete items with `qty > 0`. `N = |I|`, `Q = Σ qty`, `M = Σ margin` over I.
+- `coverage_bps = div(Σ net over I × 10000, Σ net over all items sold in the category)`; `null` when that total is 0.
+- `state`: `incomplete_costs` if `coverage_bps < 5000`; else `too_few_items` if `N < 3`; else `ok`. Only `ok` returns quadrants.
+- **Popular** iff `qty_i × N × 10 ≥ Q × 7` (share ≥ 70% of an equal share). **High margin** iff `margin_i × Q ≥ M × qty_i` (margin per portion ≥ the weighted average, cross-multiplied, no division).
+- **Quadrant:** `andalan` (popular, high), `naikkan_harga` (popular, low), `promosikan` (not popular, high), `evaluasi` (not popular, low). UI labels *Andalan*, *Naikkan harga*, *Promosikan*, *Evaluasi*, each with a one-line explanation (i18n). Never the classic English names.
+- `avg_margin_per_portion = div(M, Q)`. For `naikkan_harga` items only: `gap = max(avg_margin_per_portion − margin_per_portion, 0)`, `suggested_increase` = `gap` rounded **up** to a multiple of Rp 1.000, at least Rp 1.000; `extra_30d = div(suggested_increase × qty × 30, days_in_range)`. The UI labels it as an estimate "jika jumlah terjual tetap".
+- Response: `{ from, to, category_id, state, coverage_bps, avg_margin_per_portion, items: [{ item_id, name, archived, qty, net, cogs, margin, margin_per_portion, quadrant, suggested_increase?, extra_30d? }], incomplete: [{ item_id, name, net, reasons: [...], ingredients: [names] }] }`.
+- **Page:** a category picker, the coverage line ("HPP lengkap untuk X dari Y menu, Z% dari penjualan"), the four groups as lists (a scatter chart is optional; the lists are the source of truth and work at 375 px), and the *HPP belum lengkap* list linking to each item's recipe. `incomplete_costs` shows *Lengkapi HPP dulu* with that list instead of the groups.
+
+### 12.6 Report emails (PRD F17, D-074, D-075)
+
+Two outbox kinds, rendered at enqueue time like every email (§10):
+
+| Kind | When (shop time) | Covers | Skipped when |
+|---|---|---|---|
+| `daily_summary` | 07:00 | the previous business date `D` | `D` has no paid orders |
+| `weekly_summary` | Monday 07:30 | the previous Monday–Sunday business dates | the week has no paid orders |
+
+- **Daily content:** net sales, orders, average order value for `D`; change against `D − 7` (same weekday), as a whole percent with `div`, or "—" when `D − 7` had no orders; totals per payment method; top 3 items by net after order discount; voids count and total when > 0; number of ingredients at or below threshold now; a link to the dashboard Home.
+- **Weekly content:** net sales and orders against the week before; the §12.4 insight over the 4 weeks ending that Sunday (left out when not reliable); up to 3 menu actions from §12.5 over the same 4 weeks, taken from every category whose state is `ok` (`naikkan_harga` items by `extra_30d` desc, then `promosikan` by `qty` asc); a coverage nudge when any category with sales is `incomplete_costs`.
+- Money through the API's one IDR formatter. Subject (id): `[ZuruPOS] Ringkasan {Kamis, 26 Nov}: Rp …` and `[ZuruPOS] Ringkasan minggu {23–29 Nov}`. Locale of the owner.
+- **Recipient:** the active owner only (not `alert_extra_emails`).
+- **Settings:** `tenants.daily_summary_enabled`, `tenants.weekly_summary_enabled` (bool, default true), in Settings → Alerts.
+- **Once only:** tenant table `report_email_runs` — `tenant_id, kind, period_start date, created_at`, pk `(tenant_id, kind, period_start)`, normal RLS (§3.2). The run row and the outbox row are inserted in the same `withTenant` transaction; a conflict means already sent, and the transaction does nothing.
+- **Scheduler:** a separate process (`node dist/scheduler/scheduler.js`, Compose service `scheduler`) connecting as `zuru_app` with the startup role guard. Every 5 minutes it gets the list of shops and their schedule fields from `auth.report_schedule()` (see D-075), works out which periods are due with a pure function (`domain/report-schedule`), and handles each shop in its own `withTenant` transaction. Catch-up is bounded: a daily summary is sent at most 24 h late and a weekly at most 72 h late; older periods are skipped, so a long outage never sends a backlog.
+- **Blocked until D-075 is approved.** It needs a fifth reviewed `auth.*` function (§3.4) and its isolation tests.
 
 ## 13. Seed data
 
@@ -694,7 +752,7 @@ The MVP is online-only, but these constraints keep offline mode a feature additi
 6. Order numbers are assigned by the server today. **Future offline plan** (do not build now): device shows a provisional number `A-017` from a per-device local counter; server keeps the daily number; receipts show both if they differ. Keep `order_number` server-side and nothing in the client may assume it is known before sync except in the Done screen after success.
 7. `paid_at` is server time; `client_created_at` is stored separately so offline orders can later be reported by their real time.
 
-### 14.2 QR table ordering readiness (next phase — do not build now)
+### 14.2 QR table ordering readiness (deferred until the pilot shows the need, D-069 — do not build now)
 
 Planned feature: the owner defines tables; ZuruPOS generates one **static QR code per table**; customers scan, browse the menu on their phone, and submit an order tagged with the table; the order appears on the counter device; the cashier records payment as usual.
 
@@ -731,6 +789,14 @@ Each milestone ends with its tests green and a short note appended to `docs/PROG
 | M5 | Printing: transports, receipt + ticket renderers, printer settings, auto-print, reprint, drawer kick (removed later, D-067), test print | Renderer golden tests (byte output for sample orders at 58/80 mm); manual test on one Bluetooth and one network printer; print failure doesn't block order |
 | M6 | Dashboard reports (§12.2–12.3), home, orders, inventory pages, users/devices, settings with live tax example | Report integration tests against seeded data with hand-computed expected values; mobile layout check at 375 px |
 | M7 | Hardening: full regression, seed demo, `docs/USER_GUIDE.id.md` (short owner setup guide in Bahasa Indonesia), UAT checklist run | §17 UAT checklist passes; no open P0 bugs |
+
+**Post-pilot reporting** (PRD F15–F17), in order, local only until the user asks to deploy:
+
+| # | Milestone | Exit criteria |
+|---|---|---|
+| R1 | Operational heatmap (§12.4): API + `/reports/heatmap` | Integration tests on seeded orders with hand-computed cells, incl. a cutoff of 2 (01:30 order lands at the end of the previous day's row), a closed weekday (null row), 5 vs 4 occurrences of a weekday (averages, not sums), a non-Jakarta timezone and the `reliable` threshold; RLS suite green (new route covered); 375 px check |
+| R2 | Menu matrix (§12.5): API + `/reports/menu` | Integration tests for each quadrant boundary (exactly 70% share, exactly the average margin), each `incomplete` reason, the 50% coverage state, `N < 3`, a negative margin, and `suggested_increase` / `extra_30d` by hand; RLS suite green; 375 px check |
+| R3 | Report emails (§12.6) | **Review stop: D-075 approved by the user before any code.** Unit tests for `domain/report-schedule` (timezones, cutoff, Monday rollover, bounded catch-up); integration tests: one email per period even with two scheduler passes in parallel, skipped empty days, toggles respected, owner-only recipient; the §3.6 suite updated for the fifth `auth.*` function and still green; both emails arrive in Mailpit |
 
 ## 17. UAT checklist (pilot readiness)
 

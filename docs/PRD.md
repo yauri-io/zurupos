@@ -26,8 +26,8 @@ The MVP covers ordering, payment recording, ingredient-level inventory with reci
 
 ## 3. Positioning and pricing principles
 
-- **Built for counter service, not for everyone.** The product is defined by the workflow (order → pay → prepare), not a cuisine. The MVP has no tables, open bills or kitchen routing (QR table ordering comes next — §11).
-- **One plan, one flat price, everything included.** No tiers, no add-ons, no feature gating. Small merchants should not fund enterprise R&D.
+- **Built for counter service, not for everyone.** The product is defined by the workflow (order → pay → prepare), not a cuisine. The MVP has no tables, open bills or kitchen routing (QR table ordering is deferred until the pilot shows the need — §11, D-069).
+- **One plan, one flat price, everything included.** No tiers, no add-ons, no feature gating. Small merchants should not fund enterprise R&D. Every new feature must pass the **marginal-cost test**: if it costs us more for each shop or each message (WhatsApp, SMS, paid AI calls), it needs a design that stays free to run, or it doesn't ship (D-070).
 - **Record, don't process.** No payment licensing, no MDR fees, no settlement delays. Value lives in recording and reconciliation.
 - Billing/subscription is **not** part of the MVP. The pilot is free.
 
@@ -211,7 +211,31 @@ Priority: **P0** = must ship for pilot. **P1** = ship if time allows before open
 ### P1 items (if time allows before opening)
 - CSV export for orders and sales report.
 - CSV import for ingredients and menu items (speeds up owner setup).
-- Daily summary email to the owner at business-day close.
+- Daily summary email to the owner at business-day close. (Not built before opening; now part of F17.)
+
+### Post-pilot reporting (F15–F17)
+
+Scope agreed on 2026-11-25 (D-071 to D-075). The owner already gets the numbers (F12); these turn them into decisions and bring them to the owner. Each report ends in a plain sentence in Bahasa Indonesia, not just a chart. Built and released in the order F15 → F16 → F17 (SPEC §16, R1–R3). All are owner-only and included in the flat price.
+
+#### F15. Operational heatmap
+- **Question it answers:** "When is my shop busy, and when do I need two people behind the counter?"
+- A grid of weekday × hour showing **average orders** or **average net sales** per trading day (switchable), by business day in the shop's timezone. Hours after midnight that belong to the previous business day sit at the end of that day's row.
+- Default range: the last 4 weeks; presets 4, 8 and 12 weeks.
+- Shows how much data each weekday is based on ("berdasarkan 4 Sabtu"). Below 3 weeks of data, a banner says the pattern isn't reliable yet and the summary sentence is hidden.
+- One summary sentence: the busiest and the quietest time, and how they compare (e.g. "Sabtu 15.00–17.00 rata-rata 3× lebih ramai daripada Selasa siang").
+
+#### F16. Menu matrix
+- **Question it answers:** "Which items should I keep, re-price, promote or drop?"
+- Per category, each item is placed by **popularity** (share of portions sold) and **margin per portion in rupiah** (net sales after discounts − cost of goods, from what was actually sold). Four groups with action names: **Andalan** (popular, high margin: keep), **Naikkan harga** (popular, low margin: raise the price a little or lower the cost), **Promosikan** (less popular, high margin: put it forward), **Evaluasi** (less popular, low margin: rework or drop).
+- **Incomplete cost guard:** items without a recipe or with an ingredient that has no cost are never placed in the matrix; they are listed under *HPP belum lengkap* with a link to fix them. A coverage line shows how complete the costs are. If items with incomplete costs make up more than half of the category's sales, the matrix is replaced by a *Lengkapi HPP dulu* state.
+- For *Naikkan harga* items: the gap to the category's average margin per portion, and what a price rise would add over 30 days if the number sold stayed the same (labelled as an estimate).
+- Default range: the last 30 days.
+
+#### F17. Report emails
+- **Daily summary** (07:00 shop time, for the previous business day): net sales, orders, average order value, change against the same weekday last week, totals per payment method, top 3 items, voids if any, low-stock count, and a link to the dashboard. Not sent for a day without orders.
+- **Weekly summary** (Monday 07:30 shop time, for the previous Monday–Sunday): net sales and orders against the week before, the busiest and quietest times (F15), up to 3 menu actions (F16), and a nudge to complete costs if the coverage is low.
+- To the shop owner only (not the extra low-stock alert addresses, because these emails contain the shop's money figures). Each email can be turned off in Settings; both are on by default.
+- Email only. No WhatsApp (D-072).
 
 ## 8. Non-functional requirements
 
@@ -246,14 +270,17 @@ Priority: **P0** = must ship for pilot. **P1** = ship if time allows before open
 ## 11. Post-MVP roadmap (not in scope now)
 
 **Next phase** (directly after MVP):
-1. **Offline ordering** with sync.
-2. **QR table ordering.** The owner sets up tables in the dashboard. ZuruPOS generates one **static QR code per table** (printable sheet / downloadable PNG). A customer scans it, sees the menu on their phone, and places an order tagged with that table. The order arrives at the counter device. Payment is still recorded by the cashier, not processed online. Open questions for that phase: pay-at-counter vs. pay-before-prepare, how QR orders are confirmed by staff, spam/abuse protection on a public ordering page, and whether QR codes can be regenerated if leaked.
+1. **Post-pilot reporting**: operational heatmap, menu matrix, daily and weekly summary emails (F15–F17).
+2. **Offline ordering** with sync.
+
+**Deferred until the pilot shows the need** (D-069):
+- **QR table ordering.** The owner sets up tables in the dashboard. ZuruPOS generates one **static QR code per table** (printable sheet / downloadable PNG). A customer scans it, sees the menu on their phone, and places an order tagged with that table. The order arrives at the counter device. Payment is still recorded by the cashier, not processed online. Open questions for that phase: pay-at-counter vs. pay-before-prepare, how QR orders are confirmed by staff, spam/abuse protection on a public ordering page, and whether QR codes can be regenerated if leaked.
 
 **Later:**
 3. Optional second screen: barista queue (new → making → done).
 4. Shifts: open/close with cash count and variance.
 5. Kasbon (pay later) and customer list.
 6. Partial refunds.
-7. Daily summary and weekly report emails; web push notifications.
+7. Web push notifications. (Daily and weekly report emails moved to the next phase as F17.)
 8. Subscription billing (single plan).
 9. Multi-outlet.
