@@ -12,8 +12,8 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M5 | Printing (Bluetooth + network) | ✅ Done (manual printer test pending) | Manual printer test by user |
 | M6 | Dashboard reports and remaining pages | ✅ Done | |
 | M7 | Hardening, demo seed, user guide, UAT | 🔍 Awaiting UAT with the owner | UAT with the shop owner |
-| R1 | Operational heatmap (SPEC §12.4) | ✅ Done (local, not deployed) | |
-| R2 | Menu matrix (SPEC §12.5) | ✅ Done (local, not deployed) | |
+| R1 | Operational heatmap (SPEC §12.4) | ✅ Done, deployed 2026-11-25 | |
+| R2 | Menu matrix (SPEC §12.5) | ✅ Done, deployed 2026-11-25 | |
 | R3 | Report emails (SPEC §12.6) | ⬜ Not started | D-075 approved 2026-11-25 |
 
 Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · ✅ Done
@@ -276,11 +276,12 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Done: `GET /v1/reports/heatmap` (pure `domain/heatmap.ts`), dashboard *Laporan → Jam ramai* (`/reports/heatmap`) with 4/8/12-week presets, orders / net sales switch, insight sentence once every trading weekday has 3 weeks of data, rank-based shading.
 - Run: `pnpm --filter @zurupos/api test test/domain/heatmap.test.ts test/reports test/rls`, `pnpm --filter @zurupos/dashboard test`, `pnpm --filter @zurupos/dashboard test:e2e e2e/reports-pages.spec.ts` (heatmap at 375 px).
 - Tests: API 652 (heatmap unit 10, integration 7, route sweep), dashboard unit 55, reports e2e green. Checked by eye on the demo shop (desktop and 375 px, light and dark).
-- Known issues: the user guide doesn't mention the new page yet. Not deployed; the pilot has under a week of data, so the page shows the "Data baru" banner for now.
+- Known issues: the pilot has under a week of data, so the page shows the "Data baru" banner for its first weeks. Deployed with R2.
 
 ### R2 Menu matrix — 2026-11-25
 - Done: `GET /v1/reports/menu-matrix` (pure `domain/menu-matrix.ts`, signed `divRound` in `domain/decimal.ts`), dashboard *Laporan → Evaluasi menu* (`/reports/menu`, owner only): category picker, cost coverage line, *Andalan / Naikkan harga / Promosikan / Evaluasi* with the price-rise estimate, *HPP belum lengkap* list with links.
 - Run: `pnpm --filter @zurupos/api test test/domain/menu-matrix.test.ts test/reports test/rls`, `pnpm --filter @zurupos/dashboard test`, `pnpm --filter @zurupos/dashboard test:e2e e2e/reports-pages.spec.ts`.
 - Tests: API 677 (matrix unit 17, integration 6, route sweep incl. a foreign `category_id` → 404), dashboard unit 56, reports e2e green. Checked by eye on the demo shop at desktop and 375 px.
 - Decisions made while building (SPEC §12.5): coverage below half is compared exactly, not on the rounded percentage; without `category_id` the API picks the best-selling category and returns the category list for the picker; a `no_sales` state.
-- Known issues: the user guide doesn't mention *Jam ramai* or *Evaluasi menu* yet. R1 + R2 not deployed.
+- User guide: sections *Jam ramai* and *Evaluasi menu* added (`docs/USER_GUIDE.id.md` §9). The published guide PDFs (D-066) don't have them until regenerated and re-uploaded.
+- Deployed 2026-11-25 18:25 WIB (backup `zuru-20261125-1822.dump` first, copied to R2): `/healthz` reports `2026.11.25-44783ec`. No migrations, no Caddy or landing changes.
