@@ -299,3 +299,6 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Run: `pnpm --filter @zurupos/dashboard test` (`formatIdrShort` in `test/format.test.ts`), `pnpm --filter @zurupos/dashboard test:e2e reports-pages`.
 - Tests: dashboard unit 72, e2e reports-pages passed.
 - Deployed 2026-11-26 01:03 WIB as `2026.11.26-184a390` (backup `zuru-20261126-0102.dump` first). The build also carries the cashier nav-bar fix (D-068) in git, but tablets only get it with the next `cashier-v*` release.
+
+### Guide PDFs refreshed — 2026-11-26
+- Done (D-066): the source Claude Doc *Panduan Pengguna ZuruPOS* got sections D5 *Jam ramai*, D6 *Evaluasi menu* and D7 *Email ringkasan* (figures D11–D15 from the demo shop), two rows in the D2 report table, an *Email ringkasan* line in A2, and no *Buka laci kas* step or switch in A8/A13 (D-067). Parts 1 and 3 re-exported (part 2 unchanged) and uploaded over the same names on `dl.zurupos.com/panduan/`; `/panduan/` shows part 3 as 22 pages, 3.9 MB (`c570761`, pulled on the server).
