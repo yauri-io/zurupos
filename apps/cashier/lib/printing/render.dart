@@ -65,14 +65,12 @@ String _discountName(AppliedDiscount d, ReceiptLabels l) =>
     d.name ?? (d.percent ? '${l.discount} ${formatBps(d.value)}' : l.discount);
 
 /// The customer receipt. [time] is the paid time in the shop's time zone.
-/// [drawerKick] adds ESC p after the cut when the order has a cash payment.
 Uint8List renderReceipt(
   Order o,
   ShopHeader shop,
   Paper paper, {
   required String time,
   required ReceiptLabels labels,
-  bool drawerKick = false,
 }) {
   final p = EscPos(paper);
   p.text(shop.name, align: Align.center, bold: true, size: TextSize.double);
@@ -135,7 +133,6 @@ Uint8List renderReceipt(
   }
   p.feed(3);
   p.cut();
-  if (drawerKick && o.payments.any((x) => x.method == 'cash')) p.drawerKick();
   return p.build();
 }
 

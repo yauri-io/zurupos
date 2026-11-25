@@ -76,4 +76,13 @@ void main() {
     expect(p.copyWith(address: '10.0.0.5:9200').hostPort, (host: '10.0.0.5', port: 9200));
     expect(decodePrinters(null), isEmpty);
   });
+
+  test('a config saved with drawer_kick before D-067 still loads, and drops it', () {
+    const saved =
+        '[{"id":"p","name":"Kasir","transport":"bluetooth","address":"AA:BB","paper":58,'
+        '"receipt":true,"ticket":false,"auto_receipt":true,"auto_ticket":false,"drawer_kick":true}]';
+    final p = decodePrinters(saved).single;
+    expect(p.autoReceipt, isTrue);
+    expect(p.toJson().containsKey('drawer_kick'), isFalse);
+  });
 }

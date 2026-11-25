@@ -1,5 +1,5 @@
 // SPEC §11.3 printer settings: transport, address, paper, roles, auto-print,
-// drawer kick, test print. Bluetooth printers are paired in Android settings
+// test print (no drawer kick, D-067). Bluetooth printers are paired in Android settings
 // first and picked here from the bonded list.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -183,19 +183,12 @@ class _PrinterPageState extends ConsumerState<PrinterPage> {
             value: _p.receipt,
             onChanged: (v) => setState(() => _p = _p.copyWith(receipt: v)),
           ),
-          if (_p.receipt) ...[
+          if (_p.receipt)
             SwitchListTile(
               title: Text(l.printerAutoReceipt),
               value: _p.autoReceipt,
               onChanged: (v) => setState(() => _p = _p.copyWith(autoReceipt: v)),
             ),
-            SwitchListTile(
-              key: const Key('printer-drawer'),
-              title: Text(l.printerDrawerKick),
-              value: _p.drawerKick,
-              onChanged: (v) => setState(() => _p = _p.copyWith(drawerKick: v)),
-            ),
-          ],
           SwitchListTile(
             key: const Key('printer-ticket'),
             title: Text(l.printerRoleTicket),

@@ -1,5 +1,5 @@
 // SPEC §11.3 / M5: auto-print after commit, failures never block an order,
-// retry, reprint, drawer kick, test print, printer settings.
+// retry, reprint, test print, printer settings.
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -17,7 +17,6 @@ const receiptBt = PrinterConfig(
   transport: TransportKind.bluetooth,
   address: 'AA:BB:CC:DD:EE:FF',
   autoReceipt: true,
-  drawerKick: true,
 );
 const ticketLan = PrinterConfig(
   id: 'p-ticket',
@@ -55,7 +54,7 @@ Future<void> _sellAmericanoCash(WidgetTester tester) async {
 String _text(Uint8List bytes, int cols) => decode(bytes, cols).text;
 
 void main() {
-  testWidgets('after Complete: receipt + drawer kick on one printer, ticket on the other', (tester) async {
+  testWidgets('after Complete: receipt on one printer, ticket on the other, no drawer kick', (tester) async {
     final h = await _start(tester);
     await _sellAmericanoCash(tester);
     expect(find.text('No. 1'), findsOneWidget);
@@ -64,7 +63,7 @@ void main() {
     final receipt = h.printers.printed['AA:BB:CC:DD:EE:FF']!.single;
     expect(_text(receipt, 32), contains('|1 x Americano          Rp 20.000|'));
     expect(_text(receipt, 32), contains('|Kembalian              Rp 28.000|'));
-    expect(receipt.sublist(receipt.length - 5), [0x1B, 0x70, 0, 25, 250]);
+    expect(_text(receipt, 32), isNot(contains('[DRAWER')));
 
     final ticket = _text(h.printers.printed['192.168.1.50']!.single, 48);
     expect(ticket, contains('[QUAD]|No. 1|'));

@@ -182,7 +182,7 @@ Priority: **P0** = must ship for pilot. **P1** = ship if time allows before open
 - Supports **Bluetooth** (classic, ESC/POS) and **network** (LAN, ESC/POS on TCP 9100) thermal printers, 58 mm and 80 mm.
 - Up to two printers per device (e.g. receipt printer at cashier, ticket printer at the bar), each assigned *receipt*, *barista ticket*, or both.
 - Auto-print on payment toggle per ticket type; manual reprint from order history; test print in settings.
-- Optional cash-drawer kick on cash payments (for printers with a drawer port).
+- ~~Optional cash-drawer kick on cash payments~~ — removed (D-067); the cashier opens the drawer by hand.
 - **Printing failure never blocks or undoes an order.** The cashier sees a clear "print failed — retry" prompt.
 - Receipt and ticket contents defined in SPEC §11.
 

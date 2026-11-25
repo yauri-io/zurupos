@@ -185,46 +185,9 @@ void main() {
 
     test('non-ASCII header text is transliterated', () => expect(text, contains('Buka 07.00-22.00')));
 
-    test('no drawer kick unless asked, and only with cash', () {
+    test('a cash receipt never opens the drawer (D-067)', () {
       expect(text, isNot(contains('[DRAWER')));
-      final kicked = renderReceipt(
-        uatOrder(),
-        shop,
-        Paper.mm58,
-        time: time,
-        labels: labels,
-        drawerKick: true,
-      );
-      expect(kicked.sublist(kicked.length - 5), [0x1B, 0x70, 0x00, 25, 250]);
-      final noCash = Order.fromJson({
-        ...{
-          'id': 'o2',
-          'client_order_id': 'c2',
-          'order_number': 2,
-          'status': 'paid',
-          'order_type': 'takeaway',
-        },
-        'customer_name': null,
-        'subtotal': 22000,
-        'item_discount_total': 0,
-        'order_discount': null,
-        'service_charge_bps': 0,
-        'service_charge_amount': 0,
-        'tax_name': null,
-        'tax_bps': 0,
-        'tax_amount': 0,
-        'total': 22000,
-        'change_due': 0,
-        'created_by': {'id': 'u1', 'name': 'Budi'},
-        'paid_at': '2026-11-28T01:15:02.000Z',
-        'void': null,
-        'lines': [_line('Croissant', 1, 22000, [])],
-        'payments': [
-          {'method': 'qris', 'amount': 22000, 'tendered': null, 'provider': null, 'reference': null},
-        ],
-      });
-      final b = renderReceipt(noCash, shop, Paper.mm58, time: time, labels: labels, drawerKick: true);
-      expect(decode(b, 32).text, isNot(contains('[DRAWER')));
+      expect(uatOrder().payments.any((x) => x.method == 'cash'), isTrue);
     });
   });
 
@@ -243,11 +206,9 @@ void main() {
   });
 
   group('escpos', () {
-    test('init, cut and kick bytes', () {
-      final p = EscPos(Paper.mm58)
-        ..cut()
-        ..drawerKick();
-      expect(p.build(), [0x1B, 0x40, 0x1B, 0x74, 0, 0x1D, 0x56, 0x42, 0, 0x1B, 0x70, 0, 25, 250]);
+    test('init and cut bytes', () {
+      final p = EscPos(Paper.mm58)..cut();
+      expect(p.build(), [0x1B, 0x40, 0x1B, 0x74, 0, 0x1D, 0x56, 0x42, 0]);
     });
 
     test('asciiSafe and wrap', () {

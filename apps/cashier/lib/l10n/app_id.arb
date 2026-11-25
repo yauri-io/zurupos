@@ -371,7 +371,6 @@
       }
     }
   },
-  "printerDrawerKick": "Buka laci kas setelah struk tunai",
   "printerTest": "Tes cetak",
   "printerDelete": "Hapus printer",
   "printErrorPermission": "Izin Bluetooth ditolak.",

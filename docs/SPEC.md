@@ -611,7 +611,7 @@ Auth headers: dashboard = cookie; cashier app = `X-Device-Token` + `Authorizatio
 6. **Done screen** — order number huge, change due huge (if cash), print status per printer with *Retry*, *New order* (auto-return after 5 s configurable).
 7. **Orders today** — list, search, detail, reprint, void (with approval PIN sheet for cashier).
 8. **Stock** (employee, manager, owner) — ingredient list with levels and low/negative badges; actions: stock-in, waste, stock count (count mode = list with number inputs, submit all).
-9. **Settings** (manager/owner on device) — printers, auto-print, paper width, drawer kick, idle lock, language, sold-out toggles.
+9. **Settings** (manager/owner on device) — printers, auto-print, paper width, idle lock, language, sold-out toggles.
 10. **Employee home** — Orders today (read-only, ticket reprint only) + Stock. No order screen.
 
 Role determines navigation; the API enforces it regardless.
@@ -624,11 +624,11 @@ Role determines navigation; the API enforces it regardless.
 
 ### 11.3 Printing
 - `PrinterTransport` interface: `connect()`, `write(Uint8List)`, `disconnect()`, `status()`. Implementations: `BluetoothClassicTransport` (Android SPP; handle Android 12+ `BLUETOOTH_CONNECT`/`BLUETOOTH_SCAN` runtime permissions; pair via system settings, select from bonded devices list) and `NetworkTransport` (`Socket.connect(ip, port=9100, timeout 3 s)`).
-- `PrinterConfig`: `{id, name, transport, address, paper: 58|80, roles: {receipt, ticket}, autoPrint: {receipt, ticket}, drawerKick: bool}`; up to 2 printers.
+- `PrinterConfig`: `{id, name, transport, address, paper: 58|80, roles: {receipt, ticket}, autoPrint: {receipt, ticket}}`; up to 2 printers.
 - Rendering functions (pure): `renderReceipt(order, tenant, paper) → bytes`, `renderTicket(order, paper) → bytes`. Char widths: 58 mm = 32 cols, 80 mm = 48 cols. Text only (no images) in MVP; codepage handling for Indonesian text (ASCII-safe; strip unsupported chars).
 - **Receipt:** shop name (double size), address, phone, header text; order no., date/time (tenant tz), cashier name, order type, customer name; lines `qty x name ... line_gross`, modifiers indented with deltas, line discount; subtotal, discounts, service charge (with %), tax name (with %), **TOTAL**; payments per line (method, provider, amount), tendered/change for cash; footer text; *"VOID"* banner on reprint of voided order.
 - **Barista ticket:** order no. (quad size), customer name (double), order type, time; lines `qty x name` with each modifier on its own line and notes in bold; no prices.
-- Drawer kick: `ESC p 0 25 250` after receipt when any cash payment and enabled.
+- No cash-drawer kick: the app never sends `ESC p` (D-067).
 - Print jobs run after order commit, async, with timeout; failures shown on Done screen and in Orders today. **Never** roll back or block an order on print failure.
 - Test print button prints a sample receipt with column ruler.
 
@@ -728,7 +728,7 @@ Each milestone ends with its tests green and a short note appended to `docs/PROG
 | M2 | Menu, modifiers, ingredients, recipes, discounts, settings APIs + dashboard pages; recipe resolution + preview | Unit tests for §7.1 examples; CRUD integration tests; owner can build the demo menu in the dashboard |
 | M3 | Pricing engine (TS) + fixtures; `POST /orders` transaction; void; stock-in/waste/count; low-stock outbox + worker + email templates | ≥ 40 pricing fixtures pass; order/void/stock integration tests incl. **concurrency** (20 parallel orders on the same ingredients → exact final stock, no deadlocks) and **idempotency** (same `client_order_id` ×5 → one order); stock invariant holds; low-stock email arrives in Mailpit exactly once per crossing |
 | M4 | Flutter: pairing, staff picker + PIN, bootstrap cache, order screen, modifier sheet, cart, Dart pricing port (same fixtures), payment screen with split, done screen, orders today, void with approval, employee stock screens, offline banner + pending order retry | Dart fixture tests pass; widget tests for cart and payment; manual run against local API completes orders |
-| M5 | Printing: transports, receipt + ticket renderers, printer settings, auto-print, reprint, drawer kick, test print | Renderer golden tests (byte output for sample orders at 58/80 mm); manual test on one Bluetooth and one network printer; print failure doesn't block order |
+| M5 | Printing: transports, receipt + ticket renderers, printer settings, auto-print, reprint, drawer kick (removed later, D-067), test print | Renderer golden tests (byte output for sample orders at 58/80 mm); manual test on one Bluetooth and one network printer; print failure doesn't block order |
 | M6 | Dashboard reports (§12.2–12.3), home, orders, inventory pages, users/devices, settings with live tax example | Report integration tests against seeded data with hand-computed expected values; mobile layout check at 375 px |
 | M7 | Hardening: full regression, seed demo, `docs/USER_GUIDE.id.md` (short owner setup guide in Bahasa Indonesia), UAT checklist run | §17 UAT checklist passes; no open P0 bugs |
 

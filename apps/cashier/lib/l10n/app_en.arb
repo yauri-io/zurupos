@@ -195,7 +195,6 @@
   "printerAutoReceipt": "Print receipts automatically",
   "printerAutoTicket": "Print tickets automatically",
   "printerRoleAuto": "{role} (automatic)",
-  "printerDrawerKick": "Open the cash drawer after a cash receipt",
   "printerTest": "Test print",
   "printerDelete": "Remove printer",
   "printErrorPermission": "Bluetooth permission denied.",

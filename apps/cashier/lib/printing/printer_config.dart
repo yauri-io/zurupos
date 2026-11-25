@@ -22,7 +22,6 @@ class PrinterConfig {
     // A new printer prints only when asked (D-061); saved configs keep their own value.
     this.autoReceipt = false,
     this.autoTicket = false,
-    this.drawerKick = false,
   });
 
   factory PrinterConfig.fromJson(Json j) => PrinterConfig(
@@ -35,7 +34,7 @@ class PrinterConfig {
     ticket: j['ticket'] as bool,
     autoReceipt: j['auto_receipt'] as bool,
     autoTicket: j['auto_ticket'] as bool,
-    drawerKick: j['drawer_kick'] as bool,
+    // A saved 'drawer_kick' key from before D-067 is ignored.
   );
 
   final String id;
@@ -51,9 +50,6 @@ class PrinterConfig {
   final bool ticket;
   final bool autoReceipt;
   final bool autoTicket;
-
-  /// ESC p after a receipt with a cash payment.
-  final bool drawerKick;
 
   ({String host, int port}) get hostPort {
     final i = address.lastIndexOf(':');
@@ -73,7 +69,6 @@ class PrinterConfig {
     bool? ticket,
     bool? autoReceipt,
     bool? autoTicket,
-    bool? drawerKick,
   }) => PrinterConfig(
     id: id,
     name: name ?? this.name,
@@ -84,7 +79,6 @@ class PrinterConfig {
     ticket: ticket ?? this.ticket,
     autoReceipt: autoReceipt ?? this.autoReceipt,
     autoTicket: autoTicket ?? this.autoTicket,
-    drawerKick: drawerKick ?? this.drawerKick,
   );
 
   Json toJson() => {
@@ -97,7 +91,6 @@ class PrinterConfig {
     'ticket': ticket,
     'auto_receipt': autoReceipt,
     'auto_ticket': autoTicket,
-    'drawer_kick': drawerKick,
   };
 }
 

@@ -436,3 +436,9 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - The PDFs are hosted in the R2 downloads bucket behind `dl.zurupos.com` (the one the cashier APK uses, D-055), under `panduan/`, with URL-safe names: `zurupos-panduan-1-pengantar-persiapan.pdf`, `zurupos-panduan-2-di-kasir.pdf`, `zurupos-panduan-3-stok-laporan.pdf`. They stay out of git and off the VPS.
 - The sales deck is not published: the owner chose to keep it off the public site.
 **Consequences:** Uploading is manual (Cloudflare dashboard → R2 → `zurupos-downloads` → `panduan/`). When the guide changes, upload over the same names and update the page counts and sizes on the page. Cloudflare may serve the old copy until its cache expires; purge `dl.zurupos.com/panduan/*` after replacing a file.
+
+## D-067: No cash-drawer kick
+**Context:** On 2026-11-25 the owner asked to remove *Open the cash drawer after a cash receipt* from the cashier's printer settings. SPEC §11.3 and the PRD had it as an optional per-printer setting (`ESC p 0 25 250` after a receipt with a cash payment).
+**Decision:** The feature is removed, not just hidden: no toggle, no `drawerKick` in `PrinterConfig`, no `drawerKick` option on `renderReceipt`, no `ESC p` in the encoder. A printer config saved before this change with `drawer_kick: true` still loads; the key is ignored and dropped on the next save, so those tablets stop opening the drawer once updated.
+**Consequences:** The cashier opens the drawer by hand. SPEC §11.3, the PRD and the Indonesian user guide are updated. The published guide PDFs (D-066) still mention *Buka laci kas* until they are regenerated and re-uploaded.
+

@@ -86,7 +86,6 @@ Di aplikasi: **Pengaturan** → **Tambah printer** (maksimal 2).
   Setiap tablet harus dipasangkan sendiri dengan printernya.
 - **Jaringan**: isi alamat IP printer (port 9100).
 - Pilih lebar kertas (58 atau 80 mm) dan fungsinya: **struk pelanggan** dan/atau **tiket barista**.
-- **Buka laci kas** setelah struk tunai, jika laci tersambung ke printer.
 - Tekan **Tes cetak**: angka penggaris harus pas satu baris.
 
 Printer mati atau kertas habis tidak membatalkan pesanan. Di layar *Selesai* akan tampil **Gagal** dengan tombol **Coba lagi**. Struk juga bisa dicetak ulang dari **Pesanan hari ini**.

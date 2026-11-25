@@ -197,7 +197,4 @@ class EscPos {
 
   /// Feed and partial cut.
   void cut() => _raw([_gs, 0x56, 0x42, 0x00]);
-
-  /// SPEC §11.3: ESC p 0 25 250.
-  void drawerKick() => _raw([_esc, 0x70, 0x00, 25, 250]);
 }

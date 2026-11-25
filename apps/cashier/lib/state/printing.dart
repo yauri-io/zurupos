@@ -163,7 +163,6 @@ class PrintQueue extends Notifier<List<PrintJob>> {
       p.paper,
       time: receiptTime(o.paidAt, _tz),
       labels: receiptLabels(_l10n),
-      drawerKick: p.drawerKick,
     );
   }
 

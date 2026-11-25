@@ -112,7 +112,7 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - **Manual printer tests for the user** (need real hardware):
   1. Bluetooth (58 mm, e.g. a common RPP02N/EPPOS-type printer): pair it in Android settings. In the app go to Settings → Add printer → Bluetooth → pick it, set it to Customer receipt, and press *Test print*. The ruler should show exactly 32 digits on one line.
   2. Network (80 mm, port 9100): add it by IP, set it to Barista ticket, and run *Test print* (48 digits).
-  3. Take a cash order: the receipt prints on printer 1 and the ticket on printer 2. With *Open the cash drawer* on and a drawer connected, the drawer opens after the receipt; a QRIS-only order doesn't open it.
+  3. Take a cash order: the receipt prints on printer 1 and the ticket on printer 2. A drawer connected to the printer stays shut (drawer kick removed, D-067).
   4. Turn the printer off and take an order. Done shows *Gagal* within about 10 s and the order is in Orders today. Turn it on and press *Coba lagi*: it prints.
   5. Reprint a receipt from Orders today; void an order and reprint it: the *** BATAL *** banner shows.
   6. Check that the Indonesian text and Rp amounts line up in the columns on both paper widths.
