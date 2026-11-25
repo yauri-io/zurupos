@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatBps, formatIdr, parsePercentToBps, parseRupiah } from '../app/utils/money'
+import { formatBps, formatIdr, formatIdrShort, parsePercentToBps, parseRupiah } from '../app/utils/money'
 import { formatQty, parseQtyInput } from '../app/utils/qty'
 
 describe('formatIdr', () => {
@@ -15,6 +15,33 @@ describe('formatIdr', () => {
 
   it('refuses fractional rupiah', () => {
     expect(() => formatIdr(1.5)).toThrow()
+  })
+})
+
+describe('formatIdrShort', () => {
+  it.each([
+    [0, '0', '0'],
+    [850, '850', '850'],
+    [1000, '1rb', '1k'],
+    [4500, '4,5rb', '4.5k'],
+    [4549, '4,5rb', '4.5k'],
+    [4550, '4,6rb', '4.6k'],
+    [9949, '9,9rb', '9.9k'],
+    [9950, '10rb', '10k'], // rounding up moves to whole thousands
+    [45_499, '45rb', '45k'],
+    [45_500, '46rb', '46k'],
+    [999_499, '999rb', '999k'],
+    [999_500, '1jt', '1M'], // and to millions
+    [1_250_000, '1,3jt', '1.3M'],
+    [12_400_000, '12jt', '12M'],
+    [-45_000, '-45rb', '-45k'],
+  ])('%d → %s / %s', (n, id, en) => {
+    expect(formatIdrShort(n, 'id')).toBe(id)
+    expect(formatIdrShort(n, 'en')).toBe(en)
+  })
+
+  it('refuses fractional rupiah', () => {
+    expect(() => formatIdrShort(1.5, 'id')).toThrow()
   })
 })
 
