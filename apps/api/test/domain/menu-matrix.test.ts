@@ -62,13 +62,31 @@ describe('buildMenuMatrix (SPEC §12.5, D-073)', () => {
   })
 
   it('suggests a price rise for naikkan_harga only, in whole Rp 1.000, scaled to 30 days', () => {
-    // Gap 10 400 − 5 000 = 5 400 → Rp 6.000; 40 sold in 15 days → 6 000 × 40 × 30 / 15.
+    // Gap 10 400 − 5 000 = 5 400 → Rp 6.000, but Es Teh sells at Rp 15.000 a portion:
+    // capped at 10 % = 1 500 → Rp 2.000 (D-076). 40 sold in 15 days → 2 000 × 40 × 30 / 15.
     const m = buildMenuMatrix(four, 15)
     const esTeh = m.items.find((i) => i.name === 'Es Teh')
-    expect(esTeh).toMatchObject({ suggestedIncrease: 6_000n, extra30d: 480_000n })
+    expect(esTeh).toMatchObject({ suggestedIncrease: 2_000n, extra30d: 160_000n })
     for (const i of m.items.filter((x) => x.quadrant !== 'naikkan_harga')) {
       expect(i).toMatchObject({ suggestedIncrease: null, extra30d: null })
     }
+  })
+
+  it('closes the whole gap when it is under the 10 % cap (D-076)', () => {
+    // Rp 50.000 a portion → cap Rp 5.000; gap 10 400 − 5 000 = 5 400 → Rp 6.000 → capped to 5 000.
+    // Rp 100.000 a portion → cap Rp 10.000 → the full Rp 6.000.
+    const at = (price: number) =>
+      buildMenuMatrix(
+        [
+          item('A', 40, 40 * price, 40 * price - 600_000), // margin 15 000 / portion
+          item('B', 40, 40 * price, 40 * price - 200_000), // margin 5 000 / portion
+          item('C', 10, 10 * price, 10 * price - 200_000), // margin 20 000 / portion
+          item('D', 10, 10 * price, 10 * price - 40_000), // margin 4 000 / portion
+        ],
+        30,
+      ).items.find((i) => i.name === 'B')?.suggestedIncrease
+    expect(at(50_000)).toBe(5_000n)
+    expect(at(100_000)).toBe(6_000n)
   })
 
   it('suggests at least Rp 1.000 when the gap is tiny', () => {

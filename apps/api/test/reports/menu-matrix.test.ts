@@ -14,8 +14,9 @@
 // Included N 5, Q 33, M 532 590 → average Rp 16.139 a portion (16 139,09).
 // Popular: qty × 50 ≥ 231 → qty ≥ 4,62. High: margin × 33 ≥ 532 590 × qty.
 //   Kopi Susu, Americano → andalan; Es Kopi Murah → naikkan_harga; Kopi Hitam → promosikan;
-//   Kopi Tubruk → evaluasi. Es Kopi Murah gap 16 139 − 4 810 = 11 329 → Rp 12.000;
-//   extra 30 days = 12 000 × 10 × 30 / 30 = 120 000.
+//   Kopi Tubruk → evaluasi. Es Kopi Murah gap 16 139 − 4 810 = 11 329 → Rp 12.000, but it
+//   sells at Rp 8.000 a portion: capped at 10 % → Rp 1.000 (D-076);
+//   extra 30 days = 1 000 × 10 × 30 / 30 = 10 000.
 // Coverage 586 000 / 694 000 = 84,44 %.
 // "Makanan": Croissant only → too_few_items. "Minuman Lain": Teh Manis (no recipe,
 // 50 000) and Air Mineral (10 000) → 16,67 % covered → incomplete_costs.
@@ -188,8 +189,8 @@ describe('GET /v1/reports/menu-matrix', () => {
         margin: 48100,
         margin_per_portion: 4810,
         quadrant: 'naikkan_harga',
-        suggested_increase: 12000,
-        extra_30d: 120000,
+        suggested_increase: 1000,
+        extra_30d: 10000,
       },
       {
         item_id: id['hitam'],

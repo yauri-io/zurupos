@@ -6,6 +6,13 @@ import { divRound } from './decimal.js'
 export const MIN_COVERAGE_BPS = 5000n
 export const MIN_ITEMS = 3
 export const PRICE_STEP = 1000n // suggested price rises in whole Rp 1.000
+export const MAX_RISE_PCT = 10n // at most ~10 % of the item's selling price per portion (D-076)
+
+// Up to the next whole Rp 1.000, at least Rp 1.000.
+const toStep = (amount: bigint): bigint => {
+  const steps = (amount + PRICE_STEP - 1n) / PRICE_STEP
+  return (steps > 0n ? steps : 1n) * PRICE_STEP
+}
 
 export type MatrixItemInput = {
   itemId: string
@@ -114,8 +121,13 @@ export const buildMenuMatrix = (input: readonly MatrixItemInput[], daysInRange: 
         quadrant = popular ? (high ? 'andalan' : 'naikkan_harga') : high ? 'promosikan' : 'evaluasi'
         if (quadrant === 'naikkan_harga') {
           const gap = avgMarginPerPortion > marginPerPortion ? avgMarginPerPortion - marginPerPortion : 0n
-          const steps = (gap + PRICE_STEP - 1n) / PRICE_STEP
-          suggestedIncrease = (steps > 0n ? steps : 1n) * PRICE_STEP
+          // Closing the whole gap could mean tripling a cheap item's price (a Rp 5.000
+          // bottle of water next to lattes), so the rise is capped at ~10 % of what
+          // a portion actually sells for (D-076).
+          const pricePerPortion = i.net > 0n ? divRound(i.net, i.qty) : 0n
+          const cap = toStep((pricePerPortion * MAX_RISE_PCT + 99n) / 100n)
+          const wanted = toStep(gap)
+          suggestedIncrease = wanted < cap ? wanted : cap
           extra30d = divRound(suggestedIncrease * i.qty * 30n, BigInt(daysInRange))
         }
       }

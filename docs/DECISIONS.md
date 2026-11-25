@@ -487,3 +487,9 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - Tests in the same commit: §3.6 #5 expects exactly these five functions; a new DB-level test checks the function returns no other columns and that `zuru_worker` can't execute it; the scheduler integration tests check that a shop's email contains only that shop's data.
 **Alternatives rejected:** letting the worker read tenant tables (breaks the worker's no-tenant-access role); a system table copying each shop's schedule outside RLS (duplicates tenant settings and must be kept in sync); building the email when the owner opens the dashboard (not "sent to the owner").
 **Consequences:** Built in R3, with its tests in the same commit. R1 and R2 don't depend on it.
+
+## D-076: Suggested price rises are capped at about 10 %
+**Context:** On 2026-11-25, checking the first weekly summary email on the demo shop, the menu advice read "Air Mineral (Non-Kopi): … Jika harga naik Rp 9.000". SPEC §12.5 suggested closing the whole gap to the category's average margin per portion, which for a cheap item next to expensive ones means nearly tripling its price. Owners may act on that advice, in the dashboard (*Evaluasi menu*, deployed in R2) and in the weekly email.
+**Decision:** The suggested rise for *Naikkan harga* items is the gap rounded up to Rp 1.000, but at most 10 % of the item's actual net selling price per portion (net sales after discounts ÷ portions), also rounded up to Rp 1.000, and never under Rp 1.000. The 30-day estimate uses the capped amount. The item stays in *Naikkan harga*; only the size of the suggestion changes.
+**Consequences:** SPEC §12.5 and the user guide say so. A Rp 8.000 item gets at most Rp 1.000; a Rp 25.000 item at most Rp 3.000. The estimate still assumes the same number sold, as labelled.
+

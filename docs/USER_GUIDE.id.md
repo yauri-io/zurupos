@@ -129,7 +129,7 @@ Setiap menu dinilai dari dua hal: **laris** (jumlah terjual dibanding menu lain 
 | Kelompok | Artinya | Yang bisa dilakukan |
 |---|---|---|
 | **Andalan** | Laris dan untungnya besar | Pertahankan resep, harga dan posisinya |
-| **Naikkan harga** | Laris, tapi untung per porsinya kecil | Naikkan harga sedikit atau kurangi HPP. ZuruPOS menyarankan kenaikan (kelipatan Rp 1.000) dan perkiraan tambahan per 30 hari, *jika jumlah terjual tetap* |
+| **Naikkan harga** | Laris, tapi untung per porsinya kecil | Naikkan harga sedikit atau kurangi HPP. ZuruPOS menyarankan kenaikan (kelipatan Rp 1.000, paling banyak sekitar 10% dari harganya) dan perkiraan tambahan per 30 hari, *jika jumlah terjual tetap* |
 | **Promosikan** | Untungnya besar, tapi kurang laris | Tawarkan ke pembeli, taruh di tempat yang terlihat |
 | **Evaluasi** | Kurang laris dan untungnya kecil | Ubah resep atau harga, atau pertimbangkan untuk dihapus |
 
