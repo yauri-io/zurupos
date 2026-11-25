@@ -231,11 +231,15 @@
     "alerts_device": "Peringatan & perangkat",
     "low_stock_alerts": "Email peringatan stok menipis",
     "extra_emails": "Email tambahan",
-    "extra_emails_help": "Pisahkan dengan koma. Email pemilik selalu dikirimi.",
+    "extra_emails_help": "Untuk email stok menipis. Pisahkan dengan koma. Email pemilik selalu dikirimi.",
     "idle_lock": "Kunci otomatis kasir (menit)",
     "idle_lock_help": "0 = tidak dikunci.",
     "example": "Contoh: pesanan {net}",
-    "example_total": "Total dibayar pelanggan"
+    "example_total": "Total dibayar pelanggan",
+    "daily_summary": "Email ringkasan harian",
+    "daily_summary_help": "Setiap pagi jam 07.00 (waktu toko) untuk hari kemarin, juga saat tidak ada transaksi. Hanya ke email pemilik.",
+    "weekly_summary": "Email ringkasan mingguan",
+    "weekly_summary_help": "Senin jam 07.30 untuk minggu lalu, dengan jam ramai dan saran menu. Hanya ke email pemilik."
   },
   "payment_methods": {
     "cash": "Tunai",

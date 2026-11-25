@@ -231,11 +231,15 @@
     "alerts_device": "Alerts & device",
     "low_stock_alerts": "Low-stock alert emails",
     "extra_emails": "Extra emails",
-    "extra_emails_help": "Comma separated. The owner always gets them.",
+    "extra_emails_help": "For low-stock emails. Separate with commas. The owner is always included.",
     "idle_lock": "Counter auto-lock (minutes)",
     "idle_lock_help": "0 = never lock.",
     "example": "Example: an order of {net}",
-    "example_total": "Customer pays"
+    "example_total": "Customer pays",
+    "daily_summary": "Daily summary email",
+    "daily_summary_help": "Every morning at 07:00 (shop time) for the day before, also when nothing was sold. To the owner only.",
+    "weekly_summary": "Weekly summary email",
+    "weekly_summary_help": "Monday at 07:30 for the week before, with busy hours and menu suggestions. To the owner only."
   },
   "payment_methods": {
     "cash": "Cash",

@@ -24,6 +24,8 @@ const form = reactive({
   enabled_payment_methods: [...settings.enabled_payment_methods] as string[],
   low_stock_alerts_enabled: settings.alerts?.low_stock_alerts_enabled ?? true,
   alert_extra_emails: (settings.alerts?.alert_extra_emails ?? []).join(', '),
+  daily_summary_enabled: settings.alerts?.daily_summary_enabled ?? true,
+  weekly_summary_enabled: settings.alerts?.weekly_summary_enabled ?? true,
   idle_lock_minutes: settings.idle_lock_minutes,
 })
 
@@ -85,6 +87,8 @@ const save = async () => {
           enabled_payment_methods: form.enabled_payment_methods as (typeof METHODS)[number][],
           low_stock_alerts_enabled: form.low_stock_alerts_enabled,
           alert_extra_emails: emails.value,
+          daily_summary_enabled: form.daily_summary_enabled,
+          weekly_summary_enabled: form.weekly_summary_enabled,
           idle_lock_minutes: form.idle_lock_minutes,
         },
       }),
@@ -231,6 +235,19 @@ const save = async () => {
           >
             <UInput v-model="form.alert_extra_emails" class="w-full" />
           </UFormField>
+          <!-- Report emails (SPEC §12.6): to the owner only, never the extra addresses. -->
+          <USwitch
+            v-model="form.daily_summary_enabled"
+            :label="t('settings.daily_summary')"
+            :description="t('settings.daily_summary_help')"
+            data-testid="daily-summary"
+          />
+          <USwitch
+            v-model="form.weekly_summary_enabled"
+            :label="t('settings.weekly_summary')"
+            :description="t('settings.weekly_summary_help')"
+            data-testid="weekly-summary"
+          />
           <UFormField
             :label="t('settings.idle_lock')"
             :help="t('settings.idle_lock_help')"
