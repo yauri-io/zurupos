@@ -8179,6 +8179,242 @@
         }
       }
     },
+    "/v1/reports/heatmap": {
+      "get": {
+        "tags": ["reports"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "from",
+                    "to",
+                    "cutoff_hour",
+                    "hours",
+                    "weekdays",
+                    "weeks_of_data",
+                    "reliable",
+                    "insight"
+                  ],
+                  "properties": {
+                    "from": {
+                      "type": "string",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    },
+                    "to": {
+                      "type": "string",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    },
+                    "cutoff_hour": {
+                      "type": "integer"
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "weekdays": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "trading_days", "cells"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer"
+                          },
+                          "trading_days": {
+                            "type": "integer"
+                          },
+                          "cells": {
+                            "type": "array",
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": [
+                                    "hour",
+                                    "orders",
+                                    "net_sales",
+                                    "avg_orders_x10",
+                                    "avg_net_sales"
+                                  ],
+                                  "properties": {
+                                    "hour": {
+                                      "type": "integer"
+                                    },
+                                    "orders": {
+                                      "type": "integer"
+                                    },
+                                    "net_sales": {
+                                      "type": "integer"
+                                    },
+                                    "avg_orders_x10": {
+                                      "type": "integer"
+                                    },
+                                    "avg_net_sales": {
+                                      "type": "integer"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "weeks_of_data": {
+                      "type": "integer"
+                    },
+                    "reliable": {
+                      "type": "boolean"
+                    },
+                    "insight": {
+                      "type": "object",
+                      "required": ["orders", "net_sales"],
+                      "properties": {
+                        "orders": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "required": ["busiest", "quietest", "ratio"],
+                              "properties": {
+                                "busiest": {
+                                  "type": "object",
+                                  "required": ["weekday", "hour", "avg"],
+                                  "properties": {
+                                    "weekday": {
+                                      "type": "integer"
+                                    },
+                                    "hour": {
+                                      "type": "integer"
+                                    },
+                                    "avg": {
+                                      "type": "integer"
+                                    }
+                                  }
+                                },
+                                "quietest": {
+                                  "type": "object",
+                                  "required": ["weekday", "hour", "avg"],
+                                  "properties": {
+                                    "weekday": {
+                                      "type": "integer"
+                                    },
+                                    "hour": {
+                                      "type": "integer"
+                                    },
+                                    "avg": {
+                                      "type": "integer"
+                                    }
+                                  }
+                                },
+                                "ratio": {
+                                  "anyOf": [
+                                    {
+                                      "type": "integer"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "net_sales": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "required": ["busiest", "quietest", "ratio"],
+                              "properties": {
+                                "busiest": {
+                                  "type": "object",
+                                  "required": ["weekday", "hour", "avg"],
+                                  "properties": {
+                                    "weekday": {
+                                      "type": "integer"
+                                    },
+                                    "hour": {
+                                      "type": "integer"
+                                    },
+                                    "avg": {
+                                      "type": "integer"
+                                    }
+                                  }
+                                },
+                                "quietest": {
+                                  "type": "object",
+                                  "required": ["weekday", "hour", "avg"],
+                                  "properties": {
+                                    "weekday": {
+                                      "type": "integer"
+                                    },
+                                    "hour": {
+                                      "type": "integer"
+                                    },
+                                    "avg": {
+                                      "type": "integer"
+                                    }
+                                  }
+                                },
+                                "ratio": {
+                                  "anyOf": [
+                                    {
+                                      "type": "integer"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/reports/items": {
       "get": {
         "tags": ["reports"],

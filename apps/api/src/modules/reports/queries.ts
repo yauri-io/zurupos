@@ -170,6 +170,35 @@ export const stockValue = (trx: Tx, tenantId: string) =>
       order by value desc, name`,
   )
 
+// SPEC §12.4: paid orders per ISO weekday of the business date × local hour of paid_at.
+export const heatmapCells = (trx: Tx, r: Range, timezone: string) =>
+  rows(
+    trx,
+    sql<{ weekday: number; hour: number; orders: bigint; net_sales: bigint }>`
+      select extract(isodow from o.business_date)::int as weekday,
+             extract(hour from o.paid_at at time zone ${timezone})::int as hour,
+             count(*)::bigint as orders, sum(o.net_sales)::bigint as net_sales
+      from orders o where ${paidInRange(r)}
+      group by 1, 2`,
+  )
+
+// Business dates with at least one paid order, counted per ISO weekday.
+export const tradingDays = (trx: Tx, r: Range) =>
+  rows(
+    trx,
+    sql<{ weekday: number; days: number }>`
+      select extract(isodow from d.business_date)::int as weekday, count(*)::int as days
+      from (select distinct o.business_date from orders o where ${paidInRange(r)}) d
+      group by 1`,
+  )
+
+export const tenantDay = async (trx: Tx, tenantId: string) =>
+  trx
+    .selectFrom('tenants')
+    .select(['timezone', 'business_day_cutoff_hour'])
+    .where('id', '=', tenantId)
+    .executeTakeFirstOrThrow()
+
 export const tenantTimezone = async (trx: Tx, tenantId: string) =>
   (await trx.selectFrom('tenants').select('timezone').where('id', '=', tenantId).executeTakeFirstOrThrow())
     .timezone

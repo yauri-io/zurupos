@@ -3,6 +3,7 @@ import type { App } from '../../http/types.js'
 import {
   CategoriesResponse,
   DailyResponse,
+  HeatmapResponse,
   HourlyResponse,
   ItemsResponse,
   MarginResponse,
@@ -35,6 +36,12 @@ export const reportRoutes = async (app: App) => {
     { config: OWNER, schema: { tags, querystring: RangeQuery, response: { 200: HourlyResponse } } },
     async (request) =>
       request.tenantTx((trx) => service.hourly(trx, requireAuth(request.auth), request.query)),
+  )
+  app.get(
+    '/reports/heatmap',
+    { config: OWNER, schema: { tags, querystring: RangeQuery, response: { 200: HeatmapResponse } } },
+    async (request) =>
+      request.tenantTx((trx) => service.heatmap(trx, requireAuth(request.auth), request.query)),
   )
   app.get(
     '/reports/items',

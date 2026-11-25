@@ -171,6 +171,10 @@ const NUMERIC_REPORTS: Record<string, (r: Json, own: OwnFigures) => unknown[]> =
     const hours = r['hours'] as Json[]
     return [hours.reduce((n, h) => n + (h['orders'] as number), 0), own.orders]
   },
+  'GET /v1/reports/heatmap': (r, own) => {
+    const cells = (r['weekdays'] as Json[]).flatMap((w) => w['cells'] as (Json | null)[])
+    return [cells.reduce((n, c) => n + ((c?.['orders'] as number | undefined) ?? 0), 0), own.orders]
+  },
   'GET /v1/reports/payments': (r, own) => [r['total'], own.payments],
   'GET /v1/reports/voids': (r, own) => [r['count'], own.voids],
 }

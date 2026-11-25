@@ -1,6 +1,7 @@
 import type { AuthContext } from '../../auth/context.js'
 import type { Tx } from '../../db/with-tenant.js'
 import { divHalfUp } from '../../domain/decimal.js'
+import { buildHeatmap, type Insight } from '../../domain/heatmap.js'
 import { checkRange, type DateRange } from '../../http/date-range.js'
 import { iso, money } from '../../http/serialize.js'
 import * as q from './queries.js'
@@ -54,6 +55,50 @@ export const hourly = async (trx: Tx, auth: AuthContext, query: { from: string; 
   const rows = await q.hourly(trx, r, await q.tenantTimezone(trx, auth.tenantId))
   return {
     hours: rows.map((h) => ({ hour: h.hour, orders: Number(h.orders), net_sales: money(h.net_sales) })),
+  }
+}
+
+// SPEC §12.4: at most 92 days, so one weekday never averages over more than ~13 weeks.
+export const HEATMAP_MAX_DAYS = 92
+
+const insight = (i: Insight | null) =>
+  i && {
+    busiest: { ...i.busiest, avg: Number(i.busiest.avg) },
+    quietest: { ...i.quietest, avg: Number(i.quietest.avg) },
+    ratio: i.ratio === null ? null : Number(i.ratio),
+  }
+
+export const heatmap = async (trx: Tx, auth: AuthContext, query: { from: string; to: string }) => {
+  const r: q.Range = { tenantId: auth.tenantId, ...checkRange(query, HEATMAP_MAX_DAYS) }
+  const day = await q.tenantDay(trx, auth.tenantId)
+  const [cells, trading] = await Promise.all([q.heatmapCells(trx, r, day.timezone), q.tradingDays(trx, r)])
+  const h = buildHeatmap({
+    cutoffHour: day.business_day_cutoff_hour,
+    tradingDays: new Map(trading.map((t) => [t.weekday, t.days])),
+    rows: cells.map((c) => ({ weekday: c.weekday, hour: c.hour, orders: c.orders, netSales: c.net_sales })),
+  })
+  return {
+    from: r.from,
+    to: r.to,
+    cutoff_hour: day.business_day_cutoff_hour,
+    hours: h.hours,
+    weekdays: h.weekdays.map((w) => ({
+      weekday: w.weekday,
+      trading_days: w.tradingDays,
+      cells: w.cells.map(
+        (c) =>
+          c && {
+            hour: c.hour,
+            orders: Number(c.orders),
+            net_sales: money(c.netSales),
+            avg_orders_x10: Number(c.avgOrdersX10),
+            avg_net_sales: money(c.avgNetSales),
+          },
+      ),
+    })),
+    weeks_of_data: h.weeksOfData,
+    reliable: h.reliable,
+    insight: { orders: insight(h.insight.orders), net_sales: insight(h.insight.netSales) },
   }
 }
 

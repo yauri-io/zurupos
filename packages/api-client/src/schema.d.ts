@@ -3744,6 +3744,90 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/reports/heatmap': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query: {
+          from: string
+          to: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              from: string
+              to: string
+              cutoff_hour: number
+              hours: number[]
+              weekdays: {
+                weekday: number
+                trading_days: number
+                cells: ({
+                  hour: number
+                  orders: number
+                  net_sales: number
+                  avg_orders_x10: number
+                  avg_net_sales: number
+                } | null)[]
+              }[]
+              weeks_of_data: number
+              reliable: boolean
+              insight: {
+                orders: {
+                  busiest: {
+                    weekday: number
+                    hour: number
+                    avg: number
+                  }
+                  quietest: {
+                    weekday: number
+                    hour: number
+                    avg: number
+                  }
+                  ratio: number | null
+                } | null
+                net_sales: {
+                  busiest: {
+                    weekday: number
+                    hour: number
+                    avg: number
+                  }
+                  quietest: {
+                    weekday: number
+                    hour: number
+                    avg: number
+                  }
+                  ratio: number | null
+                } | null
+              }
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/reports/items': {
     parameters: {
       query?: never

@@ -82,6 +82,41 @@ export const MarginResponse = Type.Object({
   ),
 })
 
+// SPEC §12.4. Averages are per trading day of that weekday, half-up.
+const HeatmapCell = Type.Object({
+  hour: Int,
+  orders: Int,
+  net_sales: Int,
+  // Average orders in tenths: 25 = 2,5 orders.
+  avg_orders_x10: Int,
+  avg_net_sales: Int,
+})
+// `avg` is in the metric's unit: tenths of an order, or whole rupiah.
+const Peak = Type.Object({ weekday: Int, hour: Int, avg: Int })
+const Insight = Nullable(
+  Type.Object({
+    busiest: Peak,
+    quietest: Peak,
+    // Rounded busiest / quietest; null unless the busiest is at least twice the quietest.
+    ratio: Nullable(Int),
+  }),
+)
+
+export const HeatmapResponse = Type.Object({
+  from: Day,
+  to: Day,
+  cutoff_hour: Int,
+  // Hours in business-day order (the cutoff hour first), trimmed to those with orders.
+  hours: Type.Array(Int),
+  // ISO weekdays 1 (Monday) … 7; `cells` follows `hours`, null on a weekday without trading days.
+  weekdays: Type.Array(
+    Type.Object({ weekday: Int, trading_days: Int, cells: Type.Array(Nullable(HeatmapCell)) }),
+  ),
+  weeks_of_data: Int,
+  reliable: Type.Boolean(),
+  insight: Type.Object({ orders: Insight, net_sales: Insight }),
+})
+
 const UserRef = Type.Object({ id: Uuid, name: Type.String() })
 
 export const VoidsResponse = Type.Object({
