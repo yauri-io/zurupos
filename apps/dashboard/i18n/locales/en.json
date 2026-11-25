@@ -19,7 +19,8 @@
     "items": "Item sales",
     "margin": "Margin",
     "voids": "Voids",
-    "heatmap": "Busy hours"
+    "heatmap": "Busy hours",
+    "menu_matrix": "Menu review"
   },
   "roles": {
     "owner": "Owner",
@@ -289,7 +290,8 @@
     "to": "To",
     "weeks4": "4 weeks",
     "weeks8": "8 weeks",
-    "weeks12": "12 weeks"
+    "weeks12": "12 weeks",
+    "last30": "30 days"
   },
   "reports": {
     "sales": "Sales report",
@@ -488,5 +490,33 @@
     "legend_high": "Busy",
     "pick_hint": "Tap a square to see its numbers.",
     "note": "Average per trading day: days without orders are left out. Hours by payment time, in the shop’s time zone. Voided orders are not counted."
+  },
+  "matrix": {
+    "title": "Menu review",
+    "category": "Category",
+    "coverage": "Costs complete for {done} of {all} items ({pct} of this category’s sales).",
+    "average": "Average margin per portion in this category: {amount}.",
+    "q_andalan": "Keep",
+    "q_andalan_hint": "Sells well with a high margin. Keep its recipe, price and place on the menu.",
+    "q_naikkan_harga": "Raise the price",
+    "q_naikkan_harga_hint": "Sells well, but earns little per portion. Raise the price a little or lower its cost.",
+    "q_promosikan": "Promote",
+    "q_promosikan_hint": "High margin, but doesn’t sell much. Suggest it to customers or give it a visible spot.",
+    "q_evaluasi": "Review",
+    "q_evaluasi_hint": "Sells little and earns little. Change the recipe or price, or consider dropping it.",
+    "none": "No items here.",
+    "line": "{qty} sold · margin {amount}/portion",
+    "suggest": "If the price goes up {increase} and the number sold stays the same: about {extra} more per 30 days.",
+    "archived": "Archived",
+    "incomplete_title": "Costs incomplete",
+    "incomplete_hint": "These items are left out because their cost can’t be trusted yet. Complete their recipes and ingredient costs.",
+    "reason_no_recipe": "No recipe yet",
+    "reason_ingredient_without_cost": "Ingredients without a cost: {names}",
+    "reason_sold_without_cost": "Sold with a cost of Rp 0 in this period",
+    "fix": "Complete",
+    "state_incomplete_costs": "Complete the costs first",
+    "state_incomplete_costs_hint": "More than half of this category’s sales come from items with incomplete costs, so the result can’t be used yet.",
+    "state_too_few_items": "This category needs at least 3 items with complete costs to compare.",
+    "note": "Margin = net sales after discounts − cost of goods at the time of sale. Sells well = at least 70% of the category’s average per item. High margin = margin per portion at least the category average."
   }
 }

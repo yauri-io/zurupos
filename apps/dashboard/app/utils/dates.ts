@@ -4,10 +4,12 @@
 
 export type DateRange = { from: string; to: string }
 export type Preset =
-  'today' | 'yesterday' | 'last7' | 'this_month' | 'last_month' | 'weeks4' | 'weeks8' | 'weeks12'
+  'today' | 'yesterday' | 'last7' | 'this_month' | 'last_month' | 'weeks4' | 'weeks8' | 'weeks12' | 'last30'
 export const PRESETS: Preset[] = ['today', 'yesterday', 'last7', 'this_month', 'last_month']
 // Whole weeks ending yesterday, so every weekday occurs equally often (SPEC §12.4).
 export const WEEK_PRESETS: Preset[] = ['weeks4', 'weeks8', 'weeks12']
+// Menu matrix (SPEC §12.5): complete days only, so today's half day doesn't skew it.
+export const MATRIX_PRESETS: Preset[] = ['last30', 'last_month', 'weeks12']
 
 // The shop's business date at `now`: local date of (now − cutoff hours).
 export const businessToday = (timezone: string, cutoffHour: number, now = new Date()): string => {
@@ -46,6 +48,8 @@ export const presetRange = (preset: Preset, today: string): DateRange => {
       return { from: firstOfMonth(y, m), to: today }
     case 'last_month':
       return { from: firstOfMonth(y, m - 1), to: addDays(firstOfMonth(y, m), -1) }
+    case 'last30':
+      return { from: addDays(today, -30), to: addDays(today, -1) }
     case 'weeks4':
     case 'weeks8':
     case 'weeks12': {

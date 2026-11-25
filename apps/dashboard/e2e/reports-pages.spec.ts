@@ -126,6 +126,15 @@ test('owner pages at 375 px, with correct report figures', async ({ page }) => {
   await expect(page.getByText('Terjadi kesalahan')).toHaveCount(0)
   await noHorizontalScroll(page, '/reports/heatmap')
 
+  // Menu matrix (SPEC §12.5): the seeded Kopi Susu has no recipe, so the guard shows instead.
+  await page.goto(`/reports/menu?from=${today}&to=${today}`)
+  await expect(page.getByTestId('matrix-state')).toContainText('Lengkapi HPP dulu')
+  await expect(page.getByTestId('matrix-incomplete')).toContainText('Kopi Susu')
+  await expect(page.getByTestId('matrix-incomplete')).toContainText('Belum ada resep')
+  await expect(page.getByTestId('matrix-coverage')).toContainText('HPP lengkap untuk 0 dari 1 menu (0% dari')
+  await expect(page.getByText('Terjadi kesalahan')).toHaveCount(0)
+  await noHorizontalScroll(page, '/reports/menu')
+
   // Stock-in through the form, then the level and the movement show it.
   await page.goto('/inventory/stock-in')
   await noHorizontalScroll(page, '/inventory/stock-in')

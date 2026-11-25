@@ -19,7 +19,8 @@
     "items": "Menu terjual",
     "margin": "Margin",
     "voids": "Pembatalan",
-    "heatmap": "Jam ramai"
+    "heatmap": "Jam ramai",
+    "menu_matrix": "Evaluasi menu"
   },
   "roles": {
     "owner": "Pemilik",
@@ -289,7 +290,8 @@
     "to": "Sampai tanggal",
     "weeks4": "4 minggu",
     "weeks8": "8 minggu",
-    "weeks12": "12 minggu"
+    "weeks12": "12 minggu",
+    "last30": "30 hari"
   },
   "reports": {
     "sales": "Laporan penjualan",
@@ -488,5 +490,33 @@
     "legend_high": "Ramai",
     "pick_hint": "Ketuk kotak untuk melihat angkanya.",
     "note": "Rata-rata per hari buka: hari tanpa pesanan tidak ikut dihitung. Jam dari waktu bayar, sesuai zona waktu toko. Pesanan batal tidak dihitung."
+  },
+  "matrix": {
+    "title": "Evaluasi menu",
+    "category": "Kategori",
+    "coverage": "HPP lengkap untuk {done} dari {all} menu ({pct} dari penjualan kategori ini).",
+    "average": "Rata-rata untung per porsi di kategori ini: {amount}.",
+    "q_andalan": "Andalan",
+    "q_andalan_hint": "Laris dan untungnya besar. Pertahankan resep, harga dan posisinya di menu.",
+    "q_naikkan_harga": "Naikkan harga",
+    "q_naikkan_harga_hint": "Laris, tapi untung per porsinya kecil. Naikkan harga sedikit atau kurangi HPP.",
+    "q_promosikan": "Promosikan",
+    "q_promosikan_hint": "Untungnya besar, tapi kurang laris. Tawarkan ke pembeli atau taruh di tempat yang terlihat.",
+    "q_evaluasi": "Evaluasi",
+    "q_evaluasi_hint": "Kurang laris dan untungnya kecil. Ubah resep atau harganya, atau pertimbangkan untuk dihapus.",
+    "none": "Tidak ada menu di sini.",
+    "line": "{qty} terjual · untung {amount}/porsi",
+    "suggest": "Jika harga naik {increase} dan jumlah terjual tetap: ±{extra} lebih banyak per 30 hari.",
+    "archived": "Diarsipkan",
+    "incomplete_title": "HPP belum lengkap",
+    "incomplete_hint": "Menu ini tidak dimasukkan karena HPP-nya belum bisa dipercaya. Lengkapi resep dan biaya bahannya.",
+    "reason_no_recipe": "Belum ada resep",
+    "reason_ingredient_without_cost": "Bahan tanpa biaya: {names}",
+    "reason_sold_without_cost": "Ada penjualan dengan HPP Rp 0 di periode ini",
+    "fix": "Lengkapi",
+    "state_incomplete_costs": "Lengkapi HPP dulu",
+    "state_incomplete_costs_hint": "Lebih dari separuh penjualan kategori ini berasal dari menu yang HPP-nya belum lengkap, jadi hasilnya belum bisa dipakai.",
+    "state_too_few_items": "Butuh minimal 3 menu dengan HPP lengkap di kategori ini untuk dibandingkan.",
+    "note": "Untung = penjualan bersih setelah diskon − HPP saat terjual. Laris = terjual minimal 70% dari rata-rata per menu di kategori ini. Untung besar = untung per porsi minimal rata-rata kategori."
   }
 }

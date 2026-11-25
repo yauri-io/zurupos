@@ -27,10 +27,11 @@ describe('presets', () => {
     ['weeks4', '2026-10-31', '2026-11-27'],
     ['weeks8', '2026-10-03', '2026-11-27'],
     ['weeks12', '2026-09-05', '2026-11-27'],
-  ] as const)('%s: whole weeks ending yesterday', (preset, from, to) => {
+    ['last30', '2026-10-29', '2026-11-27'],
+  ] as const)('%s: whole days ending yesterday', (preset, from, to) => {
     const r = presetRange(preset, '2026-11-28')
     expect(r).toEqual({ from, to })
-    expect(rangeDays(r) % 7).toBe(0)
+    expect(rangeDays(r) % (preset === 'last30' ? 30 : 7)).toBe(0)
   })
   it('rangeDays is inclusive', () => {
     expect(rangeDays({ from: '2026-11-28', to: '2026-11-28' })).toBe(1)
