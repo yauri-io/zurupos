@@ -123,7 +123,8 @@ Keduanya bisa dimatikan di **Pengaturan → Peringatan & perangkat**.
 
 **Laporan → Jam ramai** menunjukkan kapan toko ramai: setiap baris satu hari (Senin–Minggu), setiap kolom satu jam. Makin gelap kotaknya, makin ramai jam itu dibanding jam lain.
 
-- Pilih **Jumlah pesanan** atau **Penjualan bersih** di atas tabel. Ketuk kotak untuk melihat angkanya.
+- Pilih **Jumlah pesanan** atau **Penjualan bersih** di atas tabel. Di **Penjualan bersih**, angka di kotak dibulatkan: *45rb* = Rp 45.000, *1,2jt* = Rp 1.200.000. Ketuk kotak untuk melihat angka lengkapnya.
+- Penjualan bersih diambil dari pesanan yang sudah dibayar, jadi tidak perlu resep atau bahan.
 - Angkanya **rata-rata per hari buka**. Hari tanpa pesanan sama sekali (misalnya toko tutup) tidak ikut dihitung, jadi tidak menurunkan rata-rata.
 - Jika toko buka lewat tengah malam, jam setelah 00.00 tetap masuk ke hari sebelumnya, sesuai **Pergantian hari (jam)** di Pengaturan.
 - Pilih periode 4, 8 atau 12 minggu. Selama datanya belum 3 minggu, muncul tulisan **Data baru … minggu**: angkanya sudah benar, tapi polanya belum tentu mewakili minggu biasa. Setelah 3 minggu, ZuruPOS menulis jam paling ramai dan paling sepi di atas tabel.

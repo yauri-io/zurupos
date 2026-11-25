@@ -148,6 +148,9 @@ const shadeStyle = (level: number) =>
                     <template v-if="metric === 'orders' && c.avg_orders_x10 > 0">
                       {{ formatTenths(c.avg_orders_x10, locale) }}
                     </template>
+                    <template v-else-if="metric === 'net_sales' && c.avg_net_sales > 0">
+                      {{ formatIdrShort(c.avg_net_sales, locale) }}
+                    </template>
                   </button>
                   <div v-else class="h-9 w-full min-w-10 rounded-sm bg-muted opacity-40" />
                 </td>
@@ -166,6 +169,9 @@ const shadeStyle = (level: number) =>
           />
           <span>{{ t('heatmap.legend_high') }}</span>
         </div>
+        <p v-if="metric === 'net_sales'" class="text-xs text-muted" data-testid="heatmap-short-hint">
+          {{ t('heatmap.short_hint') }}
+        </p>
 
         <p class="text-sm min-h-5" aria-live="polite" data-testid="heatmap-picked">
           <template v-if="picked">

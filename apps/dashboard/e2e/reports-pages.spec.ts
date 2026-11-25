@@ -123,6 +123,10 @@ test('owner pages at 375 px, with correct report figures', async ({ page }) => {
   await expect(page.getByTestId('heatmap-insight')).toHaveCount(0)
   await page.getByTestId('heatmap').getByRole('button').first().click()
   await expect(page.getByTestId('heatmap-picked')).toContainText('rata-rata 1,0 pesanan · Rp 50.000')
+  // Net sales cells carry the short amount, not just a shade (D-077).
+  await page.getByTestId('heatmap-metric').getByText('Penjualan bersih').click()
+  await expect(page.getByTestId('heatmap').getByRole('button').first()).toHaveText('50rb')
+  await expect(page.getByTestId('heatmap-short-hint')).toContainText('45rb = Rp 45.000')
   await expect(page.getByText('Terjadi kesalahan')).toHaveCount(0)
   await noHorizontalScroll(page, '/reports/heatmap')
 

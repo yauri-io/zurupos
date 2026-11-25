@@ -294,3 +294,7 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Known issues: the guide PDFs (D-066) don't have the R1–R3 sections yet.
 - Deployed 2026-11-25 20:55 WIB (backup `zuru-20261125-2051.dump` first, copied to R2): `/healthz` reports `2026.11.25-b159ed4`; both migrations applied; `scheduler` healthy. First pass: 2 daily summaries for 24 Nov queued and sent by the worker, 2 weekly summaries for 16–22 Nov skipped (no orders), 0 failures.
 
+### Busy-hours net sales readability — 2026-11-26
+- Fixed (D-077): on **Jam ramai → Penjualan bersih** the cells were shaded but blank, so the report looked empty. They now show the rounded average (`45rb`, `1,2jt`), with a line explaining it. The data was always there; recipes and ingredients don't affect this report.
+- Run: `pnpm --filter @zurupos/dashboard test` (`formatIdrShort` in `test/format.test.ts`), `pnpm --filter @zurupos/dashboard test:e2e reports-pages`.
+- Tests: dashboard unit 72, e2e reports-pages passed. Ships with the next dashboard deploy (DEPLOY.md §6).

@@ -493,6 +493,7 @@
     "legend_low": "Sepi",
     "legend_high": "Ramai",
     "pick_hint": "Ketuk kotak untuk melihat angkanya.",
+    "short_hint": "Penjualan di kotak dibulatkan: 45rb = Rp 45.000, 1,2jt = Rp 1.200.000.",
     "note": "Rata-rata per hari buka: hari tanpa pesanan tidak ikut dihitung. Jam dari waktu bayar, sesuai zona waktu toko. Pesanan batal tidak dihitung."
   },
   "matrix": {

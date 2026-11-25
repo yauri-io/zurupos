@@ -493,6 +493,7 @@
     "legend_low": "Quiet",
     "legend_high": "Busy",
     "pick_hint": "Tap a square to see its numbers.",
+    "short_hint": "Sales in the squares are rounded: 45k = Rp 45.000, 1.2M = Rp 1.200.000.",
     "note": "Average per trading day: days without orders are left out. Hours by payment time, in the shop’s time zone. Voided orders are not counted."
   },
   "matrix": {
