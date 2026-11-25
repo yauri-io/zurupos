@@ -14,7 +14,7 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M7 | Hardening, demo seed, user guide, UAT | 🔍 Awaiting UAT with the owner | UAT with the shop owner |
 | R1 | Operational heatmap (SPEC §12.4) | ✅ Done, deployed 2026-11-25 | |
 | R2 | Menu matrix (SPEC §12.5) | ✅ Done, deployed 2026-11-25 | |
-| R3 | Report emails (SPEC §12.6) | ⬜ Not started | D-075 approved 2026-11-25 |
+| R3 | Report emails (SPEC §12.6) | ✅ Done (local, not deployed) | D-075 approved 2026-11-25 |
 
 Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · ✅ Done
 
@@ -285,3 +285,11 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Decisions made while building (SPEC §12.5): coverage below half is compared exactly, not on the rounded percentage; without `category_id` the API picks the best-selling category and returns the category list for the picker; a `no_sales` state.
 - User guide: sections *Jam ramai* and *Evaluasi menu* added (`docs/USER_GUIDE.id.md` §9). The published guide PDFs (D-066) don't have them until regenerated and re-uploaded.
 - Deployed 2026-11-25 18:25 WIB (backup `zuru-20261125-1822.dump` first, copied to R2): `/healthz` reports `2026.11.25-44783ec`. No migrations, no Caddy or landing changes.
+
+### R3 Report emails — 2026-11-25
+- Done: migrations `20261125100000_report_emails` (summary switches on `tenants`, append-only `report_email_runs` with RLS, `auth.report_schedule()` per D-075) and `20261125100100_outbox_report_kinds`; scheduler process `dist/scheduler/scheduler.js` (Compose service `scheduler`, as `zuru_app`, every 5 min) with pure `domain/report-schedule.ts`; templates `daily-summary.ts` / `weekly-summary.ts` with the API's IDR formatter (`outbox/templates/format.ts`); switches in Settings (API + dashboard); `restore.sh` stops the scheduler too; DEPLOY.md and the user guide updated.
+- D-076 (found while reading the first weekly email): suggested price rises capped at about 10 % of the selling price per portion; this changes the deployed *Evaluasi menu* as well.
+- Run: `pnpm --filter @zurupos/api test test/scheduler test/domain test/rls test/menu/settings.test.ts`; locally `docker compose up -d --build --wait` and watch `docker compose logs scheduler` plus Mailpit (:8025).
+- Tests: API 713 (RLS suite 270 incl. the new table and the fifth definer function; scheduler integration 8; schedule 8 and template 7 unit), dashboard unit 56, e2e 6. Checked in Mailpit: the demo owner got the daily (empty day) and weekly emails, owner only.
+- Known issues: the guide PDFs (D-066) don't have the R1–R3 sections yet. Not deployed.
+

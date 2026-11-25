@@ -70,7 +70,7 @@ Keep this section current. Flutter SDK on this machine: `/Volumes/PBox/sdk/flutt
 cp .env.example .env
 pnpm install
 
-# Whole stack (postgres :55432, migrate, mailpit :8025, api :4000, worker, dashboard :3000)
+# Whole stack (postgres :55432, migrate, mailpit :8025, api :4000, worker, scheduler, dashboard :3000)
 docker compose up -d --build --wait
 docker compose down            # stop (add -v to wipe the database volume)
 
@@ -79,6 +79,7 @@ docker compose up -d --wait postgres mailpit
 pnpm db:migrate                # dev db `zuru`, as zuru_migrator
 pnpm --filter @zurupos/api dev
 pnpm --filter @zurupos/api worker   # outbox worker (sends email to Mailpit)
+pnpm --filter @zurupos/api scheduler   # report email scheduler (daily/weekly summaries, SPEC §12.6)
 
 # Migrations (dbmate, plain SQL in db/migrations)
 pnpm db:new <name>             # new migration file
@@ -91,6 +92,7 @@ pnpm --filter @zurupos/api test           # everything
 pnpm --filter @zurupos/api test:rls       # SPEC §3.6 isolation suite only
 pnpm --filter @zurupos/api test test/auth # auth tests only
 pnpm --filter @zurupos/api test test/orders test/stock test/worker  # M3: orders, stock, email
+pnpm --filter @zurupos/api test test/scheduler test/reports  # R1–R3: reports and report emails
 python3 apps/api/scripts/pricing-cases.py # regenerate pricing fixtures (never edit by hand)
 
 # Lint / typecheck / format (all JS workspaces)

@@ -110,6 +110,15 @@ Printer mati atau kertas habis tidak membatalkan pesanan. Di layar *Selesai* aka
 - **Pesanan**: semua pesanan dengan pencarian (nomor, nama pelanggan, menu) dan filter.
 - *Penjualan bersih* = setelah diskon, sebelum pajak dan biaya layanan. Pesanan batal tidak dihitung.
 
+### Email ringkasan
+
+ZuruPOS mengirim dua email ke **email pemilik** (tidak ke email tambahan untuk stok menipis):
+
+- **Ringkasan harian**, setiap pagi jam 07.00 (waktu toko) untuk hari kemarin: penjualan bersih, jumlah pesanan, rata-rata per pesanan, perbandingan dengan hari yang sama minggu lalu, pembayaran per metode, 3 menu terlaris, pembatalan dan jumlah bahan yang stoknya menipis. Email ini tetap dikirim walau tidak ada transaksi; isinya *Tidak ada transaksi tercatat*. Jika toko buka tapi muncul tulisan itu, periksa tablet kasir.
+- **Ringkasan mingguan**, setiap Senin jam 07.30 untuk minggu lalu (Senin–Minggu): penjualan dibanding minggu sebelumnya, jam ramai dan sepi (setelah ada data 3 minggu), dan paling banyak 3 saran dari *Evaluasi menu*. Tidak dikirim untuk minggu tanpa transaksi.
+
+Keduanya bisa dimatikan di **Pengaturan → Peringatan & perangkat**.
+
 ### Jam ramai
 
 **Laporan → Jam ramai** menunjukkan kapan toko ramai: setiap baris satu hari (Senin–Minggu), setiap kolom satu jam. Makin gelap kotaknya, makin ramai jam itu dibanding jam lain.
