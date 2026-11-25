@@ -16,6 +16,7 @@ const items = computed<NavigationMenuItem[]>(() =>
         { label: t('nav.sales'), to: '/reports/sales' },
         { label: t('nav.payments'), to: '/reports/payments' },
         { label: t('nav.items'), to: '/reports/items' },
+        { label: t('nav.heatmap'), to: '/reports/heatmap' },
         ...(can('costs.view') ? [{ label: t('nav.margin'), to: '/reports/margin' }] : []),
         { label: t('nav.voids'), to: '/reports/voids' },
       ],

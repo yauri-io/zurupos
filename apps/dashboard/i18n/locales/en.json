@@ -18,7 +18,8 @@
     "payments": "Payments",
     "items": "Item sales",
     "margin": "Margin",
-    "voids": "Voids"
+    "voids": "Voids",
+    "heatmap": "Busy hours"
   },
   "roles": {
     "owner": "Owner",
@@ -285,7 +286,10 @@
     "this_month": "This month",
     "last_month": "Last month",
     "from": "From",
-    "to": "To"
+    "to": "To",
+    "weeks4": "4 weeks",
+    "weeks8": "8 weeks",
+    "weeks12": "12 weeks"
   },
   "reports": {
     "sales": "Sales report",
@@ -464,5 +468,25 @@
     "new_title": "New version available",
     "new_body": "Reload the page to use the latest version. Save any unsaved changes first.",
     "reload": "Reload"
+  },
+  "heatmap": {
+    "title": "Busy hours",
+    "metric_orders": "Orders",
+    "metric_net_sales": "Net sales",
+    "insight_orders": "Busiest: {busiest}. Quietest: {quietest}.",
+    "insight_orders_ratio": "{busiest} is on average {ratio}× busier than {quietest}.",
+    "insight_net_sales": "Highest sales: {busiest}. Lowest: {quietest}.",
+    "insight_net_sales_ratio": "{busiest} brings in on average {ratio}× the sales of {quietest}.",
+    "cell": "{where}: average {orders} orders · {net} · based on {days} days",
+    "based_on": "{n} days",
+    "no_data": "no data",
+    "weekday": "Day",
+    "unreliable": "Only {n} week of data so far | Only {n} weeks of data so far",
+    "unreliable_hint": "Busy-hour patterns usually show after 3 weeks. The numbers are right, but may not reflect a usual week yet.",
+    "too_long": "Choose a period of at most {n} days.",
+    "legend_low": "Quiet",
+    "legend_high": "Busy",
+    "pick_hint": "Tap a square to see its numbers.",
+    "note": "Average per trading day: days without orders are left out. Hours by payment time, in the shop’s time zone. Voided orders are not counted."
   }
 }

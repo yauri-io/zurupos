@@ -3,8 +3,11 @@
 // daylight-saving shift can move a day.
 
 export type DateRange = { from: string; to: string }
-export type Preset = 'today' | 'yesterday' | 'last7' | 'this_month' | 'last_month'
+export type Preset =
+  'today' | 'yesterday' | 'last7' | 'this_month' | 'last_month' | 'weeks4' | 'weeks8' | 'weeks12'
 export const PRESETS: Preset[] = ['today', 'yesterday', 'last7', 'this_month', 'last_month']
+// Whole weeks ending yesterday, so every weekday occurs equally often (SPEC §12.4).
+export const WEEK_PRESETS: Preset[] = ['weeks4', 'weeks8', 'weeks12']
 
 // The shop's business date at `now`: local date of (now − cutoff hours).
 export const businessToday = (timezone: string, cutoffHour: number, now = new Date()): string => {
@@ -43,8 +46,18 @@ export const presetRange = (preset: Preset, today: string): DateRange => {
       return { from: firstOfMonth(y, m), to: today }
     case 'last_month':
       return { from: firstOfMonth(y, m - 1), to: addDays(firstOfMonth(y, m), -1) }
+    case 'weeks4':
+    case 'weeks8':
+    case 'weeks12': {
+      const weeks = Number(preset.slice(5))
+      return { from: addDays(today, -7 * weeks), to: addDays(today, -1) }
+    }
   }
 }
+
+// Number of days in an inclusive range.
+export const rangeDays = (r: DateRange): number =>
+  Math.round((toUtc(r.to).getTime() - toUtc(r.from).getTime()) / 86_400_000) + 1
 
 // "2026-11-28" → "28 Nov 2026" in the UI language.
 export const formatDay = (day: string, locale: string): string =>

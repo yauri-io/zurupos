@@ -114,6 +114,18 @@ test('owner pages at 375 px, with correct report figures', async ({ page }) => {
     await noHorizontalScroll(page, path)
   }
 
+  // Heatmap (SPEC §12.4): default 4 weeks end yesterday, so today's order needs today's range.
+  await page.goto('/reports/heatmap')
+  await expect(page.getByText('Belum ada data').first()).toBeVisible()
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(new Date())
+  await page.goto(`/reports/heatmap?from=${today}&to=${today}`)
+  await expect(page.getByTestId('heatmap-unreliable')).toContainText('Data baru 1 minggu')
+  await expect(page.getByTestId('heatmap-insight')).toHaveCount(0)
+  await page.getByTestId('heatmap').getByRole('button').first().click()
+  await expect(page.getByTestId('heatmap-picked')).toContainText('rata-rata 1,0 pesanan · Rp 50.000')
+  await expect(page.getByText('Terjadi kesalahan')).toHaveCount(0)
+  await noHorizontalScroll(page, '/reports/heatmap')
+
   // Stock-in through the form, then the level and the movement show it.
   await page.goto('/inventory/stock-in')
   await noHorizontalScroll(page, '/inventory/stock-in')

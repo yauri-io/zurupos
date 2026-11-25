@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { addDays, businessToday, presetRange } from '../app/utils/dates'
+import { addDays, businessToday, presetRange, rangeDays } from '../app/utils/dates'
 import { exampleTotals } from '../app/utils/pricing'
 
 describe('businessToday', () => {
@@ -22,6 +22,19 @@ describe('presets', () => {
     ['last_month', '2026-10-01', '2026-10-31'],
   ] as const)('%s', (preset, from, to) => {
     expect(presetRange(preset, '2026-11-28')).toEqual({ from, to })
+  })
+  it.each([
+    ['weeks4', '2026-10-31', '2026-11-27'],
+    ['weeks8', '2026-10-03', '2026-11-27'],
+    ['weeks12', '2026-09-05', '2026-11-27'],
+  ] as const)('%s: whole weeks ending yesterday', (preset, from, to) => {
+    const r = presetRange(preset, '2026-11-28')
+    expect(r).toEqual({ from, to })
+    expect(rangeDays(r) % 7).toBe(0)
+  })
+  it('rangeDays is inclusive', () => {
+    expect(rangeDays({ from: '2026-11-28', to: '2026-11-28' })).toBe(1)
+    expect(rangeDays({ from: '2026-08-03', to: '2026-11-02' })).toBe(92)
   })
   it('last month across a year boundary and a leap February', () => {
     expect(presetRange('last_month', '2027-01-15')).toEqual({ from: '2026-12-01', to: '2026-12-31' })

@@ -18,7 +18,8 @@
     "payments": "Pembayaran",
     "items": "Menu terjual",
     "margin": "Margin",
-    "voids": "Pembatalan"
+    "voids": "Pembatalan",
+    "heatmap": "Jam ramai"
   },
   "roles": {
     "owner": "Pemilik",
@@ -285,7 +286,10 @@
     "this_month": "Bulan ini",
     "last_month": "Bulan lalu",
     "from": "Dari tanggal",
-    "to": "Sampai tanggal"
+    "to": "Sampai tanggal",
+    "weeks4": "4 minggu",
+    "weeks8": "8 minggu",
+    "weeks12": "12 minggu"
   },
   "reports": {
     "sales": "Laporan penjualan",
@@ -464,5 +468,25 @@
     "new_title": "Versi baru tersedia",
     "new_body": "Muat ulang halaman untuk memakai versi terbaru. Simpan dulu isian yang belum disimpan.",
     "reload": "Muat ulang"
+  },
+  "heatmap": {
+    "title": "Jam ramai",
+    "metric_orders": "Jumlah pesanan",
+    "metric_net_sales": "Penjualan bersih",
+    "insight_orders": "Paling ramai: {busiest}. Paling sepi: {quietest}.",
+    "insight_orders_ratio": "{busiest} rata-rata {ratio}× lebih ramai daripada {quietest}.",
+    "insight_net_sales": "Penjualan tertinggi: {busiest}. Terendah: {quietest}.",
+    "insight_net_sales_ratio": "{busiest} rata-rata menghasilkan {ratio}× penjualan {quietest}.",
+    "cell": "{where}: rata-rata {orders} pesanan · {net} · berdasarkan {days} hari {weekday}",
+    "based_on": "{n} hari",
+    "no_data": "tidak ada data",
+    "weekday": "Hari",
+    "unreliable": "Data baru {n} minggu",
+    "unreliable_hint": "Pola jam ramai biasanya baru terlihat setelah 3 minggu. Angkanya sudah benar, tapi belum tentu mewakili minggu biasa.",
+    "too_long": "Pilih periode paling lama {n} hari.",
+    "legend_low": "Sepi",
+    "legend_high": "Ramai",
+    "pick_hint": "Ketuk kotak untuk melihat angkanya.",
+    "note": "Rata-rata per hari buka: hari tanpa pesanan tidak ikut dihitung. Jam dari waktu bayar, sesuai zona waktu toko. Pesanan batal tidak dihitung."
   }
 }
