@@ -26,7 +26,12 @@ describe('GET /settings', () => {
       tax_name: 'PB1',
       tax_enabled: false,
       enabled_payment_methods: ['cash', 'qris', 'debit', 'credit', 'transfer', 'other'],
-      alerts: { low_stock_alerts_enabled: true, alert_extra_emails: [] },
+      alerts: {
+        low_stock_alerts_enabled: true,
+        alert_extra_emails: [],
+        daily_summary_enabled: true,
+        weekly_summary_enabled: true,
+      },
     })
   })
 
@@ -67,7 +72,23 @@ describe('PATCH /settings', () => {
     expect(audit.map((a) => a.action)).toContain('settings.change')
   })
 
+  it('owner turns the report emails off and on (SPEC §12.6)', async () => {
+    const off = await api(t.app, shop.as.owner, 'PATCH', '/v1/settings', {
+      daily_summary_enabled: false,
+      weekly_summary_enabled: false,
+    })
+    expect(off.statusCode, off.body).toBe(200)
+    expect(off.json()).toMatchObject({
+      alerts: { daily_summary_enabled: false, weekly_summary_enabled: false },
+    })
+    const on = await api(t.app, shop.as.owner, 'PATCH', '/v1/settings', { daily_summary_enabled: true })
+    expect(on.json()).toMatchObject({
+      alerts: { daily_summary_enabled: true, weekly_summary_enabled: false },
+    })
+  })
+
   it.each([
+    [{ daily_summary_enabled: 'yes' }],
     [{ timezone: 'Mars/Olympus' }],
     [{ tax_bps: 10001 }],
     [{ business_day_cutoff_hour: 7 }],

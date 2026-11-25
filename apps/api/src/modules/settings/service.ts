@@ -31,6 +31,8 @@ export const presentSettings = (row: q.SettingsRow, withAlerts: boolean) => ({
         alerts: {
           low_stock_alerts_enabled: row.low_stock_alerts_enabled,
           alert_extra_emails: row.alert_extra_emails,
+          daily_summary_enabled: row.daily_summary_enabled,
+          weekly_summary_enabled: row.weekly_summary_enabled,
         },
       }
     : {}),

@@ -927,6 +927,8 @@ export interface paths {
               alerts?: {
                 low_stock_alerts_enabled: boolean
                 alert_extra_emails: string[]
+                daily_summary_enabled: boolean
+                weekly_summary_enabled: boolean
               }
             }
           }
@@ -964,6 +966,8 @@ export interface paths {
             enabled_payment_methods?: ('cash' | 'qris' | 'debit' | 'credit' | 'transfer' | 'other')[]
             low_stock_alerts_enabled?: boolean
             alert_extra_emails?: string[]
+            daily_summary_enabled?: boolean
+            weekly_summary_enabled?: boolean
             idle_lock_minutes?: number
           }
         }
@@ -994,6 +998,8 @@ export interface paths {
               alerts?: {
                 low_stock_alerts_enabled: boolean
                 alert_extra_emails: string[]
+                daily_summary_enabled: boolean
+                weekly_summary_enabled: boolean
               }
             }
           }

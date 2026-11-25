@@ -17,6 +17,8 @@ const SETTINGS_COLUMNS = [
   'enabled_payment_methods',
   'low_stock_alerts_enabled',
   'alert_extra_emails',
+  'daily_summary_enabled',
+  'weekly_summary_enabled',
   'idle_lock_minutes',
 ] as const
 

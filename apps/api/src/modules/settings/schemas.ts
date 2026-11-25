@@ -17,6 +17,9 @@ const Text = (maxLength: number) => Nullable(Type.String({ maxLength }))
 const AlertSettings = Type.Object({
   low_stock_alerts_enabled: Type.Boolean(),
   alert_extra_emails: Type.Array(Type.String()),
+  // Report emails to the owner (SPEC §12.6).
+  daily_summary_enabled: Type.Boolean(),
+  weekly_summary_enabled: Type.Boolean(),
 })
 
 export const SettingsResponse = Type.Object({
@@ -57,5 +60,7 @@ export const UpdateSettingsBody = Body({
   ),
   low_stock_alerts_enabled: Type.Optional(Type.Boolean()),
   alert_extra_emails: Type.Optional(Type.Array(Email, { maxItems: 5, uniqueItems: true })),
+  daily_summary_enabled: Type.Optional(Type.Boolean()),
+  weekly_summary_enabled: Type.Optional(Type.Boolean()),
   idle_lock_minutes: Type.Optional(Type.Integer({ minimum: 0, maximum: 240 })),
 })
