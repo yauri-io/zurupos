@@ -297,4 +297,5 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 ### Busy-hours net sales readability — 2026-11-26
 - Fixed (D-077): on **Jam ramai → Penjualan bersih** the cells were shaded but blank, so the report looked empty. They now show the rounded average (`45rb`, `1,2jt`), with a line explaining it. The data was always there; recipes and ingredients don't affect this report.
 - Run: `pnpm --filter @zurupos/dashboard test` (`formatIdrShort` in `test/format.test.ts`), `pnpm --filter @zurupos/dashboard test:e2e reports-pages`.
-- Tests: dashboard unit 72, e2e reports-pages passed. Ships with the next dashboard deploy (DEPLOY.md §6).
+- Tests: dashboard unit 72, e2e reports-pages passed.
+- Deployed 2026-11-26 01:03 WIB as `2026.11.26-184a390` (backup `zuru-20261126-0102.dump` first). The build also carries the cashier nav-bar fix (D-068) in git, but tablets only get it with the next `cashier-v*` release.
