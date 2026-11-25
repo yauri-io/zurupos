@@ -14,7 +14,7 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M7 | Hardening, demo seed, user guide, UAT | 🔍 Awaiting UAT with the owner | UAT with the shop owner |
 | R1 | Operational heatmap (SPEC §12.4) | ✅ Done, deployed 2026-11-25 | |
 | R2 | Menu matrix (SPEC §12.5) | ✅ Done, deployed 2026-11-25 | |
-| R3 | Report emails (SPEC §12.6) | ✅ Done (local, not deployed) | D-075 approved 2026-11-25 |
+| R3 | Report emails (SPEC §12.6) | ✅ Done, deployed 2026-11-25 | D-075 approved 2026-11-25 |
 
 Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · ✅ Done
 
@@ -291,5 +291,6 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - D-076 (found while reading the first weekly email): suggested price rises capped at about 10 % of the selling price per portion; this changes the deployed *Evaluasi menu* as well.
 - Run: `pnpm --filter @zurupos/api test test/scheduler test/domain test/rls test/menu/settings.test.ts`; locally `docker compose up -d --build --wait` and watch `docker compose logs scheduler` plus Mailpit (:8025).
 - Tests: API 713 (RLS suite 270 incl. the new table and the fifth definer function; scheduler integration 8; schedule 8 and template 7 unit), dashboard unit 56, e2e 6. Checked in Mailpit: the demo owner got the daily (empty day) and weekly emails, owner only.
-- Known issues: the guide PDFs (D-066) don't have the R1–R3 sections yet. Not deployed.
+- Known issues: the guide PDFs (D-066) don't have the R1–R3 sections yet.
+- Deployed 2026-11-25 20:55 WIB (backup `zuru-20261125-2051.dump` first, copied to R2): `/healthz` reports `2026.11.25-b159ed4`; both migrations applied; `scheduler` healthy. First pass: 2 daily summaries for 24 Nov queued and sent by the worker, 2 weekly summaries for 16–22 Nov skipped (no orders), 0 failures.
 
