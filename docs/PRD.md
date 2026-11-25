@@ -232,7 +232,7 @@ Scope agreed on 2026-11-25 (D-071 to D-075). The owner already gets the numbers 
 - Default range: the last 30 days.
 
 #### F17. Report emails
-- **Daily summary** (07:00 shop time, for the previous business day): net sales, orders, average order value, change against the same weekday last week, totals per payment method, top 3 items, voids if any, low-stock count, and a link to the dashboard. Not sent for a day without orders.
+- **Daily summary** (07:00 shop time, for the previous business day): net sales, orders, average order value, change against the same weekday last week, totals per payment method, top 3 items, voids if any, low-stock count, and a link to the dashboard. Sent every day, also when no orders were recorded, so the owner can count on it; that email says so plainly ("Tidak ada transaksi tercatat"), which also flags a shop that was open but didn't record sales.
 - **Weekly summary** (Monday 07:30 shop time, for the previous Monday–Sunday): net sales and orders against the week before, the busiest and quietest times (F15), up to 3 menu actions (F16), and a nudge to complete costs if the coverage is low.
 - To the shop owner only (not the extra low-stock alert addresses, because these emails contain the shop's money figures). Each email can be turned off in Settings; both are on by default.
 - Email only. No WhatsApp (D-072).

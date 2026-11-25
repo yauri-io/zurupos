@@ -193,7 +193,7 @@ Login and token verification happen before a tenant is known. These use a small 
 
 Because §3.2 forces RLS on the owner too, each looked-up table (`users`, `sessions`, `devices`, `password_resets`) has one extra policy, `auth_definer_lookup`: `for select to zuru_owner using (true)`. It is SELECT-only and only for the NOLOGIN owner role; `zuru_app` is never a member of `zuru_owner` (see D-024).
 
-After the lookup, all further work (PIN check, session creation, etc.) runs inside `withTenant`. These four functions are the **complete** list of exceptions; adding one requires a `DECISIONS.md` entry and an isolation test. (Proposed, not approved: a fifth, `auth.report_schedule()`, for the report email scheduler, D-075.)
+After the lookup, all further work (PIN check, session creation, etc.) runs inside `withTenant`. These four functions are the **complete** list of exceptions; adding one requires a `DECISIONS.md` entry and an isolation test. (Approved, added in R3: a fifth, `auth.report_schedule()`, for the report email scheduler, D-075. Until R3 ships, the four above are the complete list.)
 
 ### 3.5 System tables (no tenant RLS)
 
@@ -723,17 +723,17 @@ Two outbox kinds, rendered at enqueue time like every email (§10):
 
 | Kind | When (shop time) | Covers | Skipped when |
 |---|---|---|---|
-| `daily_summary` | 07:00 | the previous business date `D` | `D` has no paid orders |
+| `daily_summary` | 07:00 | the previous business date `D` | never (sent also when `D` has no paid orders) |
 | `weekly_summary` | Monday 07:30 | the previous Monday–Sunday business dates | the week has no paid orders |
 
-- **Daily content:** net sales, orders, average order value for `D`; change against `D − 7` (same weekday), as a whole percent with `div`, or "—" when `D − 7` had no orders; totals per payment method; top 3 items by net after order discount; voids count and total when > 0; number of ingredients at or below threshold now; a link to the dashboard Home.
+- **Daily content:** net sales, orders, average order value for `D`; change against `D − 7` (same weekday), as a whole percent with `div`, or "—" when `D − 7` had no orders; totals per payment method; top 3 items by net after order discount; voids count and total when > 0; number of ingredients at or below threshold now; a link to the dashboard Home. When `D` has no paid orders the email says *Tidak ada transaksi tercatat* instead of the sales figures, and still shows the comparison with `D − 7`, voids and the low-stock count.
 - **Weekly content:** net sales and orders against the week before; the §12.4 insight over the 4 weeks ending that Sunday (left out when not reliable); up to 3 menu actions from §12.5 over the same 4 weeks, taken from every category whose state is `ok` (`naikkan_harga` items by `extra_30d` desc, then `promosikan` by `qty` asc); a coverage nudge when any category with sales is `incomplete_costs`.
 - Money through the API's one IDR formatter. Subject (id): `[ZuruPOS] Ringkasan {Kamis, 26 Nov}: Rp …` and `[ZuruPOS] Ringkasan minggu {23–29 Nov}`. Locale of the owner.
 - **Recipient:** the active owner only (not `alert_extra_emails`).
 - **Settings:** `tenants.daily_summary_enabled`, `tenants.weekly_summary_enabled` (bool, default true), in Settings → Alerts.
 - **Once only:** tenant table `report_email_runs` — `tenant_id, kind, period_start date, created_at`, pk `(tenant_id, kind, period_start)`, normal RLS (§3.2). The run row and the outbox row are inserted in the same `withTenant` transaction; a conflict means already sent, and the transaction does nothing.
 - **Scheduler:** a separate process (`node dist/scheduler/scheduler.js`, Compose service `scheduler`) connecting as `zuru_app` with the startup role guard. Every 5 minutes it gets the list of shops and their schedule fields from `auth.report_schedule()` (see D-075), works out which periods are due with a pure function (`domain/report-schedule`), and handles each shop in its own `withTenant` transaction. Catch-up is bounded: a daily summary is sent at most 24 h late and a weekly at most 72 h late; older periods are skipped, so a long outage never sends a backlog.
-- **Blocked until D-075 is approved.** It needs a fifth reviewed `auth.*` function (§3.4) and its isolation tests.
+- Needs a fifth reviewed `auth.*` function (§3.4, D-075, approved 2026-11-25), added with its isolation tests in R3.
 
 ## 13. Seed data
 
@@ -796,7 +796,7 @@ Each milestone ends with its tests green and a short note appended to `docs/PROG
 |---|---|---|
 | R1 | Operational heatmap (§12.4): API + `/reports/heatmap` | Integration tests on seeded orders with hand-computed cells, incl. a cutoff of 2 (01:30 order lands at the end of the previous day's row), a closed weekday (null row), 5 vs 4 occurrences of a weekday (averages, not sums), a non-Jakarta timezone and the `reliable` threshold; RLS suite green (new route covered); 375 px check |
 | R2 | Menu matrix (§12.5): API + `/reports/menu` | Integration tests for each quadrant boundary (exactly 70% share, exactly the average margin), each `incomplete` reason, the 50% coverage state, `N < 3`, a negative margin, and `suggested_increase` / `extra_30d` by hand; RLS suite green; 375 px check |
-| R3 | Report emails (§12.6) | **Review stop: D-075 approved by the user before any code.** Unit tests for `domain/report-schedule` (timezones, cutoff, Monday rollover, bounded catch-up); integration tests: one email per period even with two scheduler passes in parallel, skipped empty days, toggles respected, owner-only recipient; the §3.6 suite updated for the fifth `auth.*` function and still green; both emails arrive in Mailpit |
+| R3 | Report emails (§12.6) | D-075 approved 2026-11-25. Unit tests for `domain/report-schedule` (timezones, cutoff, Monday rollover, bounded catch-up); integration tests: one email per period even with two scheduler passes in parallel, an empty day still sends its email (weekly: skipped), toggles respected, owner-only recipient; the §3.6 suite updated for the fifth `auth.*` function and still green; both emails arrive in Mailpit |
 
 ## 17. UAT checklist (pilot readiness)
 

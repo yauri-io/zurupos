@@ -14,7 +14,7 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M7 | Hardening, demo seed, user guide, UAT | 🔍 Awaiting UAT with the owner | UAT with the shop owner |
 | R1 | Operational heatmap (SPEC §12.4) | ⬜ Not started | |
 | R2 | Menu matrix (SPEC §12.5) | ⬜ Not started | |
-| R3 | Report emails (SPEC §12.6) | ⬜ Not started | **User approval of D-075 first** |
+| R3 | Report emails (SPEC §12.6) | ⬜ Not started | D-075 approved 2026-11-25 |
 
 Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · ✅ Done
 
@@ -270,4 +270,4 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 
 ### Post-pilot reporting scope — 2026-11-25
 - Done (docs only): PRD F15–F17 and roadmap, SPEC §12.4–12.6 and milestones R1–R3, D-069 to D-075. QR table ordering is deferred (D-069).
-- Open: D-075 (a fifth `auth.*` function for the report scheduler) needs the user's approval before R3. R1 and R2 don't depend on it.
+- D-075 (a fifth `auth.*` function for the report scheduler) approved by the user on 2026-11-25. The daily email is sent also on days without orders (owner's choice).
