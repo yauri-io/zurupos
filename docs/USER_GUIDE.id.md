@@ -105,10 +105,38 @@ Printer mati atau kertas habis tidak membatalkan pesanan. Di layar *Selesai* aka
 ## 9. Laporan (pemilik)
 
 - **Beranda**: penjualan hari ini, diperbarui otomatis setiap menit.
-- **Laporan**: penjualan per hari dan per jam, pembayaran per metode, menu terjual, margin dan nilai stok, serta pembatalan.
+- **Laporan**: penjualan per hari dan per jam, pembayaran per metode, menu terjual, jam ramai, margin dan nilai stok, evaluasi menu, serta pembatalan.
   Pilih periode: Hari ini, Kemarin, 7 hari, Bulan ini, Bulan lalu, atau tanggal sendiri.
 - **Pesanan**: semua pesanan dengan pencarian (nomor, nama pelanggan, menu) dan filter.
 - *Penjualan bersih* = setelah diskon, sebelum pajak dan biaya layanan. Pesanan batal tidak dihitung.
+
+### Jam ramai
+
+**Laporan → Jam ramai** menunjukkan kapan toko ramai: setiap baris satu hari (Senin–Minggu), setiap kolom satu jam. Makin gelap kotaknya, makin ramai jam itu dibanding jam lain.
+
+- Pilih **Jumlah pesanan** atau **Penjualan bersih** di atas tabel. Ketuk kotak untuk melihat angkanya.
+- Angkanya **rata-rata per hari buka**. Hari tanpa pesanan sama sekali (misalnya toko tutup) tidak ikut dihitung, jadi tidak menurunkan rata-rata.
+- Jika toko buka lewat tengah malam, jam setelah 00.00 tetap masuk ke hari sebelumnya, sesuai **Pergantian hari (jam)** di Pengaturan.
+- Pilih periode 4, 8 atau 12 minggu. Selama datanya belum 3 minggu, muncul tulisan **Data baru … minggu**: angkanya sudah benar, tapi polanya belum tentu mewakili minggu biasa. Setelah 3 minggu, ZuruPOS menulis jam paling ramai dan paling sepi di atas tabel.
+- Pakai untuk mengatur jadwal staf, waktu menyiapkan bahan, atau jam promo di saat sepi.
+
+### Evaluasi menu
+
+**Laporan → Evaluasi menu** membantu memutuskan menu mana yang dipertahankan, dinaikkan harganya, dipromosikan, atau dievaluasi. Pilih kategori (misalnya Kopi), karena menu dibandingkan dengan menu lain di kategori yang sama.
+
+Setiap menu dinilai dari dua hal: **laris** (jumlah terjual dibanding menu lain di kategorinya) dan **untung per porsi** (penjualan bersih setelah diskon dikurangi HPP).
+
+| Kelompok | Artinya | Yang bisa dilakukan |
+|---|---|---|
+| **Andalan** | Laris dan untungnya besar | Pertahankan resep, harga dan posisinya |
+| **Naikkan harga** | Laris, tapi untung per porsinya kecil | Naikkan harga sedikit atau kurangi HPP. ZuruPOS menyarankan kenaikan (kelipatan Rp 1.000) dan perkiraan tambahan per 30 hari, *jika jumlah terjual tetap* |
+| **Promosikan** | Untungnya besar, tapi kurang laris | Tawarkan ke pembeli, taruh di tempat yang terlihat |
+| **Evaluasi** | Kurang laris dan untungnya kecil | Ubah resep atau harga, atau pertimbangkan untuk dihapus |
+
+- Laporan ini butuh **HPP yang lengkap**. Menu tanpa resep, dengan bahan yang belum punya biaya (termasuk bahan di pilihan menu, misalnya sirup), atau yang terjual dengan HPP Rp 0, ditaruh di daftar **HPP belum lengkap**. Tekan **Lengkapi** untuk membuka menunya.
+- Biaya bahan didapat dari **Stok masuk** (jumlah dan total harga beli). Bahan yang belum pernah dicatat stok masuknya belum punya biaya.
+- Jika lebih dari separuh penjualan kategori berasal dari menu yang HPP-nya belum lengkap, muncul **Lengkapi HPP dulu** dan kelompoknya tidak ditampilkan. Kategori juga butuh minimal 3 menu dengan HPP lengkap.
+- Periode bawaan 30 hari terakhir (sampai kemarin). Menu yang baru dilengkapi resepnya bisa tetap masuk daftar *HPP belum lengkap* sampai penjualan lamanya (dengan HPP Rp 0) keluar dari periode.
 
 ## 10. Masalah umum
 
