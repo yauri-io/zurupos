@@ -7,12 +7,14 @@ const pool = appPool(2)
 afterAll(() => pool.end())
 
 const SYSTEM_TABLES = ['outbox', 'schema_migrations']
-const AUTH_LOOKUP_TABLES = ['devices', 'password_resets', 'sessions', 'users']
+// D-024 lookups, plus tenants for auth.report_schedule (D-075).
+const AUTH_LOOKUP_TABLES = ['devices', 'password_resets', 'sessions', 'tenants', 'users']
 const DEFINER_FUNCTIONS = [
   'auth.find_device',
   'auth.find_login_by_email',
   'auth.find_password_reset',
   'auth.find_session',
+  'auth.report_schedule', // D-075
 ]
 
 const publicTables = async () => {
@@ -161,7 +163,7 @@ describe('§3.6 #4 — zuru_app cannot bypass RLS', () => {
       from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind = 'r'`)
     const privileges = Object.fromEntries(rows.map((r) => [r.table, r]))
     for (const table of TENANT_TABLES) {
-      const appendOnly = table === 'stock_movements' || table === 'audit_log'
+      const appendOnly = ['stock_movements', 'audit_log', 'report_email_runs'].includes(table)
       expect(privileges[table], table).toEqual({
         table,
         sel: true,
@@ -204,8 +206,8 @@ describe('§3.6 #4 — zuru_app cannot bypass RLS', () => {
   })
 })
 
-describe('§3.6 #5 — SECURITY DEFINER functions are exactly the four in §3.4', () => {
-  it('lists only auth.find_* functions', async () => {
+describe('§3.6 #5 — SECURITY DEFINER functions are exactly the five in §3.4 (D-075)', () => {
+  it('lists only the reviewed auth.* functions', async () => {
     const { rows } = await pool.query<{ fn: string }>(`
       select n.nspname || '.' || p.proname as fn
       from pg_proc p join pg_namespace n on n.oid = p.pronamespace

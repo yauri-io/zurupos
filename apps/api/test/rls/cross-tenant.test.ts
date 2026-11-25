@@ -30,7 +30,7 @@ const targetB = (table: TenantTable): { where: string; param: string } => {
 const tenantColumn = (table: TenantTable) => (table === 'tenants' ? 'id' : 'tenant_id')
 
 const PERMISSION_DENIED = '42501'
-const APPEND_ONLY: readonly TenantTable[] = ['stock_movements', 'audit_log']
+const APPEND_ONLY: readonly TenantTable[] = ['stock_movements', 'audit_log', 'report_email_runs']
 
 describe('tenant A context', () => {
   it.each(TENANT_TABLES)('%s: sees its own row and none of B', async (table) => {

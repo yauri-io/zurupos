@@ -306,6 +306,15 @@ export interface RecipeLines {
   updated_at: Generated<Timestamp>
 }
 
+export interface ReportEmailRuns {
+  created_at: Generated<Timestamp>
+  id: Generated<string>
+  kind: string
+  period_start: string
+  tenant_id: string
+  updated_at: Generated<Timestamp>
+}
+
 export interface Sessions {
   created_at: Generated<Timestamp>
   device_id: string | null
@@ -342,6 +351,7 @@ export interface Tenants {
   alert_extra_emails: Generated<string[]>
   business_day_cutoff_hour: Generated<number>
   created_at: Generated<Timestamp>
+  daily_summary_enabled: Generated<boolean>
   enabled_payment_methods: Generated<string[]>
   id: Generated<string>
   idle_lock_minutes: Generated<number>
@@ -358,6 +368,7 @@ export interface Tenants {
   tax_on_service_charge: Generated<boolean>
   timezone: Generated<string>
   updated_at: Generated<Timestamp>
+  weekly_summary_enabled: Generated<boolean>
 }
 
 export interface Users {
@@ -395,6 +406,7 @@ export interface DB {
   payments: Payments
   pin_attempts: PinAttempts
   recipe_lines: RecipeLines
+  report_email_runs: ReportEmailRuns
   sessions: Sessions
   stock_movements: StockMovements
   tenants: Tenants

@@ -26,6 +26,7 @@ export const TENANT_TABLES = [
   'payments',
   'stock_movements',
   'audit_log',
+  'report_email_runs',
 ] as const
 
 export type TenantTable = (typeof TENANT_TABLES)[number]
@@ -221,6 +222,12 @@ export const FACTORIES: Record<TenantTable, (refs: Refs) => Row> = {
     action: 'test.seed',
     entity_type: 'test',
     data: { marker: r.marker },
+  }),
+  report_email_runs: (r) => ({
+    id: randomUUID(),
+    tenant_id: r.tenant,
+    kind: 'daily_summary',
+    period_start: '2026-11-01',
   }),
 }
 
