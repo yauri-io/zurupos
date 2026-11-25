@@ -26,6 +26,13 @@ class ZuruApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       theme: ThemeData(colorSchemeSeed: const Color(0xFF6B4226), useMaterial3: true),
+      // Android 15+ draws the app edge to edge, under the system navigation bar.
+      // Keep every route, sheet and dialog clear of it (D-068). The top is left to
+      // the app bars, which already pad for the status bar.
+      builder: (context, child) => ColoredBox(
+        color: Theme.of(context).colorScheme.surface,
+        child: SafeArea(top: false, child: child!),
+      ),
       // Keyed by state so signing out drops every pushed route.
       home: switch (auth) {
         AuthLoading() => const Scaffold(body: Center(child: CircularProgressIndicator())),

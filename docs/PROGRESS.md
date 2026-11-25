@@ -259,3 +259,8 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Done (D-066): `zurupos.com/panduan/` with download buttons for the three user guide PDFs, hosted on R2 at `dl.zurupos.com/panduan/`. Footer link on all landing pages, sitemap entry. The sales deck stays off the site.
 - Run: `cd apps/landing && python3 -m http.server 8765`, open `/panduan/`.
 - Not live yet: upload the three PDFs to R2 (D-066), then deploy the landing page (DEPLOY.md §6).
+
+### Navigation bar overlap — 2026-11-25
+- Fixed (D-068): on Android 15+ the system navigation bar covered the bottom of the cashier app (modifier sheet *Tambah*, tablet *Bayar*, printer *Tes cetak*/*Simpan*, the end of long lists). The whole app now lays out above it.
+- Run: `cd apps/cashier && flutter test test/widgets/system_insets_test.dart`.
+- Tests: cashier 165 passed. Ships with the next cashier release (`cashier-v*` tag, DEPLOY.md §5); worth a look on the pilot tablet with 3-button navigation.
