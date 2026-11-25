@@ -13,6 +13,7 @@
     "db:types": "dotenv -e ../../.env -- sh -c 'kysely-codegen --dialect postgres --url \"$MIGRATION_DATABASE_URL\" --out-file src/db/types.ts --exclude-pattern schema_migrations --date-parser string --type-mapping \"{\\\"int8\\\":\\\"bigint\\\"}\" && prettier --write src/db/types.ts'",
     "openapi": "dotenv -e ../../.env -- tsx scripts/openapi.ts",
     "worker": "dotenv -e ../../.env -- tsx watch src/worker/worker.ts",
+    "scheduler": "dotenv -e ../../.env -- tsx watch src/scheduler/scheduler.ts",
     "seed": "dotenv -e ../../.env -- tsx scripts/seed-demo.ts"
   },
   "dependencies": {

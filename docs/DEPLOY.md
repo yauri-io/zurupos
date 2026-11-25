@@ -11,6 +11,7 @@ tablet / phone ──HTTPS──▶ Cloudflare ──HTTPS :9443──▶ Caddy 
                                                               ├─▶ dashboard:3000
                                     (origin cert)            └─▶ api:4000 ──▶ postgres
                                                         worker ──▶ postgres, Resend
+                                                     scheduler ──▶ postgres (report emails into the outbox)
                                                         backup ──▶ postgres → deploy/backups/ → Cloudflare R2
 ```
 
@@ -18,7 +19,7 @@ Everything is in `deploy/`:
 
 | File | What it is |
 |---|---|
-| `compose.prod.yml` | The production stack: postgres, migrate, api, worker, dashboard, caddy, backup |
+| `compose.prod.yml` | The production stack: postgres, migrate, api, worker, scheduler, dashboard, caddy, backup |
 | `backup.Dockerfile` | The backup image: Postgres client tools plus rclone for the R2 copy |
 | `Caddyfile` | TLS with the Cloudflare origin certificate, Cloudflare-only access, security headers, real client IP, the landing page |
 | `env.prod.example` | Every production setting. Copy to `deploy/.env.prod` on the server (gitignored) |
@@ -98,7 +99,9 @@ Use monitors that run **outside** the VPS. One on the same server can't tell you
    - Put its ping URL (`https://hc-ping.com/<uuid>`) in `BACKUP_PING_URL` in `deploy/.env.prod`, then run `deploy/prod.sh up -d backup`.
    - Every good backup pings the URL. A failed dump or failed R2 copy pings `<url>/fail` and alerts at once. If no ping comes at all (the service stopped, or the server is down), it alerts at about 05:00 WIB.
 
-Logs: `deploy/prod.sh logs -f api worker`. Each container keeps at most 50 MB of logs.
+Logs: `deploy/prod.sh logs -f api worker scheduler`. Each container keeps at most 50 MB of logs.
+
+Report emails (SPEC §12.6): the `scheduler` service checks every 5 minutes which daily (07:00 shop time) and weekly (Monday 07:30) summaries are due and queues them; the worker sends them. It logs one `report pass` line whenever it queued or skipped something, with counts only. Owners turn the emails off in the dashboard under *Pengaturan → Peringatan & perangkat*.
 
 ### Error reporting: Sentry (optional)
 
@@ -269,7 +272,7 @@ Update outside opening hours. The API restarts in a few seconds; the cashier app
 - **On demand**: `deploy/prod.sh exec backup /bin/sh /backup/backup-loop.sh now`. It also copies to R2 and pings the monitor.
 - **What's in R2**: `deploy/prod.sh exec backup rclone lsl r2:zurupos-backups`.
 - **Check a backup** (safe any time; do it monthly): `deploy/restore.sh check zuru-20261201-0300.dump`. It restores into a scratch database, compares row counts with the live one, and drops the scratch database.
-- **Restore** (replaces the live data, asks you to type `restore`): `deploy/restore.sh replace zuru-20261201-0300.dump`. The API and worker stop during the restore.
+- **Restore** (replaces the live data, asks you to type `restore`): `deploy/restore.sh replace zuru-20261201-0300.dump`. The API, worker and scheduler stop during the restore.
 - **Restore from R2** (for example on a new server, after section 4): fetch the dump into `deploy/backups/`, then check or restore it as above.
 
   ```sh

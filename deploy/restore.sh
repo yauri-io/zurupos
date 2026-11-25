@@ -4,7 +4,7 @@
 #   deploy/restore.sh check   zuru-20261201-0300.dump   # restore into a scratch
 #       database, compare row counts with the live one, drop it. Safe any time.
 #   deploy/restore.sh replace zuru-20261201-0300.dump   # replace the live database.
-#       Stops the API and worker, drops `zuru`, restores, starts them again.
+#       Stops the API, worker and scheduler, drops `zuru`, restores, starts them again.
 #
 # The file name is relative to BACKUP_DIR (the backup service's /backups).
 set -eu
@@ -50,10 +50,10 @@ fi
 printf 'This REPLACES the live database with %s. Type the word restore to continue: ' "$file"
 read -r answer
 [ "$answer" = restore ] || { echo "cancelled"; exit 1; }
-compose stop api worker
+compose stop api worker scheduler
 psql_ -d postgres -c "drop database zuru with (force)"
 # --create recreates the database with its owner, grants and settings.
 compose exec -T backup pg_restore --exit-on-error --create --dbname=postgres "/backups/$file"
-compose up -d --wait api worker
+compose up -d --wait api worker scheduler
 echo "replace: done; counts now:"
 counts zuru | tr ' ' '\n'

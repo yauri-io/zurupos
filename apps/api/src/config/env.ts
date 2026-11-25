@@ -109,6 +109,24 @@ export const loadWorkerConfig = (env: Env = process.env): WorkerConfig => ({
   sentry: loadSentry(env, optional(env, 'NODE_ENV', 'development')),
 })
 
+// The report scheduler (SPEC §12.6) connects as zuru_app, like the API: it reads
+// tenant data inside withTenant and writes to the outbox.
+export type SchedulerConfig = {
+  logLevel: string
+  databaseUrl: string
+  dashboardUrl: string
+  pollIntervalMs: number
+  sentry: SentryConfig
+}
+
+export const loadSchedulerConfig = (env: Env = process.env): SchedulerConfig => ({
+  logLevel: optional(env, 'LOG_LEVEL', 'info'),
+  databaseUrl: required(env, 'DATABASE_URL'),
+  dashboardUrl: required(env, 'DASHBOARD_URL'),
+  pollIntervalMs: int(env, 'SCHEDULER_POLL_MS', 300_000),
+  sentry: loadSentry(env, optional(env, 'NODE_ENV', 'development')),
+})
+
 export const loadConfig = (env: Env = process.env): Config => {
   const nodeEnv = oneOf(env, 'NODE_ENV', ['development', 'test', 'production'] as const, 'development')
   const config: Config = {

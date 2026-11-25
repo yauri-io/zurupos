@@ -4,7 +4,7 @@
 import type { Tx } from '../db/with-tenant.js'
 import type { RenderedEmail } from './templates/types.js'
 
-export type EmailKind = 'low_stock' | 'password_reset' | 'manager_invite'
+export type EmailKind = 'low_stock' | 'password_reset' | 'manager_invite' | 'daily_summary' | 'weekly_summary'
 
 export const enqueueEmail = (
   trx: Tx,

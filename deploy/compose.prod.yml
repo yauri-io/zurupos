@@ -108,6 +108,23 @@ services:
       api:
         condition: service_healthy
 
+  # Report email scheduler (SPEC §12.6, D-075): as zuru_app, like the API.
+  scheduler:
+    image: zurupos-api:prod
+    restart: unless-stopped
+    logging: *logging
+    command: ['node', 'dist/scheduler/scheduler.js']
+    environment:
+      <<: *sentry
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgres://zuru_app:${ZURU_APP_PASSWORD}@postgres:5432/zuru
+      DASHBOARD_URL: https://${APP_DOMAIN:?set APP_DOMAIN}
+      SCHEDULER_POLL_MS: ${SCHEDULER_POLL_MS:-300000}
+    depends_on:
+      api:
+        condition: service_healthy
+
   dashboard:
     image: zurupos-dashboard:prod
     build:

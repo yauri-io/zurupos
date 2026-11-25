@@ -88,6 +88,23 @@ services:
       mailpit:
         condition: service_started
 
+  # Report email scheduler (SPEC §12.6): as zuru_app; queues emails for the worker.
+  scheduler:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ['node', 'dist/scheduler/scheduler.js']
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgres://zuru_app:${ZURU_APP_PASSWORD:-dev_app}@postgres:5432/zuru
+      DASHBOARD_URL: ${DASHBOARD_URL:-http://localhost:3000}
+      SCHEDULER_POLL_MS: ${SCHEDULER_POLL_MS:-300000}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
   dashboard:
     restart: unless-stopped
     build:

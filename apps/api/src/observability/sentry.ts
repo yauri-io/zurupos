@@ -8,7 +8,7 @@ import * as Sentry from '@sentry/node'
 import type { ErrorEvent } from '@sentry/node'
 import type { SentryConfig } from '../config/env.js'
 
-export type Service = 'api' | 'worker'
+export type Service = 'api' | 'worker' | 'scheduler'
 
 const SECRET_HEADERS = new Set(['authorization', 'cookie', 'set-cookie', 'x-device-token'])
 
