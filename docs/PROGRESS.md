@@ -12,7 +12,7 @@ Update this file at the end of every milestone (SPEC §16). Keep entries short: 
 | M5 | Printing (Bluetooth + network) | ✅ Done (manual printer test pending) | Manual printer test by user |
 | M6 | Dashboard reports and remaining pages | ✅ Done | |
 | M7 | Hardening, demo seed, user guide, UAT | 🔍 Awaiting UAT with the owner | UAT with the shop owner |
-| R1 | Operational heatmap (SPEC §12.4) | ⬜ Not started | |
+| R1 | Operational heatmap (SPEC §12.4) | ✅ Done (local, not deployed) | |
 | R2 | Menu matrix (SPEC §12.5) | ⬜ Not started | |
 | R3 | Report emails (SPEC §12.6) | ⬜ Not started | D-075 approved 2026-11-25 |
 
@@ -271,3 +271,9 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 ### Post-pilot reporting scope — 2026-11-25
 - Done (docs only): PRD F15–F17 and roadmap, SPEC §12.4–12.6 and milestones R1–R3, D-069 to D-075. QR table ordering is deferred (D-069).
 - D-075 (a fifth `auth.*` function for the report scheduler) approved by the user on 2026-11-25. The daily email is sent also on days without orders (owner's choice).
+
+### R1 Operational heatmap — 2026-11-25
+- Done: `GET /v1/reports/heatmap` (pure `domain/heatmap.ts`), dashboard *Laporan → Jam ramai* (`/reports/heatmap`) with 4/8/12-week presets, orders / net sales switch, insight sentence once every trading weekday has 3 weeks of data, rank-based shading.
+- Run: `pnpm --filter @zurupos/api test test/domain/heatmap.test.ts test/reports test/rls`, `pnpm --filter @zurupos/dashboard test`, `pnpm --filter @zurupos/dashboard test:e2e e2e/reports-pages.spec.ts` (heatmap at 375 px).
+- Tests: API 652 (heatmap unit 10, integration 7, route sweep), dashboard unit 55, reports e2e green. Checked by eye on the demo shop (desktop and 375 px, light and dark).
+- Known issues: the user guide doesn't mention the new page yet. Not deployed; the pilot has under a week of data, so the page shows the "Data baru" banner for now.

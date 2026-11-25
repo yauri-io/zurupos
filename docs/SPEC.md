@@ -697,7 +697,7 @@ It equals `pct` (§6.1) for non-negative values. No floating point.
 - `weeks_of_data` = min of `trading_days[w]` over weekdays with `trading_days > 0`; `reliable = weeks_of_data ≥ 3`.
 - **Insight**, per metric, only when `reliable`: `busiest` = the cell with the highest average, `quietest` = the cell with the lowest **non-zero** average (ties: earlier weekday, then earlier hour in display order); `ratio = div(busiest avg, quietest avg)` when `busiest avg ≥ 2 × quietest avg` (compared exactly, so 1.6× never shows as 2×), else `null`. The dashboard renders the sentence from these fields through i18n keys.
 - Response: `{ from, to, cutoff_hour, hours: int[], weekdays: [{ weekday, trading_days, cells: [{ hour, orders, net_sales, avg_orders_x10, avg_net_sales } | null] }], weeks_of_data, reliable, insight: { orders, net_sales } }` with `insight.*` = `{ busiest: { weekday, hour, avg }, quietest: { weekday, hour, avg }, ratio } | null`.
-- **Page:** grid with a metric switch (*Jumlah pesanan* / *Penjualan bersih*), the sentence above it, "berdasarkan N Sabtu" per row, and a banner when not `reliable`. At 375 px the grid scrolls sideways inside its card (the page itself doesn't), with the weekday column pinned.
+- **Page:** grid with a metric switch (*Jumlah pesanan* / *Penjualan bersih*), the sentence above it, the trading days per row, and a banner when not `reliable`. Cells are shaded by rank among the non-empty cells (4 shades), not linearly against the maximum, so one unusually big order doesn't flatten the rest; tapping a cell shows its averages and the number of days behind them. At 375 px the grid scrolls sideways inside its card (the page itself doesn't), with the weekday column pinned.
 
 ### 12.5 Menu matrix (PRD F16, D-073)
 
