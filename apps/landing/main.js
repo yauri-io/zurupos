@@ -40,6 +40,7 @@
         '.cards > li',
         '.principles > li',
         '.plain-list > li',
+        '.report-card',
         '.check-list > li',
         '.price-main',
         '.story-mark',

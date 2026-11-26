@@ -389,7 +389,7 @@ a:focus-visible,
 }
 
 .r-foot {
-  margin-top: 12px !important;
+  margin-top: 12px;
 }
 
 .receipt-figure figcaption {
@@ -626,6 +626,157 @@ a:focus-visible,
   background: var(--paper-deep);
 }
 
+/* ---------- Reports ---------- */
+
+.reports {
+  display: grid;
+  gap: 40px;
+}
+
+@media (min-width: 900px) {
+  .reports {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 64px;
+    align-items: center;
+  }
+}
+
+.report-list h3 {
+  font-size: 1.15rem;
+  margin-bottom: 0.3em;
+}
+
+.report-list p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.plain-list.report-list li {
+  padding: 16px 0;
+}
+
+.reports-note {
+  font-weight: 700;
+  margin-top: 20px;
+}
+
+.report-figure {
+  margin: 0;
+  display: grid;
+  gap: 14px;
+  max-width: 460px;
+  width: 100%;
+  justify-self: center;
+}
+
+.report-card {
+  background: var(--paper-light);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 18px 18px 14px;
+}
+
+.report-card p {
+  margin: 0;
+}
+
+.report-card .report-card-title {
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+/* Heatmap mock: a weekday column, then 12 hours (07–18). */
+.hm {
+  display: grid;
+  grid-template-columns: 2.4em repeat(12, 1fr);
+  gap: 3px;
+  font-size: 0.72rem;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.hm-h {
+  padding-bottom: 3px;
+}
+
+.hm-d {
+  align-self: center;
+  font-weight: 700;
+}
+
+.hm i,
+.report-card .hm-legend i {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: 4px;
+}
+
+.hm .l1,
+.hm-legend .l1 {
+  background: rgba(200, 135, 58, 0.16);
+}
+
+.hm .l2,
+.hm-legend .l2 {
+  background: rgba(200, 135, 58, 0.4);
+}
+
+.hm .l3,
+.hm-legend .l3 {
+  background: rgba(200, 135, 58, 0.72);
+}
+
+.hm .l4,
+.hm-legend .l4 {
+  background: var(--amber-dark);
+}
+
+.report-card .hm-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.report-card .hm-legend i {
+  width: 14px;
+}
+
+.report-card .report-insight {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px dashed rgba(26, 26, 26, 0.2);
+  font-size: 0.95rem;
+}
+
+.report-card-tip .report-card-title::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--amber);
+  margin-right: 8px;
+}
+
+.report-tip-item {
+  font-size: 0.95rem;
+}
+
+.report-card .report-tip-figure {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.report-figure figcaption {
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
 .story {
   display: grid;
   gap: 28px;
@@ -722,7 +873,7 @@ a:focus-visible,
 
 @media (min-width: 720px) {
   .sticky-cta {
-    display: none !important;
+    display: none;
   }
 }
 
