@@ -2,8 +2,10 @@ import { trimName } from '../../http/input.js'
 import { IdParams, NoContent } from '../../http/schemas.js'
 import { requireAuth } from '../../http/require-auth.js'
 import type { App } from '../../http/types.js'
+import type { MediaStore } from '../../media/store.js'
 import {
   AvailabilityBody,
+  AvailabilityResponse,
   CreateItemBody,
   ItemGroupsBody,
   ItemListQuery,
@@ -16,19 +18,22 @@ import * as service from './service.js'
 const MANAGE = { auth: 'user', permission: 'menu.manage' } as const
 const tags = ['menu']
 
-export const itemRoutes = async (app: App) => {
+export const itemRoutes = async (app: App, { media }: { media: MediaStore }) => {
+  const deps = { store: media }
   app.get(
     '/items',
     { config: MANAGE, schema: { tags, querystring: ItemListQuery, response: { 200: ItemListResponse } } },
     async (request) =>
-      request.tenantTx((trx) => service.listItems(trx, requireAuth(request.auth), request.query.category_id)),
+      request.tenantTx((trx) =>
+        service.listItems(trx, requireAuth(request.auth), deps, request.query.category_id),
+      ),
   )
 
   app.get(
     '/items/:id',
     { config: MANAGE, schema: { tags, params: IdParams, response: { 200: ItemResponse } } },
     async (request) =>
-      request.tenantTx((trx) => service.getItem(trx, requireAuth(request.auth), request.params.id)),
+      request.tenantTx((trx) => service.getItem(trx, requireAuth(request.auth), deps, request.params.id)),
   )
 
   app.post(
@@ -36,7 +41,7 @@ export const itemRoutes = async (app: App) => {
     { config: MANAGE, schema: { tags, body: CreateItemBody, response: { 201: ItemResponse } } },
     async (request, reply) => {
       const item = await request.tenantTx((trx) =>
-        service.createItem(trx, requireAuth(request.auth), trimName(request.body)),
+        service.createItem(trx, requireAuth(request.auth), deps, trimName(request.body)),
       )
       return reply.status(201).send(item)
     },
@@ -50,7 +55,7 @@ export const itemRoutes = async (app: App) => {
     },
     async (request) =>
       request.tenantTx((trx) =>
-        service.updateItem(trx, requireAuth(request.auth), request.params.id, trimName(request.body)),
+        service.updateItem(trx, requireAuth(request.auth), deps, request.params.id, trimName(request.body)),
       ),
   )
 
@@ -59,11 +64,17 @@ export const itemRoutes = async (app: App) => {
     '/items/:id/availability',
     {
       config: { auth: 'user', permission: 'menu.availability' },
-      schema: { tags, params: IdParams, body: AvailabilityBody, response: { 200: ItemResponse } },
+      schema: { tags, params: IdParams, body: AvailabilityBody, response: { 200: AvailabilityResponse } },
     },
     async (request) =>
       request.tenantTx((trx) =>
-        service.setAvailability(trx, requireAuth(request.auth), request.params.id, request.body.is_available),
+        service.setAvailability(
+          trx,
+          requireAuth(request.auth),
+          deps,
+          request.params.id,
+          request.body.is_available,
+        ),
       ),
   )
 
@@ -75,7 +86,13 @@ export const itemRoutes = async (app: App) => {
     },
     async (request) =>
       request.tenantTx((trx) =>
-        service.setModifierGroups(trx, requireAuth(request.auth), request.params.id, request.body.group_ids),
+        service.setModifierGroups(
+          trx,
+          requireAuth(request.auth),
+          deps,
+          request.params.id,
+          request.body.group_ids,
+        ),
       ),
   )
 

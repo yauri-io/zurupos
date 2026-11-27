@@ -17,6 +17,7 @@ import { createTestApp } from '../support/app.js'
 import * as menu from '../support/menu.js'
 import { appPool, inTx } from '../support/pg.js'
 import { buildFullShop, leakedSecrets, type FullShop } from '../support/shops.js'
+import { multipart, solidImage } from '../support/images.js'
 
 type Caller = 'dashboard' | 'staff' | 'device'
 type Resource =
@@ -29,9 +30,14 @@ type Resource =
   | 'ingredient'
   | 'discount'
   | 'order'
+  | 'gallery'
 
 // Routes with path params. Each param names the kind of resource it addresses.
-const ID_ROUTES: Record<string, { caller: Caller; params: Record<string, Resource>; body?: unknown }> = {
+// `upload` routes get a real image as multipart, so they reach the id check.
+const ID_ROUTES: Record<
+  string,
+  { caller: Caller; params: Record<string, Resource>; body?: unknown; upload?: true }
+> = {
   'POST /v1/devices/{id}/revoke': { caller: 'dashboard', params: { id: 'device' } },
   'PATCH /v1/users/{id}': { caller: 'dashboard', params: { id: 'user' }, body: { name: 'Hijacked' } },
   'POST /v1/users/{id}/reset-pin': { caller: 'dashboard', params: { id: 'user' }, body: { pin: '8642' } },
@@ -96,6 +102,10 @@ const ID_ROUTES: Record<string, { caller: Caller; params: Record<string, Resourc
     params: { id: 'order' },
     body: { reason: 'Hijack', restock: false },
   },
+  // Online menu (O1, SPEC §12.7).
+  'PUT /v1/items/{id}/photo': { caller: 'dashboard', params: { id: 'item' }, upload: true },
+  'DELETE /v1/items/{id}/photo': { caller: 'dashboard', params: { id: 'item' } },
+  'DELETE /v1/online-menu/gallery/{id}': { caller: 'dashboard', params: { id: 'gallery' } },
 }
 
 // Routes that take resource ids in the body.
@@ -158,6 +168,7 @@ const SCAN_ROUTES: Record<string, Caller[]> = {
   'GET /v1/reports/stock-value': ['dashboard'],
   'GET /v1/reports/menu-matrix': ['dashboard'],
   'GET /v1/orders': ['dashboard'],
+  'GET /v1/online-menu': ['dashboard', 'staff'],
 }
 
 // Reports that are only numbers: nothing to scan for, so each must equal A's own
@@ -207,6 +218,15 @@ const NO_TENANT_INPUT: Record<string, string> = {
   'POST /v1/modifier-groups': 'creates a new row in the caller’s tenant',
   'POST /v1/ingredients': 'creates a new row in the caller’s tenant',
   'POST /v1/discounts': 'creates a new row in the caller’s tenant',
+  'PATCH /v1/online-menu': 'acts on the caller’s own tenant',
+  'PUT /v1/online-menu/hours': 'acts on the caller’s own tenant',
+  'POST /v1/online-menu/publish': 'acts on the caller’s own tenant',
+  'POST /v1/online-menu/unpublish': 'acts on the caller’s own tenant',
+  'PUT /v1/online-menu/logo': 'acts on the caller’s own tenant (upload)',
+  'DELETE /v1/online-menu/logo': 'acts on the caller’s own tenant',
+  'PUT /v1/online-menu/cover': 'acts on the caller’s own tenant (upload)',
+  'DELETE /v1/online-menu/cover': 'acts on the caller’s own tenant',
+  'POST /v1/online-menu/gallery': 'creates a new row in the caller’s tenant (upload)',
 }
 
 let t: TestApp
@@ -216,6 +236,7 @@ let b: FullShop
 let operations: string[]
 
 beforeAll(async () => {
+  photo = await solidImage(640, 480)
   t = await createTestApp()
   a = await buildFullShop(t.app, pool, 'A')
   b = await buildFullShop(t.app, pool, 'B')
@@ -278,7 +299,20 @@ const idOf = (shop: FullShop, resource: Resource): string => {
       return required(shop.seeded.discounts)
     case 'order':
       return required(shop.seeded.orders)
+    case 'gallery':
+      return required(shop.seeded.menu_gallery)
   }
+}
+
+let photo: Buffer
+const uploadA = async (url: string, method: 'PUT' | 'POST') => {
+  const form = multipart(photo)
+  return t.app.inject({
+    method,
+    url,
+    headers: { ...APP_HEADERS, ...headersFor(a.dashboard), ...form.headers },
+    payload: form.payload,
+  })
 }
 
 // A throwaway resource in A, so the positive control can't disturb other tests.
@@ -319,17 +353,27 @@ const freshA = async (resource: Resource): Promise<string> => {
       )
       return res.json<{ id: string }>().id
     }
+    case 'gallery': {
+      const res = expectStatus(await uploadA('/v1/online-menu/gallery', 'POST'), 201)
+      const gallery = res.json<{ gallery: { id: string }[] }>().gallery
+      return required(gallery[gallery.length - 1]?.id)
+    }
   }
 }
 
-const call = (key: string, creds: Creds, url: string, body?: unknown) => {
+const call = (key: string, creds: Creds, url: string, body?: unknown, upload = false) => {
   const [method] = key.split(' ')
-  const headers = { ...APP_HEADERS, ...headersFor(creds) }
+  const form = upload ? multipart(photo) : null
+  const headers = { ...APP_HEADERS, ...headersFor(creds), ...(form?.headers ?? {}) }
   return t.app.inject({
     method: method as 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE',
     url,
     headers,
-    ...(body === undefined ? {} : { payload: body as Record<string, unknown> }),
+    ...(form
+      ? { payload: form.payload }
+      : body === undefined
+        ? {}
+        : { payload: body as Record<string, unknown> }),
   })
 }
 
@@ -365,7 +409,7 @@ describe("A's credentials + B's ids → 404", () => {
   it.each(Object.entries(ID_ROUTES))('%s', async (key, route) => {
     const path = key.split(' ')[1] ?? ''
     const bParams = Object.fromEntries(Object.entries(route.params).map(([p, r]) => [p, idOf(b, r)]))
-    const res = await call(key, credsOf(a, route.caller), fill(path, bParams), route.body)
+    const res = await call(key, credsOf(a, route.caller), fill(path, bParams), route.body, route.upload)
     expect(res.statusCode, res.body).toBe(404)
     expect(res.json()).toMatchObject({ error: { code: 'NOT_FOUND' } })
     expect(leakedSecrets(res.body, b)).toEqual([])
@@ -373,7 +417,7 @@ describe("A's credentials + B's ids → 404", () => {
     // Positive control: the same call on A's own resource is not a 404.
     const aParams: Record<string, string> = {}
     for (const [p, r] of Object.entries(route.params)) aParams[p] = await freshA(r)
-    const own = await call(key, credsOf(a, route.caller), fill(path, aParams), route.body)
+    const own = await call(key, credsOf(a, route.caller), fill(path, aParams), route.body, route.upload)
     expect(own.statusCode, own.body).toBeLessThan(400)
   })
 
@@ -394,6 +438,10 @@ describe("A's credentials + B's ids → 404", () => {
       devices: { id: string; revoked_at: string | null }[]
     }>().devices
     expect(devices.find((d) => d.id === b.deviceId)?.revoked_at).toBeNull()
+    const menu = expectStatus(await call('GET /v1/online-menu', b.dashboard, '/v1/online-menu'), 200).json<{
+      gallery: { id: string }[]
+    }>()
+    expect(menu.gallery.map((g) => g.id)).toContain(b.seeded.menu_gallery)
   })
 })
 

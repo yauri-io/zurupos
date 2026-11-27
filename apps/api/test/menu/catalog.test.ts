@@ -78,6 +78,10 @@ describe('items', () => {
       is_active: true,
       is_available: true,
       modifier_group_ids: [],
+      // Online menu defaults (SPEC §4.1): shown online, not recommended, no photo.
+      show_online: true,
+      is_recommended: false,
+      photo: null,
     })
   })
 

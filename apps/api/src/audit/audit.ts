@@ -19,6 +19,9 @@ export type AuditAction =
   | 'stock.count'
   | 'order.void'
   | 'order.custom_discount'
+  | 'online_menu.publish'
+  | 'online_menu.unpublish'
+  | 'online_menu.slug'
 
 export const writeAudit = (
   trx: Tx,

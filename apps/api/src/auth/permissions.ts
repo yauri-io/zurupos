@@ -32,6 +32,10 @@ export const PERMISSIONS = {
   'settings.view': [O, M, C, E],
   'dashboard.access': [O, M],
   'admin.stock_invariant': [O],
+  // Online menu (PRD §6, F18–F19): per-item photo, show online and recommended
+  // for owner and manager; the shop profile, photos, hours and publish for the owner.
+  'online_menu.items': [O, M],
+  'online_menu.manage': [O],
 } as const satisfies Record<string, readonly Role[]>
 
 export type Permission = keyof typeof PERMISSIONS

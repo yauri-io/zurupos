@@ -1,6 +1,19 @@
 import type { Tx } from '../../db/with-tenant.js'
+import type { MediaRef } from '../../media/variants.js'
 
-const COLUMNS = ['id', 'category_id', 'name', 'price', 'color', 'sort', 'is_active', 'is_available'] as const
+const COLUMNS = [
+  'id',
+  'category_id',
+  'name',
+  'price',
+  'color',
+  'sort',
+  'is_active',
+  'is_available',
+  'show_online',
+  'is_recommended',
+  'photo_media_id',
+] as const
 
 export type ItemRow = {
   id: string
@@ -11,7 +24,13 @@ export type ItemRow = {
   sort: number
   is_active: boolean
   is_available: boolean
+  // Online menu only (SPEC §12.7); never in bootstrap.
+  show_online: boolean
+  is_recommended: boolean
+  photo_media_id: string | null
 }
+
+export type ItemPatch = Partial<Omit<ItemRow, 'id' | 'photo_media_id'>> & { archived_at?: Date }
 
 export const listItems = (trx: Tx, tenantId: string, categoryId: string | undefined) => {
   let query = trx
@@ -47,12 +66,7 @@ export const insertItem = (
   },
 ) => trx.insertInto('items').values(row).returning(COLUMNS).executeTakeFirstOrThrow()
 
-export const updateItem = (
-  trx: Tx,
-  tenantId: string,
-  id: string,
-  patch: Partial<Omit<ItemRow, 'id'>> & { archived_at?: Date },
-) =>
+export const updateItem = (trx: Tx, tenantId: string, id: string, patch: ItemPatch) =>
   trx
     .updateTable('items')
     .set(patch)
@@ -116,3 +130,13 @@ export const replaceGroupLinks = async (
     .values(groupIds.map((group_id, sort) => ({ tenant_id: tenantId, item_id: itemId, group_id, sort })))
     .execute()
 }
+
+export const photoMedia = async (trx: Tx, tenantId: string, ids: readonly string[]) =>
+  ids.length === 0
+    ? []
+    : ((await trx
+        .selectFrom('media')
+        .select(['id', 'storage_key', 'purpose', 'width', 'height'])
+        .where('tenant_id', '=', tenantId)
+        .where('id', 'in', ids)
+        .execute()) as (MediaRef & { id: string })[])

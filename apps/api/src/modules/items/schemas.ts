@@ -1,5 +1,6 @@
 import { Type } from 'typebox'
-import { Body, Money, Name, Sort, Uuid } from '../../http/schemas.js'
+import { Body, Money, Name, Nullable, Sort, Uuid } from '../../http/schemas.js'
+import { Img } from '../online-menu/schemas.js'
 
 // Tile colour tokens; the dashboard and the app map them to their palettes.
 export const ITEM_COLORS = [
@@ -20,7 +21,7 @@ export const ITEM_COLORS = [
 ] as const
 const Color = Type.Enum(ITEM_COLORS)
 
-export const ItemResponse = Type.Object({
+const ItemFields = {
   id: Uuid,
   category_id: Uuid,
   name: Type.String(),
@@ -31,7 +32,20 @@ export const ItemResponse = Type.Object({
   is_available: Type.Boolean(),
   // Attached modifier groups, in the order the modifier sheet shows them.
   modifier_group_ids: Type.Array(Uuid),
+}
+
+export const ItemResponse = Type.Object({
+  ...ItemFields,
+  // Online menu (SPEC §12.7). Dashboard only: bootstrap and the cashier's
+  // availability response never carry them (D-079).
+  show_online: Type.Boolean(),
+  is_recommended: Type.Boolean(),
+  photo: Nullable(Img),
 })
+
+// PATCH /items/:id/availability is called by the cashier app: no online-menu
+// fields, so photos never reach it (D-079).
+export const AvailabilityResponse = Type.Object(ItemFields, { additionalProperties: false })
 
 export const ItemListResponse = Type.Object({ items: Type.Array(ItemResponse) })
 
@@ -58,6 +72,9 @@ export const UpdateItemBody = Body({
   sort: Type.Optional(Sort),
   is_active: Type.Optional(Type.Boolean()),
   is_available: Type.Optional(Type.Boolean()),
+  show_online: Type.Optional(Type.Boolean()),
+  // At most RECOMMENDED_LIMIT non-archived items per shop (409 recommended_limit).
+  is_recommended: Type.Optional(Type.Boolean()),
 })
 
 export const AvailabilityBody = Body({ is_available: Type.Boolean() })

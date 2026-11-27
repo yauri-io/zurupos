@@ -38,6 +38,8 @@ const PRD_MATRIX: Record<string, Role[]> = {
   'settings.view': ['owner', 'manager', 'cashier', 'employee'],
   'dashboard.access': ['owner', 'manager'],
   'admin.stock_invariant': ['owner'],
+  'online_menu.items': ['owner', 'manager'],
+  'online_menu.manage': ['owner'],
 }
 
 describe('permission table', () => {

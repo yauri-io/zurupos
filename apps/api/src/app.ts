@@ -28,7 +28,9 @@ import { orderRoutes } from './modules/orders/routes.js'
 import { adminRoutes } from './modules/admin/routes.js'
 import { bootstrapRoutes } from './modules/bootstrap/routes.js'
 import { reportRoutes } from './modules/reports/routes.js'
+import { createMediaStore } from './media/create-store.js'
 import { localMediaRoutes } from './media/serve.js'
+import { onlineMenuRoutes } from './modules/online-menu/routes.js'
 import type { MediaStore } from './media/store.js'
 
 export type AppDeps = {
@@ -54,6 +56,7 @@ export const buildApp = async ({
   db,
   limiters = createLimiters(),
   turnstile = config.turnstileSecretKey ? createTurnstileVerifier(config.turnstileSecretKey) : null,
+  media = createMediaStore(config.media),
 }: AppDeps): Promise<App> => {
   const app = Fastify({
     logger: config.nodeEnv === 'test' ? false : { level: config.logLevel, redact: REDACT },
@@ -111,7 +114,7 @@ export const buildApp = async ({
       await v1.register(userRoutes, { config })
       await v1.register(settingsRoutes)
       await v1.register(categoryRoutes)
-      await v1.register(itemRoutes)
+      await v1.register(itemRoutes, { media })
       await v1.register(modifierRoutes)
       await v1.register(ingredientRoutes)
       await v1.register(recipeRoutes)
@@ -121,6 +124,7 @@ export const buildApp = async ({
       await v1.register(adminRoutes)
       await v1.register(bootstrapRoutes)
       await v1.register(reportRoutes)
+      await v1.register(onlineMenuRoutes, { media, menuBaseUrl: config.menuPublicBaseUrl })
     },
     { prefix: '/v1' },
   )
