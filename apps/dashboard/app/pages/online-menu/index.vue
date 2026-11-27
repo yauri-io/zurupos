@@ -198,19 +198,27 @@ const copyToAll = (row: HoursRow) => {
                 :help="t('online_menu.slug_help')"
                 :error="slugDraft !== '' && !slugValid ? t('online_menu.slug_invalid') : undefined"
               >
-                <UInput
-                  v-model="slugDraft"
-                  class="w-full"
-                  autocapitalize="off"
-                  autocomplete="off"
-                  spellcheck="false"
-                  data-testid="slug-input"
-                  @update:model-value="(v) => (slugDraft = String(v).toLowerCase().replace(/\s+/g, '-'))"
-                >
-                  <template #leading>
-                    <span class="text-muted text-sm">{{ t('online_menu.slug_prefix') }}</span>
-                  </template>
-                </UInput>
+                <!-- The domain is a label attached to the field, not inside it, so it
+                     never covers what the owner types (a #leading slot only fits an icon). -->
+                <UFieldGroup class="w-full">
+                  <UBadge
+                    color="neutral"
+                    variant="outline"
+                    size="lg"
+                    class="shrink-0 text-muted font-normal"
+                    data-testid="slug-prefix"
+                    :label="t('online_menu.slug_prefix')"
+                  />
+                  <UInput
+                    v-model="slugDraft"
+                    class="flex-1 min-w-0"
+                    autocapitalize="off"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-testid="slug-input"
+                    @update:model-value="(v) => (slugDraft = String(v).toLowerCase().replace(/\s+/g, '-'))"
+                  />
+                </UFieldGroup>
               </UFormField>
               <p v-if="menu.slug" class="text-xs text-muted">{{ t('online_menu.slug_change_note') }}</p>
               <div class="flex gap-2">

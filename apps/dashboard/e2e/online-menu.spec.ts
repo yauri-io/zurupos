@@ -66,6 +66,12 @@ test('owner sets up the online menu at 375 px', async ({ page }) => {
   const slugInput = page.getByTestId('slug-input')
   const suggested = owner.shop_name.toLowerCase().replace(/\s+/g, '-')
   await expect(slugInput).toHaveValue(suggested)
+  // The domain label sits beside the field and never covers the typed text.
+  const prefix = await page.getByTestId('slug-prefix').boundingBox()
+  const field = await slugInput.boundingBox()
+  if (!prefix || !field) throw new Error('slug field not laid out')
+  expect(field.x).toBeGreaterThanOrEqual(prefix.x + prefix.width - 1)
+  expect(field.x + field.width).toBeLessThanOrEqual(375)
   await page.getByTestId('slug-save').click()
   await expect(page.getByTestId('public-url')).toHaveText(`http://localhost:3001/${suggested}`)
   await noHorizontalScroll(page, '/online-menu')
