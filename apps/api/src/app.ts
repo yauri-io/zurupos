@@ -28,6 +28,8 @@ import { orderRoutes } from './modules/orders/routes.js'
 import { adminRoutes } from './modules/admin/routes.js'
 import { bootstrapRoutes } from './modules/bootstrap/routes.js'
 import { reportRoutes } from './modules/reports/routes.js'
+import { localMediaRoutes } from './media/serve.js'
+import type { MediaStore } from './media/store.js'
 
 export type AppDeps = {
   config: Config
@@ -35,6 +37,8 @@ export type AppDeps = {
   limiters?: Limiters
   // Tests pass a fake; otherwise built from TURNSTILE_SECRET_KEY, if set (D-064).
   turnstile?: TurnstileVerifier | null
+  // Online menu images (SPEC §12.7). Tests may pass a store that fails on purpose.
+  media?: MediaStore
 }
 
 // Never log secrets: PINs, passwords and tokens are redacted wherever they appear.
@@ -97,6 +101,9 @@ export const buildApp = async ({
   registerAuth(app, { db, config })
 
   await app.register(healthRoutes, { db, version: config.version })
+  if (config.media.driver === 'local' && config.media.localDir) {
+    await app.register(localMediaRoutes, { dir: config.media.localDir })
+  }
   await app.register(
     async (v1) => {
       await v1.register(authRoutes, { db, config, limiters, turnstile })

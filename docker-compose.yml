@@ -59,6 +59,13 @@ services:
       EMAIL_PROVIDER: smtp
       EMAIL_FROM: ${EMAIL_FROM:-ZuruPOS <no-reply@zurupos.local>}
       SMTP_URL: smtp://mailpit:1025
+      # Online menu images (SPEC §12.7): a local folder, served by the API under /media.
+      MEDIA_DRIVER: local
+      MEDIA_LOCAL_DIR: /data/media
+      MEDIA_PUBLIC_BASE_URL: ${MEDIA_PUBLIC_BASE_URL:-http://localhost:4000/media}
+      MENU_PUBLIC_BASE_URL: ${MENU_PUBLIC_BASE_URL:-http://localhost:3001}
+    volumes:
+      - media:/data/media
     ports:
       - '${API_PORT:-4000}:4000'
     depends_on:
@@ -120,3 +127,4 @@ services:
 
 volumes:
   pgdata:
+  media:

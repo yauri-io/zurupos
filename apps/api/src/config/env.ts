@@ -9,6 +9,23 @@ export type SentryConfig = {
   release: string | undefined
 }
 
+// Online menu images (SPEC §12.7, D-079). `local` writes into a folder the API
+// serves under /media; `s3` puts objects into an S3-API bucket (Cloudflare R2).
+export type MediaConfig = {
+  driver: 'local' | 's3'
+  localDir: string | undefined
+  // Where the variants are publicly reachable, without a trailing slash.
+  publicBaseUrl: string
+  s3:
+    | {
+        endpoint: string
+        bucket: string
+        accessKeyId: string
+        secretAccessKey: string
+      }
+    | undefined
+}
+
 export type Config = {
   nodeEnv: 'development' | 'test' | 'production'
   // Build version (D-057), baked into the image by deploy/prod.sh; 'dev' elsewhere.
@@ -32,6 +49,9 @@ export type Config = {
     resendApiKey: string | undefined
   }
   sentry: SentryConfig
+  media: MediaConfig
+  // Base of the public menu address, `<base>/<slug>` (SPEC §12.7), no trailing slash.
+  menuPublicBaseUrl: string
 }
 
 type Env = Record<string, string | undefined>
@@ -83,6 +103,39 @@ const loadEmail = (env: Env): Config['email'] => {
     throw new Error('RESEND_API_KEY is required when EMAIL_PROVIDER=resend')
   }
   return email
+}
+
+const baseUrl = (env: Env, key: string): string => {
+  const value = required(env, key).replace(/\/+$/, '')
+  let url: URL
+  try {
+    url = new URL(value)
+  } catch {
+    throw new Error(`Env var ${key} must be an absolute http(s) URL`)
+  }
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+    throw new Error(`Env var ${key} must be an absolute http(s) URL`)
+  }
+  return value
+}
+
+export const loadMedia = (env: Env): MediaConfig => {
+  const driver = oneOf(env, 'MEDIA_DRIVER', ['local', 's3'] as const, 'local')
+  const publicBaseUrl = baseUrl(env, 'MEDIA_PUBLIC_BASE_URL')
+  if (driver === 'local') {
+    return { driver, localDir: required(env, 'MEDIA_LOCAL_DIR'), publicBaseUrl, s3: undefined }
+  }
+  return {
+    driver,
+    localDir: undefined,
+    publicBaseUrl,
+    s3: {
+      endpoint: baseUrl(env, 'MEDIA_S3_ENDPOINT'),
+      bucket: required(env, 'MEDIA_S3_BUCKET'),
+      accessKeyId: required(env, 'MEDIA_S3_ACCESS_KEY_ID'),
+      secretAccessKey: required(env, 'MEDIA_S3_SECRET_ACCESS_KEY'),
+    },
+  }
 }
 
 export const loadSentry = (env: Env, fallbackEnvironment: string): SentryConfig => ({
@@ -145,6 +198,8 @@ export const loadConfig = (env: Env = process.env): Config => {
     turnstileSecretKey: env['TURNSTILE_SECRET_KEY'] || undefined,
     email: loadEmail(env),
     sentry: loadSentry(env, nodeEnv),
+    media: loadMedia(env),
+    menuPublicBaseUrl: baseUrl(env, 'MENU_PUBLIC_BASE_URL'),
   }
   return config
 }

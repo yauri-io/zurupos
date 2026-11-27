@@ -22,6 +22,10 @@ const MESSAGES: Record<ErrorCode, Record<Locale, string>> = {
     id: 'Terlalu banyak percobaan. Coba lagi nanti.',
     en: 'Too many attempts. Try again later.',
   },
+  FILE_TOO_LARGE: {
+    id: 'File terlalu besar. Maksimal 2 MB.',
+    en: 'The file is too large. The limit is 2 MB.',
+  },
   INTERNAL: { id: 'Terjadi kesalahan pada server.', en: 'Something went wrong on the server.' },
 }
 

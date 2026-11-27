@@ -7,7 +7,7 @@ import {
   TENANT_TABLES,
   type TenantTable,
 } from '../support/factories.js'
-import { appPool, inTx, insertRow, RLS_VIOLATION, sqlStateOf } from '../support/pg.js'
+import { appPool, inTx, insertRow, RLS_VIOLATION, sqlStateOf, type Row } from '../support/pg.js'
 import { seedTenant, type SeededTenant } from '../support/seed.js'
 
 const pool = appPool()
@@ -124,7 +124,11 @@ describe('tenant A context', () => {
   it.each([
     ['items.photo_media_id', `update items set photo_media_id = $1 where id = $2`, 'items'],
     ['menu_profiles.logo_media_id', `update menu_profiles set logo_media_id = $1 where tenant_id = $2`, null],
-    ['menu_profiles.cover_media_id', `update menu_profiles set cover_media_id = $1 where tenant_id = $2`, null],
+    [
+      'menu_profiles.cover_media_id',
+      `update menu_profiles set cover_media_id = $1 where tenant_id = $2`,
+      null,
+    ],
   ] as const)("%s cannot point at B's media (composite FK)", async (_, statement, table) => {
     const state = await inTx(pool, a.tenant, (c) =>
       sqlStateOf(c, () => c.query(statement, [b.media, table ? a[table] : a.tenant])),
@@ -141,7 +145,7 @@ describe('tenant A context', () => {
 
   it("a slug taken by B fails the insert for A without B's row being visible", async () => {
     const slug = await inTx(pool, b.tenant, async (c) => {
-      const row = { ...FACTORIES.menu_slugs(b), is_current: false }
+      const row: Row = { ...FACTORIES.menu_slugs(b), is_current: false }
       await insertRow(c, 'menu_slugs', row)
       return String(row['slug'])
     })

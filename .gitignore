@@ -58,3 +58,6 @@ playwright-report/
 # Production stack (deploy/): server-only files
 deploy/backups/
 deploy/certs/
+
+# Local online-menu media (MEDIA_DRIVER=local, SPEC §12.7)
+apps/api/var/

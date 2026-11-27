@@ -11,6 +11,8 @@ export const ERROR_STATUS = {
   PRICE_CHANGED: 409,
   ITEM_UNAVAILABLE: 422,
   RATE_LIMITED: 429,
+  // Uploads over the 2 MB limit (SPEC §12.7).
+  FILE_TOO_LARGE: 413,
   INTERNAL: 500,
 } as const
 

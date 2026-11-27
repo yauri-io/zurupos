@@ -5,6 +5,7 @@ import { createDb, type Database } from '../../src/db/kysely.js'
 import { createLimiters, type Limiters } from '../../src/http/rate-limit.js'
 import type { TurnstileVerifier } from '../../src/auth/turnstile.js'
 import type { App } from '../../src/http/types.js'
+import type { MediaStore } from '../../src/media/store.js'
 import { testConfig } from '../helpers.js'
 import { ignoreIdleError, workerPool } from './pg.js'
 
@@ -16,6 +17,7 @@ export const createTestApp = async (
     limiters?: Limiters
     signupEnabled?: boolean
     turnstile?: TurnstileVerifier
+    media?: MediaStore
   } = {},
 ): Promise<TestApp> => {
   const config = testConfig(opts.signupEnabled === undefined ? {} : { signupEnabled: opts.signupEnabled })
@@ -26,6 +28,7 @@ export const createTestApp = async (
     db,
     limiters: opts.limiters ?? createLimiters(1000),
     turnstile: opts.turnstile ?? null,
+    ...(opts.media ? { media: opts.media } : {}),
   })
   await app.ready()
   return {
