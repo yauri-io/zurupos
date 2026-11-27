@@ -351,3 +351,4 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - O1–O3 deployed as `2026.11.27-dbdee7d` (backup `zuru-20261127-1925.dump` first, copied to R2). Migrations `20261127100000_online_menu` and `20261127200000_find_public_menu` applied; `menu` service healthy; Caddy serves `menu.zurupos.com`.
 - Checked live: `menu.zurupos.com/` → 302 to the landing page; unknown slug → 404 page and API 404; the menu CSP (nonce, images from `https://media.zurupos.com/`); the dashboard CSP allows the media domain; the API wrote a test object to the `zurupos-media` bucket, `media.zurupos.com` served it (`immutable`), and the API deleted it.
 - Not done on production: no shop has published a menu yet. The owner's first publish is the real end-to-end check (DEPLOY.md, "Online menu page", step 5).
+- 2026-11-27 23:35 WIB: deployed `2026.11.27-c376d45` (backup `zuru-20261127-2333.dump` first): the slug field's domain label no longer covers the typed slug.
