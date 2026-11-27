@@ -210,6 +210,23 @@ const main = async () => {
     items.push({ id: itemId, price, drink, milk: recipe.some((l) => l.ingredient_id === ing['Susu Segar']) })
   }
 
+  // Online menu (SPEC §13, O1): slug kopi-demo, unpublished, Papan, three
+  // recommended items, no photos.
+  await call('PATCH', '/v1/online-menu', {
+    slug: 'kopi-demo',
+    template: 'papan',
+    description: 'Kopi susu gula aren, espresso dan croissant hangat di tengah Braga.',
+  })
+  const week = [1, 2, 3, 4, 5, 6].map((weekday) => ({ weekday, opens: '07:00', closes: '22:00' }))
+  await call('PUT', '/v1/online-menu/hours', {
+    hours: [...week, { weekday: 7, opens: '08:00', closes: '20:00' }],
+  })
+  for (const name of ['Kopi Susu Gula Aren', 'Latte', 'Croissant']) {
+    const item = items[menu.findIndex(([n]) => n === name)]
+    if (!item) throw new Error(`seed: no item ${name}`)
+    await call('PATCH', `/v1/items/${item.id}`, { is_recommended: true })
+  }
+
   // Modifier groups with the §7.1 effects.
   const group = (name: string, extra: Json) =>
     id('/v1/modifier-groups', { name, selection: 'single', ...extra })
@@ -420,7 +437,8 @@ const main = async () => {
   console.log(`Kopi Demo: ${created.length} orders over ${DAYS} days.
   Dashboard  http://localhost:3000   owner ${OWNER.email} / ${OWNER.password}
                                      manager ${MANAGER.email} / ${MANAGER.password}
-  App PINs   ${OWNER.name} ${OWNER.pin} · ${MANAGER.name} ${MANAGER.pin} · ${CASHIER.name} ${CASHIER.pin} · ${EMPLOYEE.name} ${EMPLOYEE.pin}`)
+  App PINs   ${OWNER.name} ${OWNER.pin} · ${MANAGER.name} ${MANAGER.pin} · ${CASHIER.name} ${CASHIER.pin} · ${EMPLOYEE.name} ${EMPLOYEE.pin}
+  Online menu  slug kopi-demo, not published (Menu online in the dashboard)`)
 }
 
 main().catch((err: unknown) => {
