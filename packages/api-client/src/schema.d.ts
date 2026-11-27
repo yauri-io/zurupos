@@ -4413,6 +4413,107 @@ export interface paths {
     }
     trace?: never
   }
+  '/v1/online-menu/preview': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: {
+          template?: 'foto' | 'papan' | 'hangat'
+          accent_color?: string
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              /** @enum {string} */
+              kind: 'menu'
+              shop: {
+                name: string
+                description: string | null
+                address: string | null
+                timezone: string
+                /** @enum {unknown} */
+                template: 'foto' | 'papan' | 'hangat'
+                accent_color: string
+                logo: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                } | null
+                cover: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                } | null
+                whatsapp: string | null
+                instagram: string | null
+                maps_url: string | null
+                hours: {
+                  weekday: number
+                  opens: string
+                  closes: string
+                }[]
+                price_note: {
+                  tax_name: string | null
+                  service_charge: boolean
+                } | null
+              }
+              recommended: string[]
+              categories: {
+                /** Format: uuid */
+                id: string
+                name: string
+                items: {
+                  /** Format: uuid */
+                  id: string
+                  name: string
+                  price: number
+                  sold_out: boolean
+                  recommended: boolean
+                  photo: {
+                    url_small: string
+                    url_large: string
+                    width: number
+                    height: number
+                  } | null
+                }[]
+              }[]
+              gallery: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              }[]
+              menu_version: string
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/online-menu/hours': {
     parameters: {
       query?: never
@@ -5233,6 +5334,112 @@ export interface paths {
         }
       }
     }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/public/menus/{slug}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          slug: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json':
+              | {
+                  /** @enum {string} */
+                  kind: 'menu'
+                  shop: {
+                    name: string
+                    description: string | null
+                    address: string | null
+                    timezone: string
+                    /** @enum {unknown} */
+                    template: 'foto' | 'papan' | 'hangat'
+                    accent_color: string
+                    logo: {
+                      url_small: string
+                      url_large: string
+                      width: number
+                      height: number
+                    } | null
+                    cover: {
+                      url_small: string
+                      url_large: string
+                      width: number
+                      height: number
+                    } | null
+                    whatsapp: string | null
+                    instagram: string | null
+                    maps_url: string | null
+                    hours: {
+                      weekday: number
+                      opens: string
+                      closes: string
+                    }[]
+                    price_note: {
+                      tax_name: string | null
+                      service_charge: boolean
+                    } | null
+                  }
+                  recommended: string[]
+                  categories: {
+                    /** Format: uuid */
+                    id: string
+                    name: string
+                    items: {
+                      /** Format: uuid */
+                      id: string
+                      name: string
+                      price: number
+                      sold_out: boolean
+                      recommended: boolean
+                      photo: {
+                        url_small: string
+                        url_large: string
+                        width: number
+                        height: number
+                      } | null
+                    }[]
+                  }[]
+                  gallery: {
+                    url_small: string
+                    url_large: string
+                    width: number
+                    height: number
+                  }[]
+                  menu_version: string
+                }
+              | {
+                  /** @enum {string} */
+                  kind: 'moved'
+                  slug: string
+                }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
     options?: never
     head?: never
     patch?: never

@@ -9999,6 +9999,332 @@
         }
       }
     },
+    "/v1/online-menu/preview": {
+      "get": {
+        "tags": ["online-menu"],
+        "parameters": [
+          {
+            "schema": {
+              "enum": ["foto", "papan", "hangat"]
+            },
+            "in": "query",
+            "name": "template",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "in": "query",
+            "name": "accent_color",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["kind", "shop", "recommended", "categories", "gallery", "menu_version"],
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "enum": ["menu"]
+                    },
+                    "shop": {
+                      "type": "object",
+                      "required": [
+                        "name",
+                        "description",
+                        "address",
+                        "timezone",
+                        "template",
+                        "accent_color",
+                        "logo",
+                        "cover",
+                        "whatsapp",
+                        "instagram",
+                        "maps_url",
+                        "hours",
+                        "price_note"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "address": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "timezone": {
+                          "type": "string"
+                        },
+                        "template": {
+                          "enum": ["foto", "papan", "hangat"]
+                        },
+                        "accent_color": {
+                          "type": "string"
+                        },
+                        "logo": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "required": ["url_small", "url_large", "width", "height"],
+                              "properties": {
+                                "url_small": {
+                                  "type": "string"
+                                },
+                                "url_large": {
+                                  "type": "string"
+                                },
+                                "width": {
+                                  "type": "integer"
+                                },
+                                "height": {
+                                  "type": "integer"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "cover": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "required": ["url_small", "url_large", "width", "height"],
+                              "properties": {
+                                "url_small": {
+                                  "type": "string"
+                                },
+                                "url_large": {
+                                  "type": "string"
+                                },
+                                "width": {
+                                  "type": "integer"
+                                },
+                                "height": {
+                                  "type": "integer"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "whatsapp": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "instagram": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maps_url": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "hours": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": ["weekday", "opens", "closes"],
+                            "properties": {
+                              "weekday": {
+                                "type": "integer"
+                              },
+                              "opens": {
+                                "type": "string"
+                              },
+                              "closes": {
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        },
+                        "price_note": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "required": ["tax_name", "service_charge"],
+                              "properties": {
+                                "tax_name": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "service_charge": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "recommended": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "categories": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "name", "items"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "items": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": ["id", "name", "price", "sold_out", "recommended", "photo"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "price": {
+                                  "type": "integer"
+                                },
+                                "sold_out": {
+                                  "type": "boolean"
+                                },
+                                "recommended": {
+                                  "type": "boolean"
+                                },
+                                "photo": {
+                                  "anyOf": [
+                                    {
+                                      "type": "object",
+                                      "required": ["url_small", "url_large", "width", "height"],
+                                      "properties": {
+                                        "url_small": {
+                                          "type": "string"
+                                        },
+                                        "url_large": {
+                                          "type": "string"
+                                        },
+                                        "width": {
+                                          "type": "integer"
+                                        },
+                                        "height": {
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "additionalProperties": false
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              },
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["url_small", "url_large", "width", "height"],
+                        "properties": {
+                          "url_small": {
+                            "type": "string"
+                          },
+                          "url_large": {
+                            "type": "string"
+                          },
+                          "width": {
+                            "type": "integer"
+                          },
+                          "height": {
+                            "type": "integer"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "menu_version": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/online-menu/hours": {
       "put": {
         "tags": ["online-menu"],
@@ -12626,6 +12952,343 @@
                       ]
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/public/menus/{slug}": {
+      "get": {
+        "tags": ["public"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "required": ["kind", "shop", "recommended", "categories", "gallery", "menu_version"],
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": ["menu"]
+                        },
+                        "shop": {
+                          "type": "object",
+                          "required": [
+                            "name",
+                            "description",
+                            "address",
+                            "timezone",
+                            "template",
+                            "accent_color",
+                            "logo",
+                            "cover",
+                            "whatsapp",
+                            "instagram",
+                            "maps_url",
+                            "hours",
+                            "price_note"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "address": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "timezone": {
+                              "type": "string"
+                            },
+                            "template": {
+                              "enum": ["foto", "papan", "hangat"]
+                            },
+                            "accent_color": {
+                              "type": "string"
+                            },
+                            "logo": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": ["url_small", "url_large", "width", "height"],
+                                  "properties": {
+                                    "url_small": {
+                                      "type": "string"
+                                    },
+                                    "url_large": {
+                                      "type": "string"
+                                    },
+                                    "width": {
+                                      "type": "integer"
+                                    },
+                                    "height": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "cover": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": ["url_small", "url_large", "width", "height"],
+                                  "properties": {
+                                    "url_small": {
+                                      "type": "string"
+                                    },
+                                    "url_large": {
+                                      "type": "string"
+                                    },
+                                    "width": {
+                                      "type": "integer"
+                                    },
+                                    "height": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "whatsapp": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "instagram": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "maps_url": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "hours": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": ["weekday", "opens", "closes"],
+                                "properties": {
+                                  "weekday": {
+                                    "type": "integer"
+                                  },
+                                  "opens": {
+                                    "type": "string"
+                                  },
+                                  "closes": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
+                              }
+                            },
+                            "price_note": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "required": ["tax_name", "service_charge"],
+                                  "properties": {
+                                    "tax_name": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "service_charge": {
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "recommended": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
+                        },
+                        "categories": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": ["id", "name", "items"],
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "items": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "required": ["id", "name", "price", "sold_out", "recommended", "photo"],
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "price": {
+                                      "type": "integer"
+                                    },
+                                    "sold_out": {
+                                      "type": "boolean"
+                                    },
+                                    "recommended": {
+                                      "type": "boolean"
+                                    },
+                                    "photo": {
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "required": ["url_small", "url_large", "width", "height"],
+                                          "properties": {
+                                            "url_small": {
+                                              "type": "string"
+                                            },
+                                            "url_large": {
+                                              "type": "string"
+                                            },
+                                            "width": {
+                                              "type": "integer"
+                                            },
+                                            "height": {
+                                              "type": "integer"
+                                            }
+                                          },
+                                          "additionalProperties": false
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        },
+                        "gallery": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        },
+                        "menu_version": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "required": ["kind", "slug"],
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": ["moved"]
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  ]
                 }
               }
             }
