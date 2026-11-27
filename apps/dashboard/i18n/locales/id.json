@@ -634,6 +634,8 @@
     "card_footer": "Menu oleh ZuruPOS",
     "card_no_slug": "Atur alamat menu dulu di halaman Menu online.",
     "print": "Cetak",
-    "print_help": "Ukuran A6 (10,5 × 14,8 cm). Pilih \"Simpan sebagai PDF\" untuk menyimpan."
+    "print_help": "Ukuran A6 (10,5 × 14,8 cm). Pilih \"Simpan sebagai PDF\" untuk menyimpan.",
+    "preview": "Pratinjau",
+    "preview_help": "Pratinjau halaman (ikut pilihan tampilan sebelum disimpan)"
   }
 }

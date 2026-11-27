@@ -2,6 +2,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-11-01',
   modules: ['@nuxt/ui', '@nuxtjs/i18n', '@nuxt/eslint'],
   css: ['~/assets/css/main.css'],
+  // The online menu preview renders the real page components (D-082).
+  build: { transpile: ['@zurupos/menu-ui'] },
   devtools: { enabled: false },
   app: {
     head: {

@@ -19,6 +19,7 @@
     "@nuxtjs/i18n": "^10.6.0",
     "@sentry/vue": "^11.14.0",
     "@zurupos/api-client": "workspace:*",
+    "@zurupos/menu-ui": "workspace:*",
     "nuxt": "^4.6.4",
     "openapi-fetch": "^0.17.0",
     "qrcode": "^1.5.4",

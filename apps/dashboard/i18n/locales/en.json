@@ -634,6 +634,8 @@
     "card_footer": "Menu by ZuruPOS",
     "card_no_slug": "Set the menu address on the Online menu page first.",
     "print": "Print",
-    "print_help": "A6 size (10.5 × 14.8 cm). Choose \"Save as PDF\" to keep a file."
+    "print_help": "A6 size (10.5 × 14.8 cm). Choose \"Save as PDF\" to keep a file.",
+    "preview": "Preview",
+    "preview_help": "Page preview (follows the look before you save)"
   }
 }
