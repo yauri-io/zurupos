@@ -636,6 +636,16 @@
     "print": "Print",
     "print_help": "A6 size (10.5 × 14.8 cm). Choose \"Save as PDF\" to keep a file.",
     "preview": "Preview",
-    "preview_help": "Page preview (follows the look before you save)"
+    "preview_help": "Page preview (follows the look before you save)",
+    "views": {
+      "title": "Views",
+      "help": "An estimate of how often the online menu was opened. No cookies; WhatsApp/Instagram link previews and search engines are not counted, and one phone counts once per 30 minutes. Not a number of people.",
+      "times": "opened {n} times",
+      "today": "Today",
+      "last_7": "Last 7 days",
+      "previous_7": "The 7 days before: {n}",
+      "last_30": "Last 30 days",
+      "split": "In 30 days: {qr} from the QR code, {link} from a link."
+    }
   }
 }

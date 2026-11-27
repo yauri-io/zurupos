@@ -32,6 +32,25 @@ const menu = result.kind === 'menu' ? result.menu : null
 // Always ask again: the page follows the POS (prices, Habis) within ~15 s.
 if (import.meta.server) useResponseHeader('cache-control').value = 'no-cache'
 
+// One view per page load (O3, D-083): a beacon after load, `qr` when the URL
+// came from the QR code. The dashboard preview renders MenuPage directly, not
+// this page, so it never sends one.
+onMounted(() => {
+  if (!menu) return
+  const source = route.query['s'] === 'qr' ? 'qr' : 'link'
+  try {
+    navigator.sendBeacon(`/v1/public/menus/${encodeURIComponent(slug)}/views`, JSON.stringify({ source }))
+  } catch {
+    // Counting is best effort; the page never depends on it.
+  }
+  // A link copied from this page shouldn't count as a QR scan.
+  if (source === 'qr') {
+    const url = new URL(window.location.href)
+    url.searchParams.delete('s')
+    window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash)
+  }
+})
+
 if (menu) {
   const canonical = `${config.public.siteUrl}/${slug}`
   const seo = menuSeo(menu, canonical, locale.value)

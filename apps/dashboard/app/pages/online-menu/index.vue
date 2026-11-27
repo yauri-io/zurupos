@@ -315,6 +315,9 @@ const copyToAll = (row: HoursRow) => {
           </div>
         </UCard>
 
+        <!-- Dilihat (F19): only once the menu has an address. -->
+        <OnlineMenuViews v-if="menu.slug" />
+
         <!-- Tampilan -->
         <UCard>
           <template #header>

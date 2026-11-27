@@ -12,6 +12,12 @@ const MENU = process.env.MENU_URL ?? 'http://localhost:3001'
 const ORIGIN = process.env.DASHBOARD_URL ?? 'http://localhost:3000'
 const headers = { 'x-requested-with': 'zuru', origin: ORIGIN }
 const TEMPLATES = ['papan', 'foto', 'hangat'] as const
+// Headless Chrome is on the bot list (D-083), so visitors use phone user agents.
+const PHONE_1 =
+  'Mozilla/5.0 (Linux; Android 14; SM-A155F) AppleWebKit/537.36 Chrome/131.0 Mobile Safari/537.36'
+const PHONE_2 =
+  'Mozilla/5.0 (Linux; Android 13; Redmi Note 12) AppleWebKit/537.36 Chrome/130.0 Mobile Safari/537.36'
+const isBeacon = (url: string) => /\/v1\/public\/menus\/[^/]+\/views$/.test(url)
 // The menu app keeps each slug's payload for 15 s (§12.7); changes show within that.
 const CACHE_WAIT = { timeout: 25_000, intervals: [1000] }
 
@@ -75,6 +81,11 @@ test('publish in the dashboard, then the public page in every template', async (
   test.setTimeout(420_000)
   const signup = await page.request.post(`${API}/v1/auth/signup`, { headers, data: owner })
   expect(signup.status(), await signup.text()).toBe(201)
+  // The dashboard (and its preview) must never send a view beacon (§12.7).
+  const dashboardBeacons: string[] = []
+  page.on('request', (r) => {
+    if (isBeacon(r.url())) dashboardBeacons.push(r.url())
+  })
   await page.goto('/')
 
   // The menu: two categories, a sold-out item, two recommended, one hidden online.
@@ -135,7 +146,7 @@ test('publish in the dashboard, then the public page in every template', async (
   await page.getByTestId('templates').getByText('Papan', { exact: true }).click()
 
   // The public page, in a fresh context (no dashboard cookie) like a customer.
-  const visitor = await browser.newContext({ locale: 'id-ID' })
+  const visitor = await browser.newContext({ locale: 'id-ID', userAgent: PHONE_1 })
   const pub = await visitor.newPage()
   const problems: string[] = []
   pub.on('console', (m) => {
@@ -256,6 +267,27 @@ test('publish in the dashboard, then the public page in every template', async (
   expect(moved.headers()['location']).toMatch(new RegExp(`/${slug}\\?s=qr$`))
 
   expect(problems).toEqual([])
+
+  // Views (O3): the first phone opened the page many times → one link view;
+  // a second phone scanning the QR code → one QR view, and ?s=qr leaves the URL.
+  const scanner = await browser.newContext({ locale: 'id-ID', userAgent: PHONE_2 })
+  const scan = await scanner.newPage()
+  const sent = scan.waitForRequest((r) => isBeacon(r.url()))
+  await scan.goto(`${MENU}/${slug}?s=qr`)
+  expect((await sent).postData()).toBe('{"source":"qr"}')
+  await expect(scan).toHaveURL(`${MENU}/${slug}`)
+  await scanner.close()
+  type Views = { today: number; days: { qr: number; link: number }[] }
+  const views = async () =>
+    (await (await page.request.get(`${API}/v1/online-menu/views`, { headers })).json()) as Views
+  await expect
+    .poll(async () => (await views()).days.at(-1), { timeout: 10_000 })
+    .toMatchObject({ qr: 1, link: 1 })
+  expect((await views()).today).toBe(2)
+  await page.goto('/online-menu')
+  await expect(page.getByTestId('views-today')).toHaveText('2 kali dibuka')
+  await expect(page.getByTestId('views-split')).toHaveText('Dalam 30 hari: 1 dari kode QR, 1 dari link.')
+  expect(dashboardBeacons).toEqual([])
 
   // Unpublishing → 404 within 15 s.
   await page.getByTestId('publish-switch').click()

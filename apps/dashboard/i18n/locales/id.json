@@ -636,6 +636,16 @@
     "print": "Cetak",
     "print_help": "Ukuran A6 (10,5 × 14,8 cm). Pilih \"Simpan sebagai PDF\" untuk menyimpan.",
     "preview": "Pratinjau",
-    "preview_help": "Pratinjau halaman (ikut pilihan tampilan sebelum disimpan)"
+    "preview_help": "Pratinjau halaman (ikut pilihan tampilan sebelum disimpan)",
+    "views": {
+      "title": "Dilihat",
+      "help": "Perkiraan berapa kali menu online dibuka. Tanpa cookie; pratinjau link di WhatsApp/Instagram dan mesin pencari tidak dihitung, dan satu HP dihitung sekali per 30 menit. Bukan jumlah orang.",
+      "times": "{n} kali dibuka",
+      "today": "Hari ini",
+      "last_7": "7 hari terakhir",
+      "previous_7": "7 hari sebelumnya: {n}",
+      "last_30": "30 hari terakhir",
+      "split": "Dalam 30 hari: {qr} dari kode QR, {link} dari link."
+    }
   }
 }
