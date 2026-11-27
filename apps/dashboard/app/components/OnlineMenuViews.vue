@@ -46,7 +46,7 @@ const count = (v: number) => t('online_menu.views.times', { n: v })
       </div>
       <div>
         <p class="text-sm text-muted mb-2">{{ t('online_menu.views.last_30') }}</p>
-        <BarChart :points="points" :format="count" />
+        <BarChart :points="points" :format="count" start-at-end data-testid="views-chart" />
       </div>
       <p class="text-sm" data-testid="views-split">
         {{ t('online_menu.views.split', { qr, link }) }}

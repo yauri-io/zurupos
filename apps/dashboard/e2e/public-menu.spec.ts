@@ -287,6 +287,12 @@ test('publish in the dashboard, then the public page in every template', async (
   await page.goto('/online-menu')
   await expect(page.getByTestId('views-today')).toHaveText('2 kali dibuka')
   await expect(page.getByTestId('views-split')).toHaveText('Dalam 30 hari: 1 dari kode QR, 1 dari link.')
+  // 30 bars don't fit the card, so the chart opens on the newest day (today).
+  const chart = page.getByTestId('views-chart')
+  await expect
+    .poll(() => chart.evaluate((el) => el.scrollWidth - el.clientWidth - el.scrollLeft))
+    .toBeLessThanOrEqual(1)
+  expect(await chart.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true)
   expect(dashboardBeacons).toEqual([])
 
   // Unpublishing → 404 within 15 s.
