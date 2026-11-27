@@ -2032,7 +2032,10 @@
                           "sort",
                           "is_active",
                           "is_available",
-                          "modifier_group_ids"
+                          "modifier_group_ids",
+                          "show_online",
+                          "is_recommended",
+                          "photo"
                         ],
                         "properties": {
                           "id": {
@@ -2067,6 +2070,37 @@
                               "type": "string",
                               "format": "uuid"
                             }
+                          },
+                          "show_online": {
+                            "type": "boolean"
+                          },
+                          "is_recommended": {
+                            "type": "boolean"
+                          },
+                          "photo": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": ["url_small", "url_large", "width", "height"],
+                                "properties": {
+                                  "url_small": {
+                                    "type": "string"
+                                  },
+                                  "url_large": {
+                                    "type": "string"
+                                  },
+                                  "width": {
+                                    "type": "integer"
+                                  },
+                                  "height": {
+                                    "type": "integer"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         }
                       }
@@ -2154,7 +2188,10 @@
                     "sort",
                     "is_active",
                     "is_available",
-                    "modifier_group_ids"
+                    "modifier_group_ids",
+                    "show_online",
+                    "is_recommended",
+                    "photo"
                   ],
                   "properties": {
                     "id": {
@@ -2189,6 +2226,37 @@
                         "type": "string",
                         "format": "uuid"
                       }
+                    },
+                    "show_online": {
+                      "type": "boolean"
+                    },
+                    "is_recommended": {
+                      "type": "boolean"
+                    },
+                    "photo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   }
                 }
@@ -2228,7 +2296,10 @@
                     "sort",
                     "is_active",
                     "is_available",
-                    "modifier_group_ids"
+                    "modifier_group_ids",
+                    "show_online",
+                    "is_recommended",
+                    "photo"
                   ],
                   "properties": {
                     "id": {
@@ -2263,6 +2334,37 @@
                         "type": "string",
                         "format": "uuid"
                       }
+                    },
+                    "show_online": {
+                      "type": "boolean"
+                    },
+                    "is_recommended": {
+                      "type": "boolean"
+                    },
+                    "photo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   }
                 }
@@ -2323,6 +2425,12 @@
                   },
                   "is_available": {
                     "type": "boolean"
+                  },
+                  "show_online": {
+                    "type": "boolean"
+                  },
+                  "is_recommended": {
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
@@ -2357,7 +2465,10 @@
                     "sort",
                     "is_active",
                     "is_available",
-                    "modifier_group_ids"
+                    "modifier_group_ids",
+                    "show_online",
+                    "is_recommended",
+                    "photo"
                   ],
                   "properties": {
                     "id": {
@@ -2392,6 +2503,37 @@
                         "type": "string",
                         "format": "uuid"
                       }
+                    },
+                    "show_online": {
+                      "type": "boolean"
+                    },
+                    "is_recommended": {
+                      "type": "boolean"
+                    },
+                    "photo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   }
                 }
@@ -2503,7 +2645,8 @@
                         "format": "uuid"
                       }
                     }
-                  }
+                  },
+                  "additionalProperties": false
                 }
               }
             }
@@ -2564,7 +2707,10 @@
                     "sort",
                     "is_active",
                     "is_available",
-                    "modifier_group_ids"
+                    "modifier_group_ids",
+                    "show_online",
+                    "is_recommended",
+                    "photo"
                   ],
                   "properties": {
                     "id": {
@@ -2599,6 +2745,37 @@
                         "type": "string",
                         "format": "uuid"
                       }
+                    },
+                    "show_online": {
+                      "type": "boolean"
+                    },
+                    "is_recommended": {
+                      "type": "boolean"
+                    },
+                    "photo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   }
                 }
@@ -9219,6 +9396,3234 @@
                           }
                         }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/online-menu": {
+      "get": {
+        "tags": ["online-menu"],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "address",
+                    "is_published",
+                    "published_at",
+                    "slug",
+                    "public_url",
+                    "qr_url",
+                    "description",
+                    "template",
+                    "accent_color",
+                    "whatsapp",
+                    "instagram",
+                    "maps_url",
+                    "logo",
+                    "cover",
+                    "hours",
+                    "gallery",
+                    "recommended_count",
+                    "limits"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "is_published": {
+                      "type": "boolean"
+                    },
+                    "published_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "slug": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "public_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "qr_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "template": {
+                      "enum": ["foto", "papan", "hangat"]
+                    },
+                    "accent_color": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "instagram": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maps_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "logo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cover": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "opens", "closes"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 7
+                          },
+                          "opens": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          },
+                          "closes": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          }
+                        }
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "image"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "image": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "recommended_count": {
+                      "type": "integer"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "required": ["recommended", "gallery", "description"],
+                      "properties": {
+                        "recommended": {
+                          "type": "integer"
+                        },
+                        "gallery": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["online-menu"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){2,39}$"
+                  },
+                  "description": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 160
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "template": {
+                    "enum": ["foto", "papan", "hangat"]
+                  },
+                  "accent_color": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "whatsapp": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^62[0-9]{8,13}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "instagram": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[a-z0-9._]{1,30}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "maps_url": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 500
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "address",
+                    "is_published",
+                    "published_at",
+                    "slug",
+                    "public_url",
+                    "qr_url",
+                    "description",
+                    "template",
+                    "accent_color",
+                    "whatsapp",
+                    "instagram",
+                    "maps_url",
+                    "logo",
+                    "cover",
+                    "hours",
+                    "gallery",
+                    "recommended_count",
+                    "limits"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "is_published": {
+                      "type": "boolean"
+                    },
+                    "published_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "slug": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "public_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "qr_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "template": {
+                      "enum": ["foto", "papan", "hangat"]
+                    },
+                    "accent_color": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "instagram": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maps_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "logo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cover": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "opens", "closes"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 7
+                          },
+                          "opens": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          },
+                          "closes": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          }
+                        }
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "image"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "image": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "recommended_count": {
+                      "type": "integer"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "required": ["recommended", "gallery", "description"],
+                      "properties": {
+                        "recommended": {
+                          "type": "integer"
+                        },
+                        "gallery": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/online-menu/hours": {
+      "put": {
+        "tags": ["online-menu"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["hours"],
+                "properties": {
+                  "hours": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["weekday", "opens", "closes"],
+                      "properties": {
+                        "weekday": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 7
+                        },
+                        "opens": {
+                          "type": "string",
+                          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                        },
+                        "closes": {
+                          "type": "string",
+                          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                        }
+                      }
+                    },
+                    "maxItems": 7
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "address",
+                    "is_published",
+                    "published_at",
+                    "slug",
+                    "public_url",
+                    "qr_url",
+                    "description",
+                    "template",
+                    "accent_color",
+                    "whatsapp",
+                    "instagram",
+                    "maps_url",
+                    "logo",
+                    "cover",
+                    "hours",
+                    "gallery",
+                    "recommended_count",
+                    "limits"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "is_published": {
+                      "type": "boolean"
+                    },
+                    "published_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "slug": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "public_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "qr_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "template": {
+                      "enum": ["foto", "papan", "hangat"]
+                    },
+                    "accent_color": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "instagram": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maps_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "logo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cover": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "opens", "closes"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 7
+                          },
+                          "opens": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          },
+                          "closes": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          }
+                        }
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "image"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "image": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "recommended_count": {
+                      "type": "integer"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "required": ["recommended", "gallery", "description"],
+                      "properties": {
+                        "recommended": {
+                          "type": "integer"
+                        },
+                        "gallery": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/online-menu/publish": {
+      "post": {
+        "tags": ["online-menu"],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "address",
+                    "is_published",
+                    "published_at",
+                    "slug",
+                    "public_url",
+                    "qr_url",
+                    "description",
+                    "template",
+                    "accent_color",
+                    "whatsapp",
+                    "instagram",
+                    "maps_url",
+                    "logo",
+                    "cover",
+                    "hours",
+                    "gallery",
+                    "recommended_count",
+                    "limits"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "is_published": {
+                      "type": "boolean"
+                    },
+                    "published_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "slug": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "public_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "qr_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "template": {
+                      "enum": ["foto", "papan", "hangat"]
+                    },
+                    "accent_color": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "instagram": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maps_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "logo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cover": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "opens", "closes"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 7
+                          },
+                          "opens": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          },
+                          "closes": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          }
+                        }
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "image"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "image": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "recommended_count": {
+                      "type": "integer"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "required": ["recommended", "gallery", "description"],
+                      "properties": {
+                        "recommended": {
+                          "type": "integer"
+                        },
+                        "gallery": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/online-menu/unpublish": {
+      "post": {
+        "tags": ["online-menu"],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "address",
+                    "is_published",
+                    "published_at",
+                    "slug",
+                    "public_url",
+                    "qr_url",
+                    "description",
+                    "template",
+                    "accent_color",
+                    "whatsapp",
+                    "instagram",
+                    "maps_url",
+                    "logo",
+                    "cover",
+                    "hours",
+                    "gallery",
+                    "recommended_count",
+                    "limits"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "is_published": {
+                      "type": "boolean"
+                    },
+                    "published_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "slug": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "public_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "qr_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "template": {
+                      "enum": ["foto", "papan", "hangat"]
+                    },
+                    "accent_color": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "instagram": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maps_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "logo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cover": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "opens", "closes"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 7
+                          },
+                          "opens": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          },
+                          "closes": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          }
+                        }
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "image"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "image": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "recommended_count": {
+                      "type": "integer"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "required": ["recommended", "gallery", "description"],
+                      "properties": {
+                        "recommended": {
+                          "type": "integer"
+                        },
+                        "gallery": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/online-menu/logo": {
+      "put": {
+        "tags": ["online-menu"],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "address",
+                    "is_published",
+                    "published_at",
+                    "slug",
+                    "public_url",
+                    "qr_url",
+                    "description",
+                    "template",
+                    "accent_color",
+                    "whatsapp",
+                    "instagram",
+                    "maps_url",
+                    "logo",
+                    "cover",
+                    "hours",
+                    "gallery",
+                    "recommended_count",
+                    "limits"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "is_published": {
+                      "type": "boolean"
+                    },
+                    "published_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "slug": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "public_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "qr_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "template": {
+                      "enum": ["foto", "papan", "hangat"]
+                    },
+                    "accent_color": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "instagram": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maps_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "logo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cover": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "opens", "closes"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 7
+                          },
+                          "opens": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          },
+                          "closes": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          }
+                        }
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "image"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "image": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "recommended_count": {
+                      "type": "integer"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "required": ["recommended", "gallery", "description"],
+                      "properties": {
+                        "recommended": {
+                          "type": "integer"
+                        },
+                        "gallery": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["online-menu"],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "address",
+                    "is_published",
+                    "published_at",
+                    "slug",
+                    "public_url",
+                    "qr_url",
+                    "description",
+                    "template",
+                    "accent_color",
+                    "whatsapp",
+                    "instagram",
+                    "maps_url",
+                    "logo",
+                    "cover",
+                    "hours",
+                    "gallery",
+                    "recommended_count",
+                    "limits"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "is_published": {
+                      "type": "boolean"
+                    },
+                    "published_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "slug": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "public_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "qr_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "template": {
+                      "enum": ["foto", "papan", "hangat"]
+                    },
+                    "accent_color": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "instagram": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maps_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "logo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cover": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "opens", "closes"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 7
+                          },
+                          "opens": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          },
+                          "closes": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          }
+                        }
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "image"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "image": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "recommended_count": {
+                      "type": "integer"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "required": ["recommended", "gallery", "description"],
+                      "properties": {
+                        "recommended": {
+                          "type": "integer"
+                        },
+                        "gallery": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/online-menu/cover": {
+      "put": {
+        "tags": ["online-menu"],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "address",
+                    "is_published",
+                    "published_at",
+                    "slug",
+                    "public_url",
+                    "qr_url",
+                    "description",
+                    "template",
+                    "accent_color",
+                    "whatsapp",
+                    "instagram",
+                    "maps_url",
+                    "logo",
+                    "cover",
+                    "hours",
+                    "gallery",
+                    "recommended_count",
+                    "limits"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "is_published": {
+                      "type": "boolean"
+                    },
+                    "published_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "slug": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "public_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "qr_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "template": {
+                      "enum": ["foto", "papan", "hangat"]
+                    },
+                    "accent_color": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "instagram": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maps_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "logo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cover": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "opens", "closes"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 7
+                          },
+                          "opens": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          },
+                          "closes": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          }
+                        }
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "image"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "image": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "recommended_count": {
+                      "type": "integer"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "required": ["recommended", "gallery", "description"],
+                      "properties": {
+                        "recommended": {
+                          "type": "integer"
+                        },
+                        "gallery": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["online-menu"],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "address",
+                    "is_published",
+                    "published_at",
+                    "slug",
+                    "public_url",
+                    "qr_url",
+                    "description",
+                    "template",
+                    "accent_color",
+                    "whatsapp",
+                    "instagram",
+                    "maps_url",
+                    "logo",
+                    "cover",
+                    "hours",
+                    "gallery",
+                    "recommended_count",
+                    "limits"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "is_published": {
+                      "type": "boolean"
+                    },
+                    "published_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "slug": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "public_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "qr_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "template": {
+                      "enum": ["foto", "papan", "hangat"]
+                    },
+                    "accent_color": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "instagram": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maps_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "logo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cover": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "opens", "closes"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 7
+                          },
+                          "opens": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          },
+                          "closes": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          }
+                        }
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "image"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "image": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "recommended_count": {
+                      "type": "integer"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "required": ["recommended", "gallery", "description"],
+                      "properties": {
+                        "recommended": {
+                          "type": "integer"
+                        },
+                        "gallery": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/online-menu/gallery": {
+      "post": {
+        "tags": ["online-menu"],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "address",
+                    "is_published",
+                    "published_at",
+                    "slug",
+                    "public_url",
+                    "qr_url",
+                    "description",
+                    "template",
+                    "accent_color",
+                    "whatsapp",
+                    "instagram",
+                    "maps_url",
+                    "logo",
+                    "cover",
+                    "hours",
+                    "gallery",
+                    "recommended_count",
+                    "limits"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "is_published": {
+                      "type": "boolean"
+                    },
+                    "published_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "slug": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "public_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "qr_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "template": {
+                      "enum": ["foto", "papan", "hangat"]
+                    },
+                    "accent_color": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "instagram": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maps_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "logo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cover": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "opens", "closes"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 7
+                          },
+                          "opens": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          },
+                          "closes": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          }
+                        }
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "image"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "image": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "recommended_count": {
+                      "type": "integer"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "required": ["recommended", "gallery", "description"],
+                      "properties": {
+                        "recommended": {
+                          "type": "integer"
+                        },
+                        "gallery": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/online-menu/gallery/{id}": {
+      "delete": {
+        "tags": ["online-menu"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "address",
+                    "is_published",
+                    "published_at",
+                    "slug",
+                    "public_url",
+                    "qr_url",
+                    "description",
+                    "template",
+                    "accent_color",
+                    "whatsapp",
+                    "instagram",
+                    "maps_url",
+                    "logo",
+                    "cover",
+                    "hours",
+                    "gallery",
+                    "recommended_count",
+                    "limits"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "is_published": {
+                      "type": "boolean"
+                    },
+                    "published_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "slug": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "public_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "qr_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "template": {
+                      "enum": ["foto", "papan", "hangat"]
+                    },
+                    "accent_color": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "instagram": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maps_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "logo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "cover": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "hours": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["weekday", "opens", "closes"],
+                        "properties": {
+                          "weekday": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 7
+                          },
+                          "opens": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          },
+                          "closes": {
+                            "type": "string",
+                            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                          }
+                        }
+                      }
+                    },
+                    "gallery": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "image"],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "image": {
+                            "type": "object",
+                            "required": ["url_small", "url_large", "width", "height"],
+                            "properties": {
+                              "url_small": {
+                                "type": "string"
+                              },
+                              "url_large": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": "integer"
+                              },
+                              "height": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "recommended_count": {
+                      "type": "integer"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "required": ["recommended", "gallery", "description"],
+                      "properties": {
+                        "recommended": {
+                          "type": "integer"
+                        },
+                        "gallery": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/items/{id}/photo": {
+      "put": {
+        "tags": ["online-menu"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "category_id",
+                    "name",
+                    "price",
+                    "color",
+                    "sort",
+                    "is_active",
+                    "is_available",
+                    "modifier_group_ids",
+                    "show_online",
+                    "is_recommended",
+                    "photo"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "category_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "price": {
+                      "type": "integer"
+                    },
+                    "color": {
+                      "type": "string"
+                    },
+                    "sort": {
+                      "type": "integer"
+                    },
+                    "is_active": {
+                      "type": "boolean"
+                    },
+                    "is_available": {
+                      "type": "boolean"
+                    },
+                    "modifier_group_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "show_online": {
+                      "type": "boolean"
+                    },
+                    "is_recommended": {
+                      "type": "boolean"
+                    },
+                    "photo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["online-menu"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "category_id",
+                    "name",
+                    "price",
+                    "color",
+                    "sort",
+                    "is_active",
+                    "is_available",
+                    "modifier_group_ids",
+                    "show_online",
+                    "is_recommended",
+                    "photo"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "category_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "price": {
+                      "type": "integer"
+                    },
+                    "color": {
+                      "type": "string"
+                    },
+                    "sort": {
+                      "type": "integer"
+                    },
+                    "is_active": {
+                      "type": "boolean"
+                    },
+                    "is_available": {
+                      "type": "boolean"
+                    },
+                    "modifier_group_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "show_online": {
+                      "type": "boolean"
+                    },
+                    "is_recommended": {
+                      "type": "boolean"
+                    },
+                    "photo": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": ["url_small", "url_large", "width", "height"],
+                          "properties": {
+                            "url_small": {
+                              "type": "string"
+                            },
+                            "url_large": {
+                              "type": "string"
+                            },
+                            "width": {
+                              "type": "integer"
+                            },
+                            "height": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   }
                 }

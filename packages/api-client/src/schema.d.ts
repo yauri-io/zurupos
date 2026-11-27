@@ -1191,6 +1191,14 @@ export interface paths {
                 is_active: boolean
                 is_available: boolean
                 modifier_group_ids: string[]
+                show_online: boolean
+                is_recommended: boolean
+                photo: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                } | null
               }[]
             }
           }
@@ -1253,6 +1261,14 @@ export interface paths {
               is_active: boolean
               is_available: boolean
               modifier_group_ids: string[]
+              show_online: boolean
+              is_recommended: boolean
+              photo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
             }
           }
         }
@@ -1300,6 +1316,14 @@ export interface paths {
               is_active: boolean
               is_available: boolean
               modifier_group_ids: string[]
+              show_online: boolean
+              is_recommended: boolean
+              photo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
             }
           }
         }
@@ -1364,6 +1388,8 @@ export interface paths {
             sort?: number
             is_active?: boolean
             is_available?: boolean
+            show_online?: boolean
+            is_recommended?: boolean
           }
         }
       }
@@ -1386,6 +1412,14 @@ export interface paths {
               is_active: boolean
               is_available: boolean
               modifier_group_ids: string[]
+              show_online: boolean
+              is_recommended: boolean
+              photo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
             }
           }
         }
@@ -1491,6 +1525,14 @@ export interface paths {
               is_active: boolean
               is_available: boolean
               modifier_group_ids: string[]
+              show_online: boolean
+              is_recommended: boolean
+              photo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
             }
           }
         }
@@ -4203,6 +4245,994 @@ export interface paths {
     put?: never
     post?: never
     delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/online-menu': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              name: string
+              address: string | null
+              is_published: boolean
+              published_at: string | null
+              slug: string | null
+              public_url: string | null
+              qr_url: string | null
+              description: string | null
+              /** @enum {unknown} */
+              template: 'foto' | 'papan' | 'hangat'
+              accent_color: string
+              whatsapp: string | null
+              instagram: string | null
+              maps_url: string | null
+              logo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              cover: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              hours: {
+                weekday: number
+                opens: string
+                closes: string
+              }[]
+              gallery: {
+                /** Format: uuid */
+                id: string
+                image: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                }
+              }[]
+              recommended_count: number
+              limits: {
+                recommended: number
+                gallery: number
+                description: number
+              }
+            }
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': {
+            slug?: string
+            description?: string | null
+            /** @enum {unknown} */
+            template?: 'foto' | 'papan' | 'hangat'
+            accent_color?: string
+            whatsapp?: string | null
+            instagram?: string | null
+            maps_url?: string | null
+          }
+        }
+      }
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              name: string
+              address: string | null
+              is_published: boolean
+              published_at: string | null
+              slug: string | null
+              public_url: string | null
+              qr_url: string | null
+              description: string | null
+              /** @enum {unknown} */
+              template: 'foto' | 'papan' | 'hangat'
+              accent_color: string
+              whatsapp: string | null
+              instagram: string | null
+              maps_url: string | null
+              logo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              cover: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              hours: {
+                weekday: number
+                opens: string
+                closes: string
+              }[]
+              gallery: {
+                /** Format: uuid */
+                id: string
+                image: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                }
+              }[]
+              recommended_count: number
+              limits: {
+                recommended: number
+                gallery: number
+                description: number
+              }
+            }
+          }
+        }
+      }
+    }
+    trace?: never
+  }
+  '/v1/online-menu/hours': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          'application/json': {
+            hours: {
+              weekday: number
+              opens: string
+              closes: string
+            }[]
+          }
+        }
+      }
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              name: string
+              address: string | null
+              is_published: boolean
+              published_at: string | null
+              slug: string | null
+              public_url: string | null
+              qr_url: string | null
+              description: string | null
+              /** @enum {unknown} */
+              template: 'foto' | 'papan' | 'hangat'
+              accent_color: string
+              whatsapp: string | null
+              instagram: string | null
+              maps_url: string | null
+              logo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              cover: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              hours: {
+                weekday: number
+                opens: string
+                closes: string
+              }[]
+              gallery: {
+                /** Format: uuid */
+                id: string
+                image: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                }
+              }[]
+              recommended_count: number
+              limits: {
+                recommended: number
+                gallery: number
+                description: number
+              }
+            }
+          }
+        }
+      }
+    }
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/online-menu/publish': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              name: string
+              address: string | null
+              is_published: boolean
+              published_at: string | null
+              slug: string | null
+              public_url: string | null
+              qr_url: string | null
+              description: string | null
+              /** @enum {unknown} */
+              template: 'foto' | 'papan' | 'hangat'
+              accent_color: string
+              whatsapp: string | null
+              instagram: string | null
+              maps_url: string | null
+              logo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              cover: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              hours: {
+                weekday: number
+                opens: string
+                closes: string
+              }[]
+              gallery: {
+                /** Format: uuid */
+                id: string
+                image: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                }
+              }[]
+              recommended_count: number
+              limits: {
+                recommended: number
+                gallery: number
+                description: number
+              }
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/online-menu/unpublish': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              name: string
+              address: string | null
+              is_published: boolean
+              published_at: string | null
+              slug: string | null
+              public_url: string | null
+              qr_url: string | null
+              description: string | null
+              /** @enum {unknown} */
+              template: 'foto' | 'papan' | 'hangat'
+              accent_color: string
+              whatsapp: string | null
+              instagram: string | null
+              maps_url: string | null
+              logo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              cover: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              hours: {
+                weekday: number
+                opens: string
+                closes: string
+              }[]
+              gallery: {
+                /** Format: uuid */
+                id: string
+                image: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                }
+              }[]
+              recommended_count: number
+              limits: {
+                recommended: number
+                gallery: number
+                description: number
+              }
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/online-menu/logo': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              name: string
+              address: string | null
+              is_published: boolean
+              published_at: string | null
+              slug: string | null
+              public_url: string | null
+              qr_url: string | null
+              description: string | null
+              /** @enum {unknown} */
+              template: 'foto' | 'papan' | 'hangat'
+              accent_color: string
+              whatsapp: string | null
+              instagram: string | null
+              maps_url: string | null
+              logo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              cover: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              hours: {
+                weekday: number
+                opens: string
+                closes: string
+              }[]
+              gallery: {
+                /** Format: uuid */
+                id: string
+                image: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                }
+              }[]
+              recommended_count: number
+              limits: {
+                recommended: number
+                gallery: number
+                description: number
+              }
+            }
+          }
+        }
+      }
+    }
+    post?: never
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              name: string
+              address: string | null
+              is_published: boolean
+              published_at: string | null
+              slug: string | null
+              public_url: string | null
+              qr_url: string | null
+              description: string | null
+              /** @enum {unknown} */
+              template: 'foto' | 'papan' | 'hangat'
+              accent_color: string
+              whatsapp: string | null
+              instagram: string | null
+              maps_url: string | null
+              logo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              cover: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              hours: {
+                weekday: number
+                opens: string
+                closes: string
+              }[]
+              gallery: {
+                /** Format: uuid */
+                id: string
+                image: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                }
+              }[]
+              recommended_count: number
+              limits: {
+                recommended: number
+                gallery: number
+                description: number
+              }
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/online-menu/cover': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              name: string
+              address: string | null
+              is_published: boolean
+              published_at: string | null
+              slug: string | null
+              public_url: string | null
+              qr_url: string | null
+              description: string | null
+              /** @enum {unknown} */
+              template: 'foto' | 'papan' | 'hangat'
+              accent_color: string
+              whatsapp: string | null
+              instagram: string | null
+              maps_url: string | null
+              logo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              cover: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              hours: {
+                weekday: number
+                opens: string
+                closes: string
+              }[]
+              gallery: {
+                /** Format: uuid */
+                id: string
+                image: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                }
+              }[]
+              recommended_count: number
+              limits: {
+                recommended: number
+                gallery: number
+                description: number
+              }
+            }
+          }
+        }
+      }
+    }
+    post?: never
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              name: string
+              address: string | null
+              is_published: boolean
+              published_at: string | null
+              slug: string | null
+              public_url: string | null
+              qr_url: string | null
+              description: string | null
+              /** @enum {unknown} */
+              template: 'foto' | 'papan' | 'hangat'
+              accent_color: string
+              whatsapp: string | null
+              instagram: string | null
+              maps_url: string | null
+              logo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              cover: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              hours: {
+                weekday: number
+                opens: string
+                closes: string
+              }[]
+              gallery: {
+                /** Format: uuid */
+                id: string
+                image: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                }
+              }[]
+              recommended_count: number
+              limits: {
+                recommended: number
+                gallery: number
+                description: number
+              }
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/online-menu/gallery': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        201: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              name: string
+              address: string | null
+              is_published: boolean
+              published_at: string | null
+              slug: string | null
+              public_url: string | null
+              qr_url: string | null
+              description: string | null
+              /** @enum {unknown} */
+              template: 'foto' | 'papan' | 'hangat'
+              accent_color: string
+              whatsapp: string | null
+              instagram: string | null
+              maps_url: string | null
+              logo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              cover: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              hours: {
+                weekday: number
+                opens: string
+                closes: string
+              }[]
+              gallery: {
+                /** Format: uuid */
+                id: string
+                image: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                }
+              }[]
+              recommended_count: number
+              limits: {
+                recommended: number
+                gallery: number
+                description: number
+              }
+            }
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/online-menu/gallery/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              name: string
+              address: string | null
+              is_published: boolean
+              published_at: string | null
+              slug: string | null
+              public_url: string | null
+              qr_url: string | null
+              description: string | null
+              /** @enum {unknown} */
+              template: 'foto' | 'papan' | 'hangat'
+              accent_color: string
+              whatsapp: string | null
+              instagram: string | null
+              maps_url: string | null
+              logo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              cover: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+              hours: {
+                weekday: number
+                opens: string
+                closes: string
+              }[]
+              gallery: {
+                /** Format: uuid */
+                id: string
+                image: {
+                  url_small: string
+                  url_large: string
+                  width: number
+                  height: number
+                }
+              }[]
+              recommended_count: number
+              limits: {
+                recommended: number
+                gallery: number
+                description: number
+              }
+            }
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/items/{id}/photo': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              /** Format: uuid */
+              id: string
+              /** Format: uuid */
+              category_id: string
+              name: string
+              price: number
+              color: string
+              sort: number
+              is_active: boolean
+              is_available: boolean
+              modifier_group_ids: string[]
+              show_online: boolean
+              is_recommended: boolean
+              photo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+            }
+          }
+        }
+      }
+    }
+    post?: never
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': {
+              /** Format: uuid */
+              id: string
+              /** Format: uuid */
+              category_id: string
+              name: string
+              price: number
+              color: string
+              sort: number
+              is_active: boolean
+              is_available: boolean
+              modifier_group_ids: string[]
+              show_online: boolean
+              is_recommended: boolean
+              photo: {
+                url_small: string
+                url_large: string
+                width: number
+                height: number
+              } | null
+            }
+          }
+        }
+      }
+    }
     options?: never
     head?: never
     patch?: never
