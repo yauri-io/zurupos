@@ -93,6 +93,7 @@ pnpm --filter @zurupos/api test:rls       # SPEC §3.6 isolation suite only
 pnpm --filter @zurupos/api test test/auth # auth tests only
 pnpm --filter @zurupos/api test test/orders test/stock test/worker  # M3: orders, stock, email
 pnpm --filter @zurupos/api test test/scheduler test/reports  # R1–R3: reports and report emails
+pnpm --filter @zurupos/api test test/online-menu test/media  # O1: online menu, uploads, image pipeline
 python3 apps/api/scripts/pricing-cases.py # regenerate pricing fixtures (never edit by hand)
 
 # Lint / typecheck / format (all JS workspaces)

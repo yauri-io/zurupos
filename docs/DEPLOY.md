@@ -56,6 +56,17 @@ The nightly dumps are copied to an R2 bucket, so losing the VPS doesn't lose the
 
 The dumps hold the shop's sales, staff names and the hashed passwords and PINs. Keep the bucket private and the token limited to this one bucket.
 
+### Online menu photos: a second R2 bucket (before the first update with O1)
+
+From milestone O1 the API stores online-menu photos (SPEC §12.7, D-079) and **refuses to start without** `MEDIA_PUBLIC_BASE_URL` and `MENU_PUBLIC_BASE_URL`. Set this up before pulling those commits:
+
+1. **Create bucket** `zurupos-media`, location hint *Asia-Pacific*. This one is public, so keep it separate from `zurupos-backups`.
+2. In the bucket, **Settings → Custom Domains → Connect domain** `media.zurupos.com`. Leave the `r2.dev` URL off.
+3. **Create API token**: *Object Read & Write*, only on `zurupos-media`.
+4. In `deploy/.env.prod` (see `deploy/env.prod.example`): `MEDIA_DRIVER=s3`, `MEDIA_PUBLIC_BASE_URL=https://media.zurupos.com`, `MEDIA_S3_ENDPOINT` (the same host-only endpoint as for backups), `MEDIA_S3_BUCKET=zurupos-media`, `MEDIA_S3_ACCESS_KEY_ID`, `MEDIA_S3_SECRET_ACCESS_KEY`, `MENU_PUBLIC_BASE_URL=https://menu.zurupos.com`.
+
+The dashboard's CSP allows images from `MEDIA_PUBLIC_BASE_URL` (Caddyfile), so Caddy is rebuilt with that update. The `menu.` DNS record and its Caddy site come with O2; until then the menu link and QR codes point at an address that doesn't answer yet, so don't hand QR codes out before O2 is live.
+
 ## 4. Server setup (once)
 
 The server needs Docker with the Compose plugin and a checkout of this repository in `~/zurupos`.

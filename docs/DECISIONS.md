@@ -562,3 +562,14 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - **Audit:** profile fields, hours, logo, cover and gallery changes are `settings.change` with `entity_type = 'menu_profile'`; publish, unpublish and slug have their own actions. Item photo changes aren't audited (not in the §4.1 list).
 - **Storage:** the S3 driver uses `aws4fetch` (small, SigV4, path-style, region `auto` for R2) instead of the AWS SDK. Locally the API serves `MEDIA_LOCAL_DIR` under `/media/m/<file>` with `Cross-Origin-Resource-Policy: cross-origin`, hidden from OpenAPI (random keys, no tenant data). The dashboard CSP's `img-src` gets `MEDIA_PUBLIC_BASE_URL`.
 **Consequences:** Tests cover each rule; the RLS route sweep covers the new routes, uploads included (sent as real multipart).
+
+## D-087: Online menu dashboard choices (O1, 2026-11-27)
+**Context:** SPEC §12.7 describes the `/online-menu` page and the item card but not every interaction.
+**Decision:**
+- **Downsizing:** every photo is decoded in the browser and, when it is over 2000 px or 2 MB or not PNG/WebP, redrawn at ≤ 2000 px as JPEG 0.85 on a white background. A small PNG or WebP (a logo, typically) is sent as it is, so its transparency survives; the server converts it to WebP with alpha. If the browser can't decode a file, it's sent unchanged and the server's answer (`not_an_image`) is shown.
+- **Saving:** the address, *Tampilan*, *Profil* and *Jam buka* each have their own save button; the publish switch and the item card's switches save at once, like the sold-out toggle. Changing the address shows that the old one keeps working.
+- **Recommended count on the item page:** counted from `GET /items`, because a manager may edit items but `GET /online-menu` is owner-only. When five are recommended, the switch is off-limits for other items and says why; the API's `409` is the real guard.
+- **QR:** a 1024 px PNG with a 4-module quiet zone, named `menu-<slug>-qr.png`. The A6 card is a page of its own (`/online-menu/card`) that sets `@page { size: A6 }` only while it is open and is printed or saved as PDF from the browser's print dialog: shop name, logo when there is one, *Pindai untuk melihat menu dan harga*, the QR, the address and *Menu oleh ZuruPOS*.
+- **Hours form:** seven rows, each with a switch; a *Samakan semua hari* button on Monday copies its hours to every day. The note explains that a closing time earlier than the opening time means after midnight.
+- **Navigation:** *Menu online* in the sidebar for `online_menu.manage` (the owner), after *Diskon*. The Home setup checklist is unchanged (§12.7).
+**Consequences:** E2E `online-menu.spec.ts` covers the page at 375 px, the 3000 × 2000 photo going through the browser shrink, the QR file and the A6 card.
