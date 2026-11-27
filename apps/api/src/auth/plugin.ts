@@ -56,7 +56,9 @@ export const registerAuth = (app: App, { db, config }: { db: Database; config: C
     // Unknown routes fall through to the 404 handler without auth.
     if (!request.routeOptions.url) return
     const mode = request.routeOptions.config.auth ?? 'user'
-    checkCsrf(request, config)
+    // A route may opt out only if it takes no credentials at all.
+    const csrfExempt = mode === 'none' && request.routeOptions.config.csrf === false
+    if (!csrfExempt) checkCsrf(request, config)
     await authenticate(request, db, mode)
     const permission = request.routeOptions.config.permission
     if (permission !== undefined) {

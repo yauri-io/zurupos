@@ -25,6 +25,9 @@ declare module 'fastify' {
     // One permission, or a list meaning "any of these" (the service then decides
     // what each one allows, e.g. void directly vs. void with approval).
     permission?: Permission | readonly Permission[]
+    // Only for auth 'none' routes a browser calls without cookies and without
+    // custom headers (the online menu view beacon, D-092). Default true.
+    csrf?: boolean
   }
   interface FastifyRequest {
     auth: AuthContext | null

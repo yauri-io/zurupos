@@ -298,3 +298,18 @@ export const removeItemPhoto = async (trx: Tx, auth: AuthContext, deps: OnlineMe
   const replaced = await dropMedia(trx, auth.tenantId, item.photo_media_id)
   return { result: await getItem(trx, auth, deps, itemId), replaced }
 }
+
+// --- Views (O3, F19): today, the last 7 days against the 7 before, and the
+// daily series. Approximate by design (D-083).
+export const views = async (trx: Tx, auth: AuthContext, days: number) => {
+  const rows = await q.viewsByDay(trx, auth.tenantId, Math.max(days, 14))
+  const total = (r: { qr: number; link: number }) => r.qr + r.link
+  const sum = (list: typeof rows) => list.reduce((n, r) => n + total(r), 0)
+  const last = rows[rows.length - 1]
+  return {
+    today: last ? total(last) : 0,
+    last_7: sum(rows.slice(-7)),
+    previous_7: sum(rows.slice(-14, -7)),
+    days: rows.slice(-days),
+  }
+}

@@ -60,3 +60,17 @@ export const lowStockCount = async (trx: Tx, tenantId: string) =>
         .executeTakeFirstOrThrow()
     ).n,
   )
+
+// Views of the online menu in the week (O3, D-083), or null when the menu isn't
+// published: the weekly email shows the line only while it is (SPEC §12.7).
+export const menuViewsInPeriod = async (trx: Tx, tenantId: string, from: string, to: string) => {
+  const { rows } = await sql<{ published: boolean; qr: number; link: number }>`
+    select coalesce((select p.is_published from menu_profiles p where p.tenant_id = ${tenantId}), false) as published,
+           coalesce(sum(v.views) filter (where v.source = 'qr'), 0)::int as qr,
+           coalesce(sum(v.views) filter (where v.source = 'link'), 0)::int as link
+    from menu_views_daily v
+    where v.tenant_id = ${tenantId} and v.business_date between ${from}::date and ${to}::date
+  `.execute(trx)
+  const row = rows[0]
+  return row?.published ? { qr: row.qr, link: row.link } : null
+}

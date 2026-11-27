@@ -190,10 +190,12 @@ const NUMERIC_REPORTS: Record<string, (r: Json, own: OwnFigures) => unknown[]> =
   },
   'GET /v1/reports/payments': (r, own) => [r['total'], own.payments],
   'GET /v1/reports/voids': (r, own) => [r['count'], own.voids],
+  // Online menu views (O3): A's count today, not A's plus B's.
+  'GET /v1/online-menu/views': (r, own) => [r['today'], own.views],
 }
 
 type Json = Record<string, unknown>
-type OwnFigures = { orders: number; total: number; payments: number; voids: number }
+type OwnFigures = { orders: number; total: number; payments: number; voids: number; views: number }
 
 // Reports take a date range; the scans use today's business date (seeded orders live there).
 const RANGED = (key: string) =>
@@ -205,6 +207,7 @@ const withRange = (key: string, path: string) => (RANGED(key) ? `${path}?from=${
 // show a shop's published data, so this sweep skips them; test/public-menu covers them.
 const PUBLIC_ROUTES: Record<string, string> = {
   'GET /v1/public/menus/{slug}': 'published online menu by slug (D-081)',
+  'POST /v1/public/menus/{slug}/views': 'view beacon by slug; writes only a counter (D-083)',
 }
 
 // Routes that take no tenant resource id at all, with the reason.
@@ -271,6 +274,13 @@ const credsOf = (shop: FullShop, caller: Caller): Creds => shop[caller]
 // below have each shop's data to find.
 const giveReadsSomethingToShow = (shop: FullShop) =>
   inTx(pool, shop.tenantId, async (c) => {
+    // Menu views today: A and B get different counts, so a sum would show.
+    await c.query(
+      `insert into menu_views_daily (tenant_id, business_date, source, views)
+       values ($1, ((now() at time zone 'Asia/Jakarta'))::date, 'qr', $2)
+       on conflict (tenant_id, business_date, source) do update set views = excluded.views`,
+      [shop.tenantId, shop.label === 'A' ? 3 : 50],
+    )
     await c.query(
       `update orders set business_date = ((now() at time zone 'Asia/Jakarta'))::date where id = $1`,
       [shop.seeded.orders],
@@ -501,6 +511,9 @@ describe("number-only reports as A count only A's orders", () => {
         ),
         voids: await q(
           `select count(*) n from orders where tenant_id = $1 and status = 'voided' and business_date = $2`,
+        ),
+        views: await q(
+          `select coalesce(sum(views), 0) n from menu_views_daily where tenant_id = $1 and business_date = $2`,
         ),
       }
     })

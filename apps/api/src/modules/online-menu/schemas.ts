@@ -72,5 +72,17 @@ export const PreviewQuery = Type.Object(
   { additionalProperties: false },
 )
 
+export const ViewsQuery = Type.Object(
+  { days: Type.Optional(Type.Union([Type.Literal('7'), Type.Literal('30'), Type.Literal('90')])) },
+  { additionalProperties: false },
+)
+
+export const ViewsResponse = Type.Object({
+  today: Type.Integer(),
+  last_7: Type.Integer(),
+  previous_7: Type.Integer(),
+  days: Type.Array(Type.Object({ business_date: Type.String(), qr: Type.Integer(), link: Type.Integer() })),
+})
+
 // Multipart uploads (one `file` part) are read in the handler, not by a schema.
 export const UPLOAD_CONSUMES = ['multipart/form-data']

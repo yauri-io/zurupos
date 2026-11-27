@@ -26,6 +26,8 @@ export type WeeklySummaryInput = {
   } | null
   actions: MenuAction[]
   incompleteCategories: string[]
+  // Online menu views in the week, only while the menu is published (O3).
+  menuViews?: { qr: number; link: number } | null
 }
 
 const COPY = {
@@ -36,6 +38,8 @@ const COPY = {
     vs: (pct: string) => `${pct} dibanding minggu sebelumnya`,
     prev: (net: string, n: string) => `Minggu sebelumnya: ${net} dari ${n} pesanan`,
     noPrev: 'Minggu sebelumnya tidak ada transaksi.',
+    views: (n: number, qr: number, link: number) =>
+      `Menu online dibuka ±${n} kali (${qr} lewat QR, ${link} lewat link).`,
     busyTitle: 'Jam ramai (4 minggu terakhir)',
     busy: (b: string, q: string) => `Paling ramai ${b}, paling sepi ${q}.`,
     busyRatio: (b: string, q: string, r: string) => `${b} rata-rata ${r}× lebih ramai daripada ${q}.`,
@@ -58,6 +62,8 @@ const COPY = {
     vs: (pct: string) => `${pct} on the week before`,
     prev: (net: string, n: string) => `Week before: ${net} from ${n} orders`,
     noPrev: 'No sales the week before.',
+    views: (n: number, qr: number, link: number) =>
+      `Online menu opened about ${n} times (${qr} by QR code, ${link} by link).`,
     busyTitle: 'Busy hours (last 4 weeks)',
     busy: (b: string, q: string) => `Busiest ${b}, quietest ${q}.`,
     busyRatio: (b: string, q: string, r: string) => `${b} is on average ${r}× busier than ${q}.`,
@@ -87,6 +93,9 @@ export const renderWeeklySummary = (i: WeeklySummaryInput): RenderedEmail => {
         c.week(formatIdr(i.netSales), String(i.orders)),
         ...(i.changePct !== null ? [c.vs(formatPct(i.changePct))] : []),
         i.prevOrders > 0n ? c.prev(formatIdr(i.prevNetSales), String(i.prevOrders)) : c.noPrev,
+        ...(i.menuViews
+          ? [c.views(i.menuViews.qr + i.menuViews.link, i.menuViews.qr, i.menuViews.link)]
+          : []),
       ],
     },
   ]

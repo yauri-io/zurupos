@@ -17,6 +17,8 @@ import {
   HoursBody,
   OnlineMenuResponse,
   PreviewQuery,
+  ViewsQuery,
+  ViewsResponse,
   UPLOAD_CONSUMES,
   UpdateOnlineMenuBody,
 } from './schemas.js'
@@ -71,6 +73,15 @@ export const onlineMenuRoutes = async (
     { config: OWNER, schema: { tags, querystring: PreviewQuery, response: { 200: PublicMenu } } },
     async (request) =>
       request.tenantTx((trx) => buildMenu(trx, requireAuth(request.auth).tenantId, media, request.query)),
+  )
+
+  app.get(
+    '/online-menu/views',
+    { config: OWNER, schema: { tags, querystring: ViewsQuery, response: { 200: ViewsResponse } } },
+    async (request) =>
+      request.tenantTx((trx) =>
+        service.views(trx, requireAuth(request.auth), Number(request.query.days ?? '30')),
+      ),
   )
 
   app.patch(

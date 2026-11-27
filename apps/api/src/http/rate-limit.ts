@@ -41,4 +41,5 @@ export const createLimiters = (scale = 1) => ({
   pinByDevice: createLimiter({ max: 30 * scale, windowMs: 5 * MINUTE }),
   // Public online menu (SPEC §12.7).
   publicMenuByIp: createLimiter({ max: 120 * scale, windowMs: MINUTE }),
+  menuViewsByIp: createLimiter({ max: 30 * scale, windowMs: MINUTE }),
 })

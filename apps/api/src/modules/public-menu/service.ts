@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto'
 import { findPublicMenu } from '../../auth/lookups.js'
 import type { Database } from '../../db/kysely.js'
-import { withTenantReadOnly, type Tx } from '../../db/with-tenant.js'
+import { withTenant, withTenantReadOnly, type Tx } from '../../db/with-tenant.js'
 import { apiError } from '../../http/errors.js'
 import { money } from '../../http/serialize.js'
 import type { MediaStore } from '../../media/store.js'
@@ -10,7 +10,9 @@ import { presentImg } from '../../media/variants.js'
 import { DEFAULT_ACCENT, DEFAULT_TEMPLATE, type Template } from '../online-menu/schemas.js'
 import { toHhMm } from '../online-menu/validate.js'
 import { SLUG_PATTERN } from '../online-menu/reserved-slugs.js'
+import { isBot } from './bots.js'
 import * as q from './queries.js'
+import type { ViewWindow } from './view-window.js'
 
 const SLUG_RE = new RegExp(SLUG_PATTERN)
 
@@ -100,4 +102,37 @@ export const readPublicMenu = async (
     await q.assertReadOnly(trx)
     return buildMenu(trx, found.tenant_id, store)
   })
+}
+
+// POST /v1/public/menus/:slug/views (O3, D-083): counts at most once per IP +
+// user agent + slug per 30 minutes, never for bots, unpublished menus or
+// unknown slugs. Returns whether it counted (the route always answers 204).
+export type ViewInput = { slug: string; source: unknown; ip: string; userAgent: string | undefined }
+
+export const recordView = async (
+  db: Database,
+  window: ViewWindow,
+  input: ViewInput,
+  now: Date = new Date(),
+): Promise<boolean> => {
+  if (isBot(input.userAgent)) return false
+  if (!SLUG_RE.test(input.slug.toLowerCase())) return false
+  const found = await findPublicMenu(db, input.slug)
+  if (!found) return false
+  const source = input.source === 'qr' ? 'qr' : 'link'
+  if (!window.firstIn([input.ip, input.userAgent ?? '', found.current_slug], now.getTime())) return false
+  await withTenant(db, found.tenant_id, (trx) => q.recordView(trx, found.tenant_id, source, now))
+  return true
+}
+
+// The beacon sends text/plain JSON ({"source":"qr"}); anything unreadable is a link view.
+export const sourceOf = (body: unknown): unknown => {
+  if (typeof body === 'string') {
+    try {
+      return (JSON.parse(body) as { source?: unknown } | null)?.source
+    } catch {
+      return undefined
+    }
+  }
+  return typeof body === 'object' && body !== null ? (body as { source?: unknown }).source : undefined
 }

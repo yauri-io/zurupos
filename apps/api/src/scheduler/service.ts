@@ -152,6 +152,7 @@ export const sendReport = async (
   // later passes don't look again.
   if (s.orders === 0n) return 'skipped_empty'
   const insights = await weeklyInsights(trx, tenantId, due.periodEnd)
+  const menuViews = await q.menuViewsInPeriod(trx, tenantId, due.periodStart, due.periodEnd)
   await enqueueEmail(trx, {
     tenantId,
     kind: 'weekly_summary',
@@ -172,6 +173,7 @@ export const sendReport = async (
       prevNetSales: p.net_sales,
       changePct: pctChange(s.net_sales, p.net_sales),
       ...insights,
+      menuViews,
     }),
   })
   return 'sent'

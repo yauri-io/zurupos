@@ -102,3 +102,18 @@ export const gallery = async (trx: Tx, tenantId: string) =>
     .orderBy('g.created_at')
     .orderBy('g.id')
     .execute()) as PublicMediaRow[]
+
+// One view on the shop's business date (SPEC §12.1: local time minus the cutoff
+// hours), per source. Runs in its own short tenant transaction (D-081).
+export const recordView = (trx: Tx, tenantId: string, source: 'qr' | 'link', now: Date) =>
+  sql`
+    insert into menu_views_daily (tenant_id, business_date, source, views)
+    select t.id,
+           ((${now.toISOString()}::timestamptz at time zone t.timezone)
+             - make_interval(hours => t.business_day_cutoff_hour))::date,
+           ${source}, 1
+    from tenants t
+    where t.id = ${tenantId}
+    on conflict (tenant_id, business_date, source)
+      do update set views = menu_views_daily.views + 1
+  `.execute(trx)

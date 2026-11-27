@@ -244,3 +244,28 @@ export const setItemPhoto = (trx: Tx, tenantId: string, itemId: string, mediaId:
     .where('tenant_id', '=', tenantId)
     .where('id', '=', itemId)
     .execute()
+
+// --- Views (O3, D-083)
+
+// Daily views per source for the `days` business dates ending today (§12.1),
+// empty days as 0, oldest first.
+export const viewsByDay = async (trx: Tx, tenantId: string, days: number) =>
+  (
+    await sql<{ business_date: string; qr: number; link: number }>`
+      with today as (
+        select ((now() at time zone t.timezone) - make_interval(hours => t.business_day_cutoff_hour))::date as d
+        from tenants t where t.id = ${tenantId}
+      ),
+      series as (
+        select (today.d - g)::date as business_date
+        from today, generate_series(0, ${days - 1}) as g
+      )
+      select s.business_date::text as business_date,
+             coalesce(sum(v.views) filter (where v.source = 'qr'), 0)::int as qr,
+             coalesce(sum(v.views) filter (where v.source = 'link'), 0)::int as link
+      from series s
+      left join menu_views_daily v on v.tenant_id = ${tenantId} and v.business_date = s.business_date
+      group by s.business_date
+      order by s.business_date
+    `.execute(trx)
+  ).rows
