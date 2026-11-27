@@ -44,6 +44,24 @@ jobs:
       - run: pnpm --filter @zurupos/dashboard run test
       - run: pnpm --filter @zurupos/dashboard run build
 
+  # Online menu: the shared page package and the public SSR app (SPEC §12.7).
+  menu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @zurupos/menu-ui run lint
+      - run: pnpm --filter @zurupos/menu-ui run typecheck
+      - run: pnpm --filter @zurupos/menu-ui run test
+      - run: pnpm --filter @zurupos/menu run lint
+      - run: pnpm --filter @zurupos/menu run typecheck
+      - run: pnpm --filter @zurupos/menu run build
+
   # Playwright against the whole Docker stack, using the runner's Google Chrome.
   e2e:
     runs-on: ubuntu-latest
@@ -57,9 +75,10 @@ jobs:
       - run: cp .env.example .env
       - run: docker compose up -d --build --wait
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @zurupos/dashboard run test:e2e
+      # One spec file at a time with an API restart before each (signup rate limit).
+      - run: pnpm --filter @zurupos/dashboard run test:e2e:each
       - if: failure()
-        run: docker compose logs api dashboard
+        run: docker compose logs api dashboard menu
 
   cashier:
     runs-on: ubuntu-latest

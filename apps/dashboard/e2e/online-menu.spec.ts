@@ -47,7 +47,6 @@ const phonePhoto = async (page: Page): Promise<Buffer> => {
 }
 
 test('owner sets up the online menu at 375 px', async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 812 })
   const signup = await page.request.post(`${API}/v1/auth/signup`, { headers, data: owner })
   expect(signup.status(), await signup.text()).toBe(201)
   const photo = await (async () => {
@@ -56,8 +55,14 @@ test('owner sets up the online menu at 375 px', async ({ page }) => {
   })()
   expect(photo.length).toBeGreaterThan(2 * 1024 * 1024)
 
+  // The owner finds it in the sidebar (managers don't: online_menu.manage).
+  await page.goto('/')
+  await page.getByRole('navigation').getByRole('link', { name: 'Menu online' }).click()
+  await expect(page).toHaveURL(/\/online-menu$/)
+  await page.setViewportSize({ width: 375, height: 812 })
+  await page.reload()
+
   // Address: suggested from the shop name, saved, then shown as a link.
-  await page.goto('/online-menu')
   const slugInput = page.getByTestId('slug-input')
   const suggested = owner.shop_name.toLowerCase().replace(/\s+/g, '-')
   await expect(slugInput).toHaveValue(suggested)
@@ -166,17 +171,4 @@ test('owner sets up the online menu at 375 px', async ({ page }) => {
   await page.reload()
   await expect(page.getByTestId('online-card').getByTestId('recommended')).toBeChecked()
   await expect(page.getByTestId('online-card').getByTestId('show-online')).not.toBeChecked()
-})
-
-// Managers don't get the entry or the page (online_menu.manage); the API side,
-// 403 for managers, is covered by the API tests.
-test('the owner finds Menu online in the sidebar', async ({ page }) => {
-  const email = `e2e-${randomUUID().slice(0, 8)}@test.zurupos.local`
-  const res = await page.request.post(`${API}/v1/auth/signup`, {
-    headers,
-    data: { ...owner, email, shop_name: 'Kopi Nav' },
-  })
-  expect(res.status(), await res.text()).toBe(201)
-  await page.goto('/')
-  await expect(page.getByRole('navigation').getByRole('link', { name: 'Menu online' })).toBeVisible()
 })

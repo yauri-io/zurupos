@@ -155,6 +155,24 @@ services:
     depends_on:
       - api
 
+  # Public online menu (SPEC §12.7), behind Caddy at MENU_DOMAIN. No database
+  # access and no credentials: it reads the API's /v1/public routes only.
+  menu:
+    image: zurupos-menu:prod
+    build:
+      context: ..
+      dockerfile: apps/menu/Dockerfile
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      NUXT_API_INTERNAL_BASE: http://api:4000
+      NUXT_PUBLIC_SITE_URL: ${MENU_PUBLIC_BASE_URL:?set MENU_PUBLIC_BASE_URL}
+      NUXT_MEDIA_BASE_URL: ${MEDIA_PUBLIC_BASE_URL:?set MEDIA_PUBLIC_BASE_URL}
+      NUXT_PUBLIC_LANDING_URL: https://${SITE_DOMAIN:-zurupos.com}
+    depends_on:
+      api:
+        condition: service_healthy
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -163,6 +181,7 @@ services:
       APP_DOMAIN: ${APP_DOMAIN}
       API_DOMAIN: ${API_DOMAIN}
       SITE_DOMAIN: ${SITE_DOMAIN:-zurupos.com}
+      MENU_DOMAIN: ${MENU_DOMAIN:-menu.zurupos.com}
       # The dashboard's CSP allows images from here (online menu photos, D-079).
       MEDIA_PUBLIC_BASE_URL: ${MEDIA_PUBLIC_BASE_URL:?set MEDIA_PUBLIC_BASE_URL}
     ports:
@@ -176,6 +195,7 @@ services:
     depends_on:
       - api
       - dashboard
+      - menu
 
   # Nightly pg_dump of `zuru` into BACKUP_DIR, pruned after BACKUP_KEEP_DAYS,
   # and copied to Cloudflare R2 when R2_BUCKET is set (D-052).

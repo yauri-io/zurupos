@@ -73,13 +73,38 @@ www.{$SITE_DOMAIN} {
 		# Keep the dashboard out of search results (D-061). Not a robots.txt
 		# Disallow: that would stop crawlers from seeing this header.
 		X-Robots-Tag "noindex, nofollow"
-		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: {$MEDIA_PUBLIC_BASE_URL}; font-src 'self' data:; connect-src 'self' https://{$API_DOMAIN} https://cloudflareinsights.com https://*.sentry.io; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: {$MEDIA_PUBLIC_BASE_URL}/; font-src 'self' data:; connect-src 'self' https://{$API_DOMAIN} https://cloudflareinsights.com https://*.sentry.io; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 		-Server
 	}
 
 	# Overwrite, never append: Cloudflare passes client-supplied XFF values on.
 	reverse_proxy dashboard:3000 {
 		header_up X-Forwarded-For {client_ip}
+	}
+}
+
+# Public online menu (SPEC §12.7, D-080). /v1/public/* goes to the API on the
+# same origin (so the dashboard-only CORS rule stays), everything else to the
+# menu app, which sends its own CSP with a per-request nonce for Nuxt's inline
+# scripts. Meant to be found: no X-Robots-Tag here (unlike app and API, D-061).
+{$MENU_DOMAIN:menu.zurupos.com} {
+	import common
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
+	handle /v1/public/* {
+		reverse_proxy api:4000 {
+			header_up X-Forwarded-For {client_ip}
+		}
+	}
+	handle {
+		# The menu app passes this on to the API for its per-IP rate limit.
+		reverse_proxy menu:3001 {
+			header_up X-Forwarded-For {client_ip}
+		}
 	}
 }
 
