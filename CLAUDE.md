@@ -70,7 +70,7 @@ Keep this section current. Flutter SDK on this machine: `/Volumes/PBox/sdk/flutt
 cp .env.example .env
 pnpm install
 
-# Whole stack (postgres :55432, migrate, mailpit :8025, api :4000, worker, scheduler, dashboard :3000)
+# Whole stack (postgres :55432, migrate, mailpit :8025, api :4000, worker, scheduler, dashboard :3000, menu :3001)
 docker compose up -d --build --wait
 docker compose down            # stop (add -v to wipe the database volume)
 
@@ -94,6 +94,7 @@ pnpm --filter @zurupos/api test test/auth # auth tests only
 pnpm --filter @zurupos/api test test/orders test/stock test/worker  # M3: orders, stock, email
 pnpm --filter @zurupos/api test test/scheduler test/reports  # R1–R3: reports and report emails
 pnpm --filter @zurupos/api test test/online-menu test/media  # O1: online menu, uploads, image pipeline
+pnpm --filter @zurupos/api test test/public-menu test/rls     # O2: public menu read, preview, sixth definer function
 python3 apps/api/scripts/pricing-cases.py # regenerate pricing fixtures (never edit by hand)
 
 # Lint / typecheck / format (all JS workspaces)
@@ -103,7 +104,8 @@ pnpm lint && pnpm typecheck && pnpm format:check
 pnpm --filter @zurupos/dashboard dev      # http://localhost:3000
 pnpm --filter @zurupos/dashboard build
 pnpm --filter @zurupos/dashboard test     # unit tests (formatters)
-pnpm --filter @zurupos/dashboard test:e2e # Playwright vs the running stack (installed Chrome)
+pnpm --filter @zurupos/dashboard test:e2e e2e/<file>.spec.ts  # one spec, Playwright vs the running stack (installed Chrome)
+pnpm --filter @zurupos/dashboard test:e2e:each  # whole suite, one spec per API restart (signup limit)
 
 # API client types (after changing routes/schemas; CI checks they're current)
 pnpm api:client
@@ -115,6 +117,11 @@ pnpm cashier:fixtures          # copy pricing-cases.json into the app after rege
 dart run build_runner build    # regenerate drift code after changing lib/data/database.dart
 flutter run --dart-define=API_BASE_URL=http://<host-ip>:4000      # on a tablet (emulator default: 10.0.2.2)
 flutter build apk --debug
+
+# Online menu (SPEC §12.7): page package and the public SSR app (http://localhost:3001/<slug>)
+pnpm --filter @zurupos/menu-ui test       # accent, hours, SEO, server-rendered templates
+pnpm --filter @zurupos/menu dev           # on the host, against the API on :4000
+pnpm --filter @zurupos/menu build
 
 # Landing site (apps/landing, static; D-059, D-060)
 node --test apps/landing/test/*.test.mjs   # HPP calculator math
@@ -132,4 +139,4 @@ deploy/prod.sh exec -T backup rclone lsl r2:zurupos-backups   # dumps copied off
 apps/cashier/tool/build_release.sh https://api.zurupos.com   # signed release APK (needs android/key.properties)
 ```
 
-Note: signup is rate-limited to 5 per IP per hour in the running API, and the e2e and cashier integration tests each sign up a shop. If they fail with 429, run `docker compose restart api`.
+Note: signup is rate-limited to 5 per IP per hour in the running API, and the e2e and cashier integration tests each sign up a shop. The full e2e suite needs more than 5, so run it with `test:e2e:each`; otherwise, if something fails with 429, run `docker compose restart api`.

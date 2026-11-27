@@ -65,7 +65,19 @@ From milestone O1 the API stores online-menu photos (SPEC §12.7, D-079) and **r
 3. **Create API token**: *Object Read & Write*, only on `zurupos-media`.
 4. In `deploy/.env.prod` (see `deploy/env.prod.example`): `MEDIA_DRIVER=s3`, `MEDIA_PUBLIC_BASE_URL=https://media.zurupos.com`, `MEDIA_S3_ENDPOINT` (the same host-only endpoint as for backups), `MEDIA_S3_BUCKET=zurupos-media`, `MEDIA_S3_ACCESS_KEY_ID`, `MEDIA_S3_SECRET_ACCESS_KEY`, `MENU_PUBLIC_BASE_URL=https://menu.zurupos.com`.
 
-The dashboard's CSP allows images from `MEDIA_PUBLIC_BASE_URL` (Caddyfile), so Caddy is rebuilt with that update. The `menu.` DNS record and its Caddy site come with O2; until then the menu link and QR codes point at an address that doesn't answer yet, so don't hand QR codes out before O2 is live.
+The dashboard's CSP allows images from `MEDIA_PUBLIC_BASE_URL` (Caddyfile), so Caddy is rebuilt with that update. The `menu.` hostname is set up in the next section; until it is live, the menu link and QR codes point at an address that doesn't answer, so don't hand QR codes out before then.
+
+### Online menu page: `menu.` hostname (before the first update with O2)
+
+The public menu (SPEC §12.7) is the `menu` service behind Caddy at `MENU_DOMAIN` (default `menu.zurupos.com`): `/v1/public/*` goes to the API, everything else to the menu app.
+
+1. **DNS**: `A menu → <VPS IP>`, **Proxied**. The origin certificate already covers `*.zurupos.com`.
+2. **Origin Rules**: add `menu.zurupos.com` to the existing rule (destination port `9443`).
+3. In `deploy/.env.prod`: `MENU_DOMAIN=menu.zurupos.com` (it must match the host in `MENU_PUBLIC_BASE_URL`).
+4. Don't put a Cloudflare cache rule or *Bot Fight Mode* on `menu.`: the page must stay current (it is `no-cache`, and the app keeps its own 15 s copy), and link-preview bots (WhatsApp, Instagram) must be able to read it.
+5. After the update: open `https://menu.zurupos.com/` (redirects to the landing page), publish a test menu in the dashboard, open its link and its QR code on a phone, and check that unpublishing gives *Menu tidak ditemukan* within about 15 seconds.
+
+The menu app sends its own Content-Security-Policy with a fresh nonce per page (Nuxt's two inline scripts need it), so Caddy deliberately sets none for `menu.`, and no `X-Robots-Tag`: the page is meant to be found.
 
 ## 4. Server setup (once)
 
@@ -306,7 +318,7 @@ The whole production stack runs on a development machine with a self-signed cert
 # and the local S3 server: R2_BUCKET=zurupos-backups, R2_ENDPOINT=http://s3:9000,
 # R2_ACCESS_KEY_ID=rehearsal, R2_SECRET_ACCESS_KEY=rehearsal-secret.
 mkdir -p deploy/certs && openssl req -x509 -newkey rsa:2048 -nodes -days 30 \
-  -subj "/CN=zurupos rehearsal" -addext "subjectAltName=DNS:app.zurupos.com,DNS:api.zurupos.com,DNS:zurupos.com,DNS:www.zurupos.com" \
+  -subj "/CN=zurupos rehearsal" -addext "subjectAltName=DNS:app.zurupos.com,DNS:api.zurupos.com,DNS:menu.zurupos.com,DNS:zurupos.com,DNS:www.zurupos.com" \
   -keyout deploy/certs/origin.key -out deploy/certs/origin.pem
 export ZURU_REHEARSAL=1 ZURU_ENV_FILE=deploy/.env.rehearsal
 deploy/prod.sh up -d --build --wait

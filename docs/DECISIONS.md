@@ -573,3 +573,30 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - **Hours form:** seven rows, each with a switch; a *Samakan semua hari* button on Monday copies its hours to every day. The note explains that a closing time earlier than the opening time means after midnight.
 - **Navigation:** *Menu online* in the sidebar for `online_menu.manage` (the owner), after *Diskon*. The Home setup checklist is unchanged (§12.7).
 **Consequences:** E2E `online-menu.spec.ts` covers the page at 375 px, the 3000 × 2000 photo going through the browser shrink, the QR file and the A6 card.
+
+## D-088: The menu app sets its own CSP, with a nonce per page (O2, 2026-11-27)
+**Context:** SPEC §15 wants `menu.zurupos.com` to allow scripts only from itself, images only from itself and `MEDIA_PUBLIC_BASE_URL`, and no third parties. A server-rendered Nuxt page has two inline scripts (the runtime config and an import map), so `script-src 'self'` alone breaks hydration, and a static header in Caddy can't carry a per-request value.
+**Decision:** A Nitro plugin (`apps/menu/server/plugins/security.ts`) adds a fresh random nonce to every `<script>` and sends `script-src 'self' 'nonce-…'`, `img-src 'self' data: <media base>/`, `style-src 'self' 'unsafe-inline'` (style attributes carry the template tokens and the shop's colour), `connect-src 'self'`, `form-action 'none'`, `frame-ancestors 'none'`, plus `nosniff`, a referrer policy and a permissions policy. Caddy sets only HSTS for `menu.`: a second CSP header from Caddy would be enforced too and block the nonce'd scripts. No `X-Robots-Tag` (the page is meant to be found). The 404 and error pages are `noindex` by meta tag.
+**Consequences:** The e2e fails on any console error, so a CSP violation fails the build. The dashboard CSP's media source now ends in `/`, since a CSP source with a path and no trailing slash matches that exact path only.
+
+## D-089: menu-ui uses its own plain CSS, not Tailwind (O2, 2026-11-27)
+**Context:** SPEC §2 lists Tailwind for `apps/menu`. The same components also render inside the dashboard, which has Tailwind's preflight, Nuxt UI and a dark mode.
+**Decision:** `packages/menu-ui` styles everything with one stylesheet under the `.zm` root class, with its own small reset and CSS custom properties for the template tokens (`templates.ts`) and the accent colours (`accent.ts`). `apps/menu` has no Tailwind and no Nuxt UI, which also keeps the page at about 81 KB compressed (budget 150 KB). Server code imports types from `@zurupos/menu-ui/types`, so it never loads the components. The page text is a small id/en dictionary in the package, not `@nuxtjs/i18n`.
+**Consequences:** The preview in the dashboard is the real page, and looks the same in light and dark dashboard themes. A fourth template is a block of tokens and CSS under `.zm--<name>`.
+
+## D-090: Public menu read details (O2, 2026-11-27)
+**Context:** SPEC §12.7 leaves some details open.
+**Decision:**
+- A malformed slug is `404 NOT_FOUND`, like an unknown one (not `400`), so the route reveals nothing about the rules. The lookup is case-insensitive (citext); a slug in other letter case, like an old slug, answers `moved` with the current one, so there is one canonical address.
+- The API sends `Cache-Control: no-store`; the menu app keeps its own 15 s copy per slug (Nitro cached function, memory), including "not found", so publishing and unpublishing both show within about 15 s. API errors are not cached.
+- The SSR app passes the visitor's IP (from Caddy's `X-Forwarded-For`) on to the API, so the 120/min limit counts visitors, not the menu server.
+- `menu_version` is a hash of the payload, like bootstrap (D-040).
+- `recommended` lists only items that are listed online; categories without a listed item are left out; the reads assert the transaction is read only before running.
+- The page data comes through an internal route `/_data/menu/:slug` on the menu app; it returns only the public payload, so being reachable from outside reveals nothing more than the page. Locally the app also proxies `/v1/public/*` to the API with a server route (runtime-configured target) instead of a build-time `routeRules` proxy; in production Caddy routes those before they reach the app.
+- `GET /online-menu/preview` (owner) takes unsaved `template` and `accent_color`, saves nothing, and is rendered in the dashboard's locale.
+**Consequences:** Covered by `test/public-menu/read.test.ts`, the pool test and `e2e/public-menu.spec.ts`.
+
+## D-091: E2E specs run one file at a time in CI (2026-11-27)
+**Context:** Signup is limited to 5 per IP per hour (D-019). With O1 and O2 the e2e suite signs up 6 shops, so one run of the whole suite gets `429`.
+**Decision:** Keep the limit. `apps/dashboard/e2e/run-each.sh` (`pnpm --filter @zurupos/dashboard test:e2e:each`) restarts the API before each spec file, which resets the in-memory limiter, and CI uses it. The O1 sidebar check now reuses the O1 shop instead of signing up its own.
+**Consequences:** E2E in CI takes a little longer; a spec that needs a second shop should share one within its file.

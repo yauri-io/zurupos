@@ -204,7 +204,7 @@ Login and token verification happen before a tenant is known. These use a small 
 
 Because §3.2 forces RLS on the owner too, each looked-up table (`users`, `sessions`, `devices`, `password_resets`) has one extra policy, `auth_definer_lookup`: `for select to zuru_owner using (true)`. It is SELECT-only and only for the NOLOGIN owner role; `zuru_app` is never a member of `zuru_owner` (see D-024).
 
-After the lookup, all further work (PIN check, session creation, etc.) runs inside `withTenant`. These functions are the **complete** list of exceptions; adding one requires a `DECISIONS.md` entry and an isolation test. The first five are live; the sixth, `auth.find_public_menu`, is approved (D-081, 2026-11-27) and is added with its tests in O2. Until O2 ships, the first five are the complete list. Its `auth_definer_lookup` policies (SELECT-only, `zuru_owner`) are on `menu_slugs`, `menu_profiles` and `users`.
+After the lookup, all further work (PIN check, session creation, etc.) runs inside `withTenant`. These functions are the **complete** list of exceptions; adding one requires a `DECISIONS.md` entry and an isolation test. All six exist since O2 (migration `20261127200000_find_public_menu`, D-081); the sixth is not deployed yet. Its `auth_definer_lookup` policies (SELECT-only, `zuru_owner`) are on `menu_slugs`, `menu_profiles` and `users`.
 
 ### 3.5 System tables (no tenant RLS)
 
