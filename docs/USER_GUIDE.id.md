@@ -65,6 +65,7 @@ Di **Staf** → **Tambah staf**:
 4. Buka menu → **Resep**: bahan per 1 porsi. Pasang grup pilihan ke menu.
    Kotak **pratinjau** menunjukkan bahan yang terpakai untuk kombinasi pilihan, misalnya *Large + Oat + Extra shot*. Periksa sebelum mulai berjualan.
 5. Menu habis? Kasir bisa menandai **Habis** dengan menekan lama tombol menu di aplikasi, atau lewat **Pengaturan → Ketersediaan menu** (ada kolom cari).
+6. Foto menu dan pilihan *Tampilkan online* / *Rekomendasi* ada di kartu **Menu online** di halaman menu; lihat bagian 10.
 
 ## 6. Diskon
 
@@ -148,7 +149,78 @@ Setiap menu dinilai dari dua hal: **laris** (jumlah terjual dibanding menu lain 
 - Jika lebih dari separuh penjualan kategori berasal dari menu yang HPP-nya belum lengkap, muncul **Lengkapi HPP dulu** dan kelompoknya tidak ditampilkan. Kategori juga butuh minimal 3 menu dengan HPP lengkap.
 - Periode bawaan 30 hari terakhir (sampai kemarin). Menu yang baru dilengkapi resepnya bisa tetap masuk daftar *HPP belum lengkap* sampai penjualan lamanya (dengan HPP Rp 0) keluar dari periode.
 
-## 10. Masalah umum
+## 10. Menu online (pemilik)
+
+**Menu online** adalah halaman menu untuk pelanggan di `menu.zurupos.com/<nama-toko>`. Pelanggan membukanya dari QR di meja atau dari link di bio Instagram, tanpa memasang aplikasi. Menu, harga dan status **Habis** selalu ikut data kasir, jadi tidak perlu diperbarui terpisah. Perubahan tampil di halaman dalam beberapa detik.
+
+Menu online hanya untuk **melihat** menu. Pelanggan belum bisa memesan atau membayar dari halaman ini.
+
+### Menayangkan menu
+
+1. Buka **Menu online** di dashboard.
+2. Di kartu **Status**, isi **Alamat menu**: 3–40 huruf kecil, angka dan tanda hubung, misalnya `kopi-senja`. Tekan **Simpan alamat**.
+   Alamat yang sudah dipakai toko lain ditolak; pilih alamat lain.
+3. Nyalakan **Tayangkan menu**. Tanda di atas kartu berubah dari *Belum tayang* menjadi **Tayang**.
+4. Tekan **Buka halaman** untuk melihat hasilnya seperti yang dilihat pelanggan, atau **Salin** untuk menyalin link (misalnya untuk bio Instagram atau pesan WhatsApp).
+
+Matikan **Tayangkan menu** kapan saja untuk menyembunyikan halaman; dalam sekitar 15 detik link dan QR menampilkan *halaman tidak ditemukan*. Pengaturan Anda tetap tersimpan.
+
+**Ganti alamat**: alamat lama tetap berfungsi dan diarahkan ke alamat baru, jadi QR yang sudah dicetak tidak perlu diganti.
+
+### Kode QR
+
+- **Unduh QR (PNG)**: gambar QR untuk ditempel di desain sendiri, stiker meja atau poster.
+- **Cetak kartu A6**: kartu siap cetak (10,5 × 14,8 cm) dengan logo (kalau ada), nama toko, QR dan tulisan *Pindai untuk melihat menu dan harga*. Di jendela cetak, pilih **Simpan sebagai PDF** kalau ingin mencetak di tempat fotokopi.
+
+Sebelum ditempel, coba pindai QR dengan HP sendiri.
+
+### Tampilan
+
+Di **Tampilan**, pilih satu dari tiga gaya, lalu tekan **Simpan**:
+
+| Gaya | Cocok untuk |
+|---|---|
+| **Foto** | Kartu bergambar dalam kisi. Paling bagus kalau banyak menu punya foto |
+| **Papan** | Daftar rapi seperti papan menu. Tetap bagus tanpa foto |
+| **Hangat** | Lembut, sudut membulat, nuansa hangat |
+
+**Warna toko** dipakai untuk tombol dan judul (format `#RRGGBB`, misalnya `#6b4f3a`). Warna apa pun aman: kalau terlalu terang, ZuruPOS menggelapkannya sedikit supaya tulisan tetap mudah dibaca.
+
+Di laptop, **pratinjau** seukuran HP ada di samping formulir. Di HP, tekan **Pratinjau** di atas halaman. Pratinjau langsung berubah saat Anda memilih gaya atau warna, sebelum disimpan.
+
+### Profil, jam buka dan galeri
+
+- **Profil**: logo, foto sampul, deskripsi singkat (maksimal 160 karakter), nomor **WhatsApp**, akun **Instagram**, dan **Link Google Maps** (di Google Maps: buka toko → **Bagikan** → salin link). Bagian yang dikosongkan tidak tampil.
+  **Alamat** diambil dari **Pengaturan → Profil toko** (sama dengan alamat di struk).
+- **Jam buka**: isi jam buka dan tutup untuk tiap hari, atau nyalakan **Tutup**. **Samakan semua hari** menyalin satu baris ke semua hari. Halaman menampilkan jam buka hari ini.
+  Tutup lewat tengah malam? Isi jam tutup lebih kecil dari jam buka, misalnya 18.00–01.00.
+- **Galeri**: hingga 6 foto suasana toko, tampil sesuai urutan unggah. Ketuk ikon hapus untuk membuang foto.
+
+Foto bisa JPG, PNG atau WebP. Foto besar dari HP dikecilkan otomatis sebelum diunggah. Lokasi dan data lain yang tersimpan di foto dibuang.
+
+### Foto dan pengaturan per menu (pemilik dan manajer)
+
+Buka menu di **Menu**, lalu kartu **Menu online**:
+
+- **Foto menu**: hanya untuk menu online. Foto tidak tampil di aplikasi kasir atau di struk. Menu tanpa foto tetap tampil, hanya tanpa gambar.
+- **Tampilkan online**: matikan untuk menyembunyikan menu dari halaman online. Menu tetap dijual di kasir.
+  Menu yang dinonaktifkan atau diarsipkan tidak pernah tampil online.
+- **Rekomendasi**: tampil di bagian *Rekomendasi* di atas halaman, dengan lencana. Paling banyak 5 menu; matikan salah satu dulu untuk memilih menu lain.
+
+Menu yang ditandai **Habis** di kasir langsung tampil *Habis* di halaman online.
+
+### Dilihat
+
+Kartu **Dilihat** menunjukkan perkiraan berapa kali menu online dibuka: hari ini, 7 hari terakhir (dengan 7 hari sebelumnya sebagai pembanding), 30 hari terakhir, dan berapa dari **kode QR** dan dari **link**.
+
+- Angkanya **bukan jumlah orang**. Satu HP dihitung sekali per 30 menit.
+- Pratinjau link di WhatsApp atau Instagram, mesin pencari, dan pratinjau di dashboard tidak dihitung.
+- Tidak memakai cookie, dan ZuruPOS tidak menyimpan data pengunjung.
+- Hari dihitung sesuai **Pergantian hari** di Pengaturan, sama seperti laporan.
+
+Selama menu tayang, **ringkasan mingguan** juga mencantumkan satu baris, misalnya *Menu online dibuka ±120 kali (80 lewat QR, 40 lewat link)*.
+
+## 11. Masalah umum
 
 | Masalah | Yang dilakukan |
 |---|---|
@@ -158,3 +230,6 @@ Setiap menu dinilai dari dua hal: **laris** (jumlah terjual dibanding menu lain 
 | Harga berubah saat kasir membayar | Aplikasi memuat menu terbaru dan menghitung ulang; periksa total lalu bayar lagi |
 | Pesanan *belum terkirim* | Periksa internet, lalu tekan **Coba lagi** |
 | Struk tidak tercetak | Nyalakan printer / isi kertas, lalu **Coba lagi** atau cetak ulang dari Pesanan hari ini |
+| Menu online *tidak ditemukan* | Periksa **Tayangkan menu** di Menu online sudah menyala dan alamatnya benar |
+| Satu menu tidak tampil online | Buka menunya → kartu **Menu online** → nyalakan **Tampilkan online**; pastikan menunya aktif |
+| Foto ditolak saat diunggah | Pakai foto JPG, PNG atau WebP; file lain (misalnya PDF) tidak bisa |
