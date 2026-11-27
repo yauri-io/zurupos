@@ -21,11 +21,12 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // NUXT_API_INTERNAL_BASE: the API over the internal network (http://api:4000 in compose).
     apiInternalBase: 'http://localhost:4000',
-    // NUXT_SITE_URL: this site's public base, the same as the API's MENU_PUBLIC_BASE_URL.
-    siteUrl: 'http://localhost:3001',
     // NUXT_MEDIA_BASE_URL: the API's MEDIA_PUBLIC_BASE_URL, for the CSP's img-src.
     mediaBaseUrl: 'http://localhost:4000/media',
     public: {
+      // NUXT_PUBLIC_SITE_URL: this site's base, the same as the API's MENU_PUBLIC_BASE_URL
+      // (canonical and og:url; public because the client re-renders the head).
+      siteUrl: 'http://localhost:3001',
       // NUXT_PUBLIC_LANDING_URL: "Menu oleh ZuruPOS" and the bare domain go here.
       landingUrl: 'https://zurupos.com',
     },

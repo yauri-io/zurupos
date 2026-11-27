@@ -33,7 +33,7 @@ const menu = result.kind === 'menu' ? result.menu : null
 if (import.meta.server) useResponseHeader('cache-control').value = 'no-cache'
 
 if (menu) {
-  const canonical = `${config.siteUrl}/${slug}`
+  const canonical = `${config.public.siteUrl}/${slug}`
   const seo = menuSeo(menu, canonical, locale.value)
   useHead({
     htmlAttrs: { lang: locale.value },
