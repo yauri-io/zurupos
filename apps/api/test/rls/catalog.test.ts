@@ -7,12 +7,22 @@ const pool = appPool(2)
 afterAll(() => pool.end())
 
 const SYSTEM_TABLES = ['outbox', 'schema_migrations']
-// D-024 lookups, plus tenants for auth.report_schedule (D-075).
-const AUTH_LOOKUP_TABLES = ['devices', 'password_resets', 'sessions', 'tenants', 'users']
+// D-024 lookups, tenants for auth.report_schedule (D-075), and the menu tables
+// for auth.find_public_menu (D-081).
+const AUTH_LOOKUP_TABLES = [
+  'devices',
+  'menu_profiles',
+  'menu_slugs',
+  'password_resets',
+  'sessions',
+  'tenants',
+  'users',
+]
 const DEFINER_FUNCTIONS = [
   'auth.find_device',
   'auth.find_login_by_email',
   'auth.find_password_reset',
+  'auth.find_public_menu', // D-081
   'auth.find_session',
   'auth.report_schedule', // D-075
 ]
@@ -206,7 +216,7 @@ describe('§3.6 #4 — zuru_app cannot bypass RLS', () => {
   })
 })
 
-describe('§3.6 #5 — SECURITY DEFINER functions are exactly the five in §3.4 (D-075)', () => {
+describe('§3.6 #5 — SECURITY DEFINER functions are exactly the six in §3.4 (D-075, D-081)', () => {
   it('lists only the reviewed auth.* functions', async () => {
     const { rows } = await pool.query<{ fn: string }>(`
       select n.nspname || '.' || p.proname as fn
