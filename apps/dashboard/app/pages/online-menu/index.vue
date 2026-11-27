@@ -77,7 +77,9 @@ const accentValid = computed(() => /^#[0-9a-fA-F]{6}$/.test(look.value.accent_co
 const saveLook = () =>
   run(async () => {
     menu.value = await unwrap(
-      api.PATCH('/v1/online-menu', { body: { template: look.value.template, accent_color: look.value.accent_color } }),
+      api.PATCH('/v1/online-menu', {
+        body: { template: look.value.template, accent_color: look.value.accent_color },
+      }),
     )
   })
 
