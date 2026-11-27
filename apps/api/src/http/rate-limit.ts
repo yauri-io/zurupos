@@ -39,4 +39,6 @@ export const createLimiters = (scale = 1) => ({
   resetByIp: createLimiter({ max: 5 * scale, windowMs: 15 * MINUTE }),
   resetByEmail: createLimiter({ max: 3 * scale, windowMs: 15 * MINUTE }),
   pinByDevice: createLimiter({ max: 30 * scale, windowMs: 5 * MINUTE }),
+  // Public online menu (SPEC §12.7).
+  publicMenuByIp: createLimiter({ max: 120 * scale, windowMs: MINUTE }),
 })

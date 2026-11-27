@@ -2,6 +2,7 @@ import type pg from 'pg'
 import type { App } from '../../src/http/types.js'
 import {
   createUser,
+  headersFor,
   pairDevice,
   signupShop,
   staffLogin,
@@ -60,3 +61,14 @@ export const buildFullShop = async (app: App, pool: pg.Pool, label: string): Pro
 
 export const leakedSecrets = (body: string, other: FullShop): string[] =>
   other.secrets.filter((s) => body.includes(s))
+
+// Gives the shop a unique slug and publishes its online menu (O2); returns the slug.
+export const publishMenu = async (app: App, shop: FullShop): Promise<string> => {
+  const slug = `pub-${shop.label.toLowerCase().replace(/[^a-z0-9]/g, '')}-${shop.tenantId.slice(0, 8)}`
+  const headers = { 'x-requested-with': 'zuru', ...headersFor(shop.dashboard) }
+  const set = await app.inject({ method: 'PATCH', url: '/v1/online-menu', headers, payload: { slug } })
+  if (set.statusCode !== 200) throw new Error(`slug: ${set.statusCode} ${set.body}`)
+  const pub = await app.inject({ method: 'POST', url: '/v1/online-menu/publish', headers })
+  if (pub.statusCode !== 200) throw new Error(`publish: ${pub.statusCode} ${pub.body}`)
+  return slug
+}

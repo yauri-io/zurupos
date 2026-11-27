@@ -11,7 +11,15 @@ import type { MediaStore } from '../../media/store.js'
 import type { MediaPurpose } from '../../media/variants.js'
 import type { Tx } from '../../db/with-tenant.js'
 import { ItemResponse } from '../items/schemas.js'
-import { HoursBody, OnlineMenuResponse, UPLOAD_CONSUMES, UpdateOnlineMenuBody } from './schemas.js'
+import { buildMenu } from '../public-menu/service.js'
+import { PublicMenu } from '../public-menu/schemas.js'
+import {
+  HoursBody,
+  OnlineMenuResponse,
+  PreviewQuery,
+  UPLOAD_CONSUMES,
+  UpdateOnlineMenuBody,
+} from './schemas.js'
 import * as service from './service.js'
 
 const OWNER = { auth: 'user', permission: 'online_menu.manage' } as const
@@ -54,6 +62,15 @@ export const onlineMenuRoutes = async (
     '/online-menu',
     { config: OWNER, schema: { tags, response: { 200: OnlineMenuResponse } } },
     async (request) => request.tenantTx((trx) => service.present(trx, requireAuth(request.auth), deps)),
+  )
+
+  // The public payload for this shop, published or not, so the dashboard's
+  // preview renders the real page (D-082). Never sends a view beacon.
+  app.get(
+    '/online-menu/preview',
+    { config: OWNER, schema: { tags, querystring: PreviewQuery, response: { 200: PublicMenu } } },
+    async (request) =>
+      request.tenantTx((trx) => buildMenu(trx, requireAuth(request.auth).tenantId, media, request.query)),
   )
 
   app.patch(

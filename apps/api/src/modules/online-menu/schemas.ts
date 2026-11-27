@@ -3,6 +3,10 @@ import { Body, DateTime, Nullable, Uuid } from '../../http/schemas.js'
 import { SLUG_PATTERN } from './reserved-slugs.js'
 
 export const TEMPLATES = ['foto', 'papan', 'hangat'] as const
+export type Template = (typeof TEMPLATES)[number]
+// Column defaults in the migration (SPEC §4.1).
+export const DEFAULT_TEMPLATE: Template = 'papan'
+export const DEFAULT_ACCENT = '#6b4f3a'
 export const RECOMMENDED_LIMIT = 5
 export const GALLERY_LIMIT = 6
 export const DESCRIPTION_MAX = 160
@@ -61,6 +65,12 @@ export const UpdateOnlineMenuBody = Body({
 
 // Replaces the week; a weekday left out is closed.
 export const HoursBody = Body({ hours: Type.Array(Hours, { maxItems: 7 }) })
+
+// Unsaved look choices for the preview, so it follows the form (SPEC §12.7).
+export const PreviewQuery = Type.Object(
+  { template: Type.Optional(Type.Enum(TEMPLATES)), accent_color: Type.Optional(AccentColor) },
+  { additionalProperties: false },
+)
 
 // Multipart uploads (one `file` part) are read in the handler, not by a schema.
 export const UPLOAD_CONSUMES = ['multipart/form-data']

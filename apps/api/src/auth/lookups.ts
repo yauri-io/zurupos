@@ -45,3 +45,10 @@ export const findPasswordReset = async (
   tokenHash: Buffer,
 ): Promise<PasswordResetLookup | undefined> =>
   (await sql<PasswordResetLookup>`select * from auth.find_password_reset(${tokenHash})`.execute(db)).rows[0]
+
+// D-081: the shop behind a public menu slug, only when its menu is published and
+// it has an active owner. `current_slug` differs from `slug` for an old slug.
+export type PublicMenuLookup = { tenant_id: string; current_slug: string }
+
+export const findPublicMenu = async (db: Database, slug: string): Promise<PublicMenuLookup | undefined> =>
+  (await sql<PublicMenuLookup>`select * from auth.find_public_menu(${slug})`.execute(db)).rows[0]

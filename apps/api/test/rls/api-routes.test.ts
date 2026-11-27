@@ -169,6 +169,7 @@ const SCAN_ROUTES: Record<string, Caller[]> = {
   'GET /v1/reports/menu-matrix': ['dashboard'],
   'GET /v1/orders': ['dashboard'],
   'GET /v1/online-menu': ['dashboard', 'staff'],
+  'GET /v1/online-menu/preview': ['dashboard', 'staff'],
 }
 
 // Reports that are only numbers: nothing to scan for, so each must equal A's own
@@ -199,6 +200,12 @@ const RANGED = (key: string) =>
   (key.startsWith('GET /v1/reports/') && key !== 'GET /v1/reports/stock-value') || key === 'GET /v1/orders'
 let today = ''
 const withRange = (key: string, path: string) => (RANGED(key) ? `${path}?from=${today}&to=${today}` : path)
+
+// Public routes (§3.6 #9): they take a slug, not credentials, and are meant to
+// show a shop's published data, so this sweep skips them; test/public-menu covers them.
+const PUBLIC_ROUTES: Record<string, string> = {
+  'GET /v1/public/menus/{slug}': 'published online menu by slug (D-081)',
+}
 
 // Routes that take no tenant resource id at all, with the reason.
 const NO_TENANT_INPUT: Record<string, string> = {
@@ -386,9 +393,14 @@ describe('OpenAPI coverage', () => {
   })
 
   it('classifies every operation exactly once', () => {
-    const registries = [ID_ROUTES, BODY_ID_ROUTES, SCAN_ROUTES, NUMERIC_REPORTS, NO_TENANT_INPUT].map((r) =>
-      Object.keys(r),
-    )
+    const registries = [
+      ID_ROUTES,
+      BODY_ID_ROUTES,
+      SCAN_ROUTES,
+      NUMERIC_REPORTS,
+      NO_TENANT_INPUT,
+      PUBLIC_ROUTES,
+    ].map((r) => Object.keys(r))
     const unclassified = operations.filter((op) => !registries.some((keys) => keys.includes(op)))
     const duplicated = operations.filter((op) => registries.filter((keys) => keys.includes(op)).length > 1)
     const stale = registries.flat().filter((key) => !operations.includes(key))
@@ -396,7 +408,7 @@ describe('OpenAPI coverage', () => {
   })
 
   it('every route with path params is in ID_ROUTES', () => {
-    const withParams = operations.filter((op) => op.includes('{'))
+    const withParams = operations.filter((op) => op.includes('{') && !(op in PUBLIC_ROUTES))
     expect(withParams.filter((op) => !(op in ID_ROUTES))).toEqual([])
   })
 

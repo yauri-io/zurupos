@@ -3,7 +3,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createTestApp, expectStatus, headersFor, type TestApp } from '../support/app.js'
 import { appPool } from '../support/pg.js'
-import { buildFullShop, leakedSecrets, type FullShop } from '../support/shops.js'
+import { buildFullShop, leakedSecrets, publishMenu, type FullShop } from '../support/shops.js'
 
 let t: TestApp
 const pool = appPool(2)
@@ -37,6 +37,30 @@ describe('connection pooling', () => {
       expect(leakedSecrets(res.body, other), `${shop.label} ${url}`).toEqual([])
       if (url === '/v1/auth/me') expect(res.json<{ tenant: { id: string } }>().tenant.id).toBe(shop.tenantId)
       else expect(res.body).toContain(shop.marker)
+    }
+  })
+
+  // §3.6 #9 in #8: public menu reads for A's and B's slugs, interleaved with
+  // authenticated ones, on the same 2 connections.
+  it('public menu reads stay per shop under concurrency', async () => {
+    const slugs = new Map([
+      [a, await publishMenu(t.app, a)],
+      [b, await publishMenu(t.app, b)],
+    ])
+    const results = await Promise.all(
+      Array.from({ length: 50 }, async (_, i) => {
+        const shop = i % 2 === 0 ? a : b
+        const res =
+          i % 5 === 4
+            ? await t.app.inject({ method: 'GET', url: '/v1/users', headers: headersFor(shop.dashboard) })
+            : await t.app.inject({ method: 'GET', url: `/v1/public/menus/${slugs.get(shop) ?? ''}` })
+        return { shop, other: shop === a ? b : a, res }
+      }),
+    )
+    for (const { shop, other, res } of results) {
+      expectStatus(res, 200)
+      expect(leakedSecrets(res.body, other), shop.label).toEqual([])
+      expect(res.body).toContain(shop.marker)
     }
   })
 })

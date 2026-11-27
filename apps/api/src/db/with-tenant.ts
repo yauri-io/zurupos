@@ -17,3 +17,22 @@ export const withTenant = <T>(db: Database, tenantId: string, fn: (trx: Tx) => P
     return fn(trx)
   })
 }
+
+// The public online menu (SPEC §12.7, D-081) reads a shop it found through
+// auth.find_public_menu, so it gets a READ ONLY transaction: nothing reached
+// without credentials can write. The tenant id comes from that lookup, never
+// from the request.
+export const withTenantReadOnly = <T>(
+  db: Database,
+  tenantId: string,
+  fn: (trx: Tx) => Promise<T>,
+): Promise<T> => {
+  if (!UUID.test(tenantId)) return Promise.reject(new Error('withTenantReadOnly: tenantId is not a uuid'))
+  return db
+    .transaction()
+    .setAccessMode('read only')
+    .execute(async (trx) => {
+      await sql`select set_config('app.tenant_id', ${tenantId}, true)`.execute(trx)
+      return fn(trx)
+    })
+}

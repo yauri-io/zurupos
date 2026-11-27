@@ -11,7 +11,13 @@ import { presentImg } from '../../media/variants.js'
 import { getItem } from '../items/service.js'
 import * as q from './queries.js'
 import { isReservedSlug } from './reserved-slugs.js'
-import { DESCRIPTION_MAX, GALLERY_LIMIT, RECOMMENDED_LIMIT } from './schemas.js'
+import {
+  DEFAULT_ACCENT,
+  DEFAULT_TEMPLATE,
+  DESCRIPTION_MAX,
+  GALLERY_LIMIT,
+  RECOMMENDED_LIMIT,
+} from './schemas.js'
 import { isAllowedMapsUrl, toHhMm } from './validate.js'
 
 export type OnlineMenuDeps = { store: MediaStore; menuBaseUrl: string }
@@ -21,8 +27,8 @@ const DEFAULT_PROFILE: q.ProfileRow = {
   is_published: false,
   published_at: null,
   description: null,
-  template: 'papan',
-  accent_color: '#6b4f3a',
+  template: DEFAULT_TEMPLATE,
+  accent_color: DEFAULT_ACCENT,
   logo_media_id: null,
   cover_media_id: null,
   whatsapp: null,

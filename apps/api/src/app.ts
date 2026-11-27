@@ -31,6 +31,7 @@ import { reportRoutes } from './modules/reports/routes.js'
 import { createMediaStore } from './media/create-store.js'
 import { localMediaRoutes } from './media/serve.js'
 import { onlineMenuRoutes } from './modules/online-menu/routes.js'
+import { publicMenuRoutes } from './modules/public-menu/routes.js'
 import type { MediaStore } from './media/store.js'
 
 export type AppDeps = {
@@ -125,6 +126,7 @@ export const buildApp = async ({
       await v1.register(bootstrapRoutes)
       await v1.register(reportRoutes)
       await v1.register(onlineMenuRoutes, { media, menuBaseUrl: config.menuPublicBaseUrl })
+      await v1.register(publicMenuRoutes, { db, limiters, media })
     },
     { prefix: '/v1' },
   )
