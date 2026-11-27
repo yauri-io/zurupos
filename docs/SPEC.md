@@ -204,7 +204,7 @@ Login and token verification happen before a tenant is known. These use a small 
 
 Because §3.2 forces RLS on the owner too, each looked-up table (`users`, `sessions`, `devices`, `password_resets`) has one extra policy, `auth_definer_lookup`: `for select to zuru_owner using (true)`. It is SELECT-only and only for the NOLOGIN owner role; `zuru_app` is never a member of `zuru_owner` (see D-024).
 
-After the lookup, all further work (PIN check, session creation, etc.) runs inside `withTenant`. These functions are the **complete** list of exceptions; adding one requires a `DECISIONS.md` entry and an isolation test. All six exist since O2 (migration `20261127200000_find_public_menu`, D-081); the sixth is not deployed yet. Its `auth_definer_lookup` policies (SELECT-only, `zuru_owner`) are on `menu_slugs`, `menu_profiles` and `users`.
+After the lookup, all further work (PIN check, session creation, etc.) runs inside `withTenant`. These functions are the **complete** list of exceptions; adding one requires a `DECISIONS.md` entry and an isolation test. All six are live; the sixth came with O2 (migration `20261127200000_find_public_menu`, D-081, deployed 2026-11-27). Its `auth_definer_lookup` policies (SELECT-only, `zuru_owner`) are on `menu_slugs`, `menu_profiles` and `users`.
 
 ### 3.5 System tables (no tenant RLS)
 
@@ -219,7 +219,7 @@ Location: `apps/api/test/rls/`. Runs in CI against real Postgres as `zuru_app`. 
 2. **DB-level:** with tenant A set, rows of tenant B are invisible; `update`/`delete` targeting B's ids affect 0 rows; `insert` with `tenant_id = B` fails the `with check`.
 3. **DB-level:** a script enumerates `pg_class` for all tables in `public` and asserts every table except the allowlist (`outbox`, `schema_migrations`) has `relrowsecurity = true` and `relforcerowsecurity = true`. New tables without RLS fail the build.
 4. **DB-level:** assert `zuru_app` is not superuser, has no `BYPASSRLS`, owns no tables, is not a member of `zuru_owner`, and neither `zuru_app` nor `zuru_worker` has `CREATE` on schemas `public` or `auth`.
-5. **DB-level:** assert the only `SECURITY DEFINER` functions are the ones live in §3.4 (five; six once O2 ships).
+5. **DB-level:** assert the only `SECURITY DEFINER` functions are the six in §3.4.
 6. **API-level:** create shops A and B with full data. For **every** route in the OpenAPI document, call it with A's credentials using B's resource ids → expect 404 (never 200, never B's data). The test iterates the OpenAPI spec so new routes are covered automatically.
 7. **API-level:** a device token from shop A plus a PIN of a user from shop B → rejected.
 8. **Pooling:** run 50 concurrent requests alternating tenants A/B on a small pool (size 2); every response contains only its own tenant's data.
