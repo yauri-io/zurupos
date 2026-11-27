@@ -234,7 +234,7 @@ const scrollTo = (id: string) => {
 .zm :where(ul) {
   list-style: none;
 }
-.zm img {
+.zm :where(img) {
   display: block;
   max-width: 100%;
   height: auto;
@@ -424,16 +424,21 @@ const scrollTo = (id: string) => {
   font-weight: 600;
   overflow-wrap: anywhere;
 }
-.zm-item-meta {
+.zm-item-line {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.zm-item-badges {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 6px;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 .zm-price {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
+  white-space: nowrap;
 }
 .zm-leader {
   display: none;
@@ -467,7 +472,7 @@ const scrollTo = (id: string) => {
 }
 .zm-gallery ul {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 .zm-gallery img {
@@ -517,9 +522,6 @@ const scrollTo = (id: string) => {
 .zm--foto .zm-cover {
   aspect-ratio: 16 / 9;
 }
-.zm--foto .zm-gallery ul {
-  grid-template-columns: repeat(3, 1fr);
-}
 
 /* Papan: a clean text list like a menu board. */
 .zm--papan .zm-h2 {
@@ -536,8 +538,8 @@ const scrollTo = (id: string) => {
   padding: 10px 0;
   border-bottom: 1px dashed var(--zm-line);
 }
-.zm--papan .zm-item-body {
-  display: flex;
+.zm--papan .zm-item-line {
+  flex-direction: row;
   align-items: baseline;
   gap: 8px;
 }
@@ -548,22 +550,17 @@ const scrollTo = (id: string) => {
   border-bottom: 2px dotted var(--zm-line);
   transform: translateY(-4px);
 }
-.zm--papan .zm-item-meta {
-  flex-wrap: nowrap;
-  margin-top: 0;
-}
 .zm--papan .zm-item-photo {
   width: 52px;
   height: 52px;
 }
-.zm--papan .zm-rec-list .zm-item-body {
-  display: block;
+.zm--papan .zm-rec-list .zm-item-line {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
 }
 .zm--papan .zm-rec-list .zm-leader {
   display: none;
-}
-.zm--papan .zm-rec-list .zm-item-meta {
-  flex-wrap: wrap;
 }
 .zm--papan a.zm-button,
 .zm--papan a.zm-tab,
@@ -589,11 +586,19 @@ const scrollTo = (id: string) => {
   border-radius: 18px;
 }
 
-/* Recommended cards are vertical in every template. */
+/* Recommended cards are vertical, framed cards in every template. */
 .zm-rec-list .zm-item {
   flex-direction: column;
   align-items: stretch;
   gap: 6px;
+  padding: 10px;
+  background: var(--zm-surface);
+  border-radius: var(--zm-radius);
+  box-shadow: inset 0 0 0 1px var(--zm-line);
+}
+.zm--foto .zm-rec-list .zm-item {
+  padding: 0;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
 }
 .zm-rec-list .zm-item-photo {
   width: 100%;
@@ -604,9 +609,6 @@ const scrollTo = (id: string) => {
 @media (min-width: 560px) {
   .zm--foto .zm-items {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .zm-gallery ul {
-    grid-template-columns: repeat(3, 1fr);
   }
 }
 @media (prefers-reduced-motion: reduce) {

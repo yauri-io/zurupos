@@ -2,9 +2,10 @@
   "name": "@zurupos/menu-ui",
   "private": true,
   "type": "module",
-  "description": "The public online menu page: components, templates, accent colours, formatting (SPEC §12.7, D-082). Used by apps/menu and the dashboard preview.",
+  "description": "The public online menu page: components, templates, accent colours, formatting (SPEC \u00a712.7, D-082). Used by apps/menu and the dashboard preview.",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts"
   },
   "scripts": {
     "test": "vitest run",

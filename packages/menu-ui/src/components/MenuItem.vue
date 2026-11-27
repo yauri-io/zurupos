@@ -38,10 +38,12 @@ const t = (key: Parameters<typeof translate>[1]) => translate(props.locale, key)
       @error="broken = true"
     />
     <div class="zm-item-body">
-      <h3 class="zm-item-name">{{ item.name }}</h3>
-      <span class="zm-leader" aria-hidden="true" />
-      <p class="zm-item-meta">
+      <div class="zm-item-line">
+        <h3 class="zm-item-name">{{ item.name }}</h3>
+        <span class="zm-leader" aria-hidden="true" />
         <span class="zm-price">{{ formatIdr(item.price) }}</span>
+      </div>
+      <p v-if="item.sold_out || (badge && item.recommended)" class="zm-item-badges">
         <span v-if="item.sold_out" class="zm-badge zm-badge--out">{{ t('sold_out') }}</span>
         <span v-if="badge && item.recommended" class="zm-badge zm-badge--rec">★ {{ t('recommended') }}</span>
       </p>
