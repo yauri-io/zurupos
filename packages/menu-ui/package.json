@@ -1,0 +1,32 @@
+{
+  "name": "@zurupos/menu-ui",
+  "private": true,
+  "type": "module",
+  "description": "The public online menu page: components, templates, accent colours, formatting (SPEC §12.7, D-082). Used by apps/menu and the dashboard preview.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "lint": "eslint ."
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitejs/plugin-vue": "^6.0.11",
+    "eslint": "^10.15.0",
+    "eslint-plugin-vue": "^10.12.1",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vite": "8.3.8",
+    "vitest": "^5.1.0",
+    "vue": "^3.5.45",
+    "vue-tsc": "^3.3.14"
+  },
+  "dependencies": {
+    "@zurupos/api-client": "workspace:*"
+  }
+}
