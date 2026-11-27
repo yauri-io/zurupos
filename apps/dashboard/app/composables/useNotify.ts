@@ -9,7 +9,10 @@ export const useNotify = () => {
     // `text` replaces the API's message when the page knows better what a failure means.
     failed: (err: unknown, text?: string) => {
       const description = text ?? (err instanceof ApiFailure ? err.message : t('common.unexpected_error'))
-      const { problem, field } = err instanceof ApiFailure ? err.details : {}
+      const details = err instanceof ApiFailure ? err.details : {}
+      // Online-menu errors name the problem `reason` (D-086); older routes use `problem`.
+      const problem = details['problem'] ?? details['reason']
+      const field = details['field']
       // A field-specific text first (`pin_weak`), then the generic problem text.
       const keys =
         typeof problem === 'string'

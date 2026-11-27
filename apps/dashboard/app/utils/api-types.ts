@@ -70,3 +70,5 @@ export type Order = Ok<'/v1/orders/{id}', 'get'>
 export type Movement = Ok<'/v1/ingredients/{id}/movements', 'get'>['movements'][number]
 export type User = Ok<'/v1/users', 'get'>['users'][number]
 export type Device = Ok<'/v1/devices', 'get'>['devices'][number]
+export type OnlineMenu = Ok<'/v1/online-menu', 'get'>
+export type OnlineImg = NonNullable<OnlineMenu['logo']>

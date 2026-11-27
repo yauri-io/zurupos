@@ -33,6 +33,42 @@ const load = async () => {
 await load()
 useHead({ title: () => item.value?.name ?? t('nav.menu') })
 
+// --- Menu online (SPEC §12.7): photo, show online, recommended (owner, manager).
+const sendFile = useUpload()
+// Recommended items across the shop, for the n/5 counter. The owner-only
+// /online-menu has the same number; managers read it from the item list.
+const recommendedIds = ref<string[]>([])
+const RECOMMENDED_LIMIT = 5
+const loadRecommended = async () => {
+  const all = await unwrap(api.GET('/v1/items'))
+  recommendedIds.value = all.items.filter((i) => i.is_recommended).map((i) => i.id)
+}
+await loadRecommended()
+const recommendedFull = computed(
+  () => !item.value?.is_recommended && recommendedIds.value.length >= RECOMMENDED_LIMIT,
+)
+const photoBusy = ref(false)
+const patchOnline = async (body: { show_online?: boolean; is_recommended?: boolean }) => {
+  await run(async () => {
+    item.value = await unwrap(api.PATCH('/v1/items/{id}', { params: { path: { id: id.value } }, body }))
+    await loadRecommended()
+  })
+}
+const uploadPhoto = async (file: File) => {
+  photoBusy.value = true
+  await run(async () => {
+    item.value = await sendFile<Item>('PUT', `/v1/items/${id.value}/photo`, await downsizeForUpload(file))
+  })
+  photoBusy.value = false
+}
+const removePhoto = async () => {
+  photoBusy.value = true
+  await run(async () => {
+    item.value = await unwrap(api.DELETE('/v1/items/{id}/photo', { params: { path: { id: id.value } } }))
+  })
+  photoBusy.value = false
+}
+
 // --- Modifier groups attached to the item.
 const groupById = computed(() => new Map(groups.value.map((g) => [g.id, g])))
 // The picker adds the chosen group, then is re-created so it shows its placeholder again.
@@ -245,6 +281,53 @@ await refreshPreview()
               @update:model-value="addGroup"
             />
             <UButton :label="t('common.save')" @click="saveGroups" />
+          </div>
+        </div>
+      </UCard>
+
+      <UCard data-testid="online-card">
+        <template #header>
+          <h2 class="font-semibold">
+            {{ t('item.online.title') }} <HelpTip :text="t('item.online.help')" />
+          </h2>
+        </template>
+        <div class="flex flex-col gap-4">
+          <PhotoSlot
+            :image="item.photo"
+            :label="t('item.online.photo')"
+            :busy="photoBusy"
+            testid="item-photo"
+            @pick="uploadPhoto"
+            @remove="removePhoto"
+          />
+          <p class="text-xs text-muted -mt-2">{{ t('item.online.photo_note') }}</p>
+          <USwitch
+            :model-value="item.show_online"
+            :label="t('item.online.show')"
+            :description="t('item.online.show_help')"
+            data-testid="show-online"
+            @update:model-value="(v) => patchOnline({ show_online: v === true })"
+          />
+          <div class="flex flex-col gap-1">
+            <USwitch
+              :model-value="item.is_recommended"
+              :disabled="recommendedFull"
+              :label="t('item.online.recommended')"
+              :description="t('item.online.recommended_help')"
+              data-testid="recommended"
+              @update:model-value="(v) => patchOnline({ is_recommended: v === true })"
+            />
+            <p
+              class="text-xs tabular-nums"
+              :class="recommendedFull ? 'text-warning' : 'text-muted'"
+              data-testid="recommended-count"
+            >
+              {{
+                recommendedFull
+                  ? t('item.online.recommended_full', { limit: RECOMMENDED_LIMIT })
+                  : t('item.online.recommended_count', { n: recommendedIds.length, limit: RECOMMENDED_LIMIT })
+              }}
+            </p>
           </div>
         </div>
       </UCard>

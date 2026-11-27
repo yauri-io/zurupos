@@ -37,6 +37,12 @@ const items = computed<NavigationMenuItem[]>(() =>
     },
     { label: t('nav.ingredients'), icon: 'i-lucide-package', to: '/ingredients', show: can('menu.manage') },
     { label: t('nav.discounts'), icon: 'i-lucide-percent', to: '/discounts', show: can('menu.manage') },
+    {
+      label: t('nav.online_menu'),
+      icon: 'i-lucide-qr-code',
+      to: '/online-menu',
+      show: can('online_menu.manage'),
+    },
     { label: t('nav.users'), icon: 'i-lucide-users', to: '/users', show: can('users.manage') },
     {
       label: t('nav.devices'),
