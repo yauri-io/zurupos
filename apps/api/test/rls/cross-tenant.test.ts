@@ -119,4 +119,39 @@ describe('tenant A context', () => {
     )
     expect(state).toBe('23503') // foreign_key_violation
   })
+
+  // Online menu (O1): photos, logo, cover and gallery can only use own media.
+  it.each([
+    ['items.photo_media_id', `update items set photo_media_id = $1 where id = $2`, 'items'],
+    ['menu_profiles.logo_media_id', `update menu_profiles set logo_media_id = $1 where tenant_id = $2`, null],
+    ['menu_profiles.cover_media_id', `update menu_profiles set cover_media_id = $1 where tenant_id = $2`, null],
+  ] as const)("%s cannot point at B's media (composite FK)", async (_, statement, table) => {
+    const state = await inTx(pool, a.tenant, (c) =>
+      sqlStateOf(c, () => c.query(statement, [b.media, table ? a[table] : a.tenant])),
+    )
+    expect(state).toBe('23503')
+  })
+
+  it("a gallery row cannot reference B's media (composite FK)", async () => {
+    const state = await inTx(pool, a.tenant, (c) =>
+      sqlStateOf(c, () => insertRow(c, 'menu_gallery', { ...FACTORIES.menu_gallery(a), media_id: b.media })),
+    )
+    expect(state).toBe('23503')
+  })
+
+  it("a slug taken by B fails the insert for A without B's row being visible", async () => {
+    const slug = await inTx(pool, b.tenant, async (c) => {
+      const row = { ...FACTORIES.menu_slugs(b), is_current: false }
+      await insertRow(c, 'menu_slugs', row)
+      return String(row['slug'])
+    })
+    const outcome = await inTx(pool, a.tenant, async (c) => {
+      const visible = (await c.query('select 1 from menu_slugs where slug = $1', [slug])).rowCount
+      const state = await sqlStateOf(c, () =>
+        insertRow(c, 'menu_slugs', { slug, tenant_id: a.tenant, is_current: false }),
+      )
+      return { visible, state }
+    })
+    expect(outcome).toEqual({ visible: 0, state: '23505' }) // unique_violation
+  })
 })

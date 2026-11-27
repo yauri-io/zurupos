@@ -27,18 +27,36 @@ export const TENANT_TABLES = [
   'stock_movements',
   'audit_log',
   'report_email_runs',
+  // Online menu, O1 (SPEC §4.1, §12.7).
+  'media',
+  'menu_profiles',
+  'menu_slugs',
+  'menu_hours',
+  'menu_gallery',
+  'menu_views_daily',
 ] as const
 
 export type TenantTable = (typeof TENANT_TABLES)[number]
 
 // Tables without an `id` column; rows are addressed by tenant_id only.
-export const TABLES_WITHOUT_ID: readonly TenantTable[] = ['item_modifier_groups', 'order_counters']
+export const TABLES_WITHOUT_ID: readonly TenantTable[] = [
+  'item_modifier_groups',
+  'order_counters',
+  'menu_profiles',
+  'menu_slugs',
+  'menu_hours',
+  'menu_views_daily',
+]
 
 // D-015: the only tables zuru_app may DELETE from.
 export const DELETABLE_TABLES: readonly TenantTable[] = [
   'item_modifier_groups',
   'recipe_lines',
   'modifier_option_effects',
+  // D-084: a replaced photo's media row, the week of hours, a gallery photo.
+  'media',
+  'menu_hours',
+  'menu_gallery',
 ]
 
 // One existing row id per table for a tenant (the parents a new row may reference).
@@ -228,6 +246,34 @@ export const FACTORIES: Record<TenantTable, (refs: Refs) => Row> = {
     tenant_id: r.tenant,
     kind: 'daily_summary',
     period_start: '2026-11-01',
+  }),
+  media: (r) => ({
+    id: randomUUID(),
+    tenant_id: r.tenant,
+    purpose: 'gallery',
+    storage_key: randomBytes(16).toString('hex'),
+    width: 1200,
+    height: 800,
+    bytes: 123_456,
+  }),
+  menu_profiles: (r) => ({
+    tenant_id: r.tenant,
+    description: `${r.marker} description`,
+    logo_media_id: ref(r, 'media'),
+  }),
+  // Slugs are unique across all shops, so each row gets a fresh one.
+  menu_slugs: (r) => ({
+    slug: `zz-${randomBytes(8).toString('hex')}`,
+    tenant_id: r.tenant,
+    is_current: false,
+  }),
+  menu_hours: (r) => ({ tenant_id: r.tenant, weekday: randomInt(1, 8), opens: '07:00', closes: '22:00' }),
+  menu_gallery: (r) => ({ id: randomUUID(), tenant_id: r.tenant, media_id: ref(r, 'media') }),
+  menu_views_daily: (r) => ({
+    tenant_id: r.tenant,
+    business_date: `2026-${String(randomInt(1, 13)).padStart(2, '0')}-${String(randomInt(1, 29)).padStart(2, '0')}`,
+    source: 'qr',
+    views: 1,
   }),
 }
 

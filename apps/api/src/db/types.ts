@@ -108,11 +108,76 @@ export interface Items {
   id: Generated<string>
   is_active: Generated<boolean>
   is_available: Generated<boolean>
+  is_recommended: Generated<boolean>
   name: string
+  photo_media_id: string | null
   price: bigint
+  show_online: Generated<boolean>
   sort: Generated<number>
   tenant_id: string
   updated_at: Generated<Timestamp>
+}
+
+export interface Media {
+  bytes: number
+  created_at: Generated<Timestamp>
+  height: number
+  id: Generated<string>
+  purpose: string
+  storage_key: string
+  tenant_id: string
+  updated_at: Generated<Timestamp>
+  width: number
+}
+
+export interface MenuGallery {
+  created_at: Generated<Timestamp>
+  id: Generated<string>
+  media_id: string
+  tenant_id: string
+  updated_at: Generated<Timestamp>
+}
+
+export interface MenuHours {
+  closes: string
+  created_at: Generated<Timestamp>
+  opens: string
+  tenant_id: string
+  updated_at: Generated<Timestamp>
+  weekday: number
+}
+
+export interface MenuProfiles {
+  accent_color: Generated<string>
+  cover_media_id: string | null
+  created_at: Generated<Timestamp>
+  description: string | null
+  instagram: string | null
+  is_published: Generated<boolean>
+  logo_media_id: string | null
+  maps_url: string | null
+  published_at: Timestamp | null
+  template: Generated<string>
+  tenant_id: string
+  updated_at: Generated<Timestamp>
+  whatsapp: string | null
+}
+
+export interface MenuSlugs {
+  created_at: Generated<Timestamp>
+  is_current: Generated<boolean>
+  slug: string
+  tenant_id: string
+  updated_at: Generated<Timestamp>
+}
+
+export interface MenuViewsDaily {
+  business_date: string
+  created_at: Generated<Timestamp>
+  source: string
+  tenant_id: string
+  updated_at: Generated<Timestamp>
+  views: Generated<number>
 }
 
 export interface ModifierGroups {
@@ -394,6 +459,12 @@ export interface DB {
   ingredients: Ingredients
   item_modifier_groups: ItemModifierGroups
   items: Items
+  media: Media
+  menu_gallery: MenuGallery
+  menu_hours: MenuHours
+  menu_profiles: MenuProfiles
+  menu_slugs: MenuSlugs
+  menu_views_daily: MenuViewsDaily
   modifier_groups: ModifierGroups
   modifier_option_effects: ModifierOptionEffects
   modifier_options: ModifierOptions
