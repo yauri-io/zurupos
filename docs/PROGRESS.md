@@ -346,3 +346,8 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Run: `pnpm --filter @zurupos/api test test/public-menu test/rls test/scheduler`; with the stack up, `pnpm --filter @zurupos/dashboard test:e2e:each`.
 - Tests: API 941 (views 29, RLS suite 332 incl. the views route compared against B's count), menu-ui 63, dashboard unit 117, e2e 8 (all specs).
 - Known issues: the numbers are approximate by design; an API restart forgets the 30-minute window. The user guide has no *Menu online* section yet.
+
+### Online menu deployed — 2026-11-27 19:30 WIB
+- O1–O3 deployed as `2026.11.27-dbdee7d` (backup `zuru-20261127-1925.dump` first, copied to R2). Migrations `20261127100000_online_menu` and `20261127200000_find_public_menu` applied; `menu` service healthy; Caddy serves `menu.zurupos.com`.
+- Checked live: `menu.zurupos.com/` → 302 to the landing page; unknown slug → 404 page and API 404; the menu CSP (nonce, images from `https://media.zurupos.com/`); the dashboard CSP allows the media domain; the API wrote a test object to the `zurupos-media` bucket, `media.zurupos.com` served it (`immutable`), and the API deleted it.
+- Not done on production: no shop has published a menu yet. The owner's first publish is the real end-to-end check (DEPLOY.md, "Online menu page", step 5).
