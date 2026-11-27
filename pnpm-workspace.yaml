@@ -1,6 +1,7 @@
 packages:
   - apps/api
   - apps/dashboard
+  - apps/menu
   - packages/*
 allowBuilds:
   argon2: true

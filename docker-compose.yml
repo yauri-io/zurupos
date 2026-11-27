@@ -125,6 +125,24 @@ services:
     depends_on:
       - api
 
+  # Public online menu (SPEC §12.7), http://localhost:3001/<slug>. Reads the API
+  # over the compose network; the browser's /v1/public/* calls are proxied to
+  # the API by the app itself (Caddy does that in production).
+  menu:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/menu/Dockerfile
+    environment:
+      NUXT_API_INTERNAL_BASE: http://api:4000
+      NUXT_SITE_URL: ${MENU_PUBLIC_BASE_URL:-http://localhost:3001}
+      NUXT_MEDIA_BASE_URL: ${MEDIA_PUBLIC_BASE_URL:-http://localhost:4000/media}
+      NUXT_PUBLIC_LANDING_URL: ${LANDING_URL:-https://zurupos.com}
+    ports:
+      - '3001:3001'
+    depends_on:
+      - api
+
 volumes:
   pgdata:
   media:

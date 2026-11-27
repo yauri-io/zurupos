@@ -1,0 +1,27 @@
+{
+  "name": "@zurupos/menu",
+  "private": true,
+  "type": "module",
+  "description": "The public online menu at menu.zurupos.com/<slug> (SPEC §12.7). Nuxt SSR; reads only the API's public routes.",
+  "scripts": {
+    "dev": "nuxt dev --port 3001",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@zurupos/menu-ui": "workspace:*",
+    "nuxt": "^4.6.4",
+    "vue": "^3.5.45",
+    "vue-router": "^5.5.1"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.17.0",
+    "@zurupos/api-client": "workspace:*",
+    "eslint": "^10.15.0",
+    "typescript": "~6.0.3",
+    "vue-tsc": "^3.3.14"
+  }
+}
