@@ -49,6 +49,7 @@
 - The **API is the only thing that talks to Postgres.** Both clients are untrusted.
 - The **server is authoritative** for prices, totals, stock and permissions. The cashier app computes the same totals locally for instant display using the identical algorithm (§6), verified by shared test fixtures.
 - One API process runs both HTTP and the outbox worker in MVP (worker can be split out later).
+- Post-pilot (§12.7, O1–O3): a public online menu app (`apps/menu`, Nuxt SSR) at `menu.zurupos.com`. It reads only through the API's public routes; it has no database access and no credentials.
 
 ## 2. Tech stack and repository layout
 
@@ -64,6 +65,9 @@
 | Password/PIN hashing | `argon2` (argon2id) |
 | Logging | `pino` (Fastify default), request id on every log line |
 | Email | `EmailProvider` interface; default implementation: Resend HTTP API; second implementation: SMTP via `nodemailer` |
+| Online menu (§12.7) | Nuxt 4 SSR (`apps/menu`), TailwindCSS, no Nuxt UI (small pages); page components, templates and the colour function in `packages/menu-ui`, shared with the dashboard preview |
+| Images (§12.7) | `sharp` in the API; `@fastify/multipart` for uploads |
+| Media storage (§12.7) | `MediaStore` interface: S3 API (Cloudflare R2, public via `media.zurupos.com`) in production, a local folder served by the API in dev/test |
 | Dashboard | Nuxt 4, Nuxt UI, TailwindCSS, `@nuxtjs/i18n` (id default, en), charts via a lightweight lib (e.g. `vue-echarts` or Chart.js wrapper) |
 | Cashier app | Flutter (current stable), Dart 3, Riverpod for state, `dio` for HTTP, `drift` (SQLite) for local cache/outbox, `flutter_secure_storage` for device token, `intl` for formatting/i18n |
 | Printing | ESC/POS byte generation (e.g. `esc_pos_utils_plus` or equivalent); Bluetooth classic SPP plugin for Android (evaluate maintained options, wrap behind interface); `dart:io` `Socket` for network printers |
@@ -100,6 +104,9 @@ zurupos/
           users/
           devices/
           settings/
+          online-menu/     # owner/manager endpoints, §12.7
+          public-menu/     # unauthenticated read + view beacon, §12.7
+        media/             # MediaStore (s3 | local), image pipeline
         domain/
           pricing.ts       # pure functions, §6
           recipe-resolve.ts# pure functions, §7
@@ -110,8 +117,10 @@ zurupos/
         rls/               # isolation suite, §3.6
     dashboard/             # Nuxt 4 app
     cashier/               # Flutter app
+    menu/                  # public online menu, Nuxt 4 SSR (§12.7)
   packages/
     api-client-ts/         # generated from OpenAPI for dashboard
+    menu-ui/               # online menu components, templates, accent colour (§12.7)
   docker-compose.yml
   .env.example
 ```
@@ -190,10 +199,12 @@ Login and token verification happen before a tenant is known. These use a small 
 | `auth.find_session(token_hash bytea)` | `session_id, user_id, tenant_id, role, kind, device_id, expires_at, revoked_at` |
 | `auth.find_device(token_hash bytea)` | `device_id, tenant_id, revoked_at` |
 | `auth.find_password_reset(token_hash bytea)` | `user_id, tenant_id, expires_at, used_at` |
+| `auth.report_schedule()` (R3, D-075) | `tenant_id, timezone, business_day_cutoff_hour, daily_summary_enabled, weekly_summary_enabled` for shops due report emails |
+| `auth.find_public_menu(slug citext)` (O2, D-081) | `tenant_id, current_slug`, only for a published menu of a shop with an active owner |
 
 Because §3.2 forces RLS on the owner too, each looked-up table (`users`, `sessions`, `devices`, `password_resets`) has one extra policy, `auth_definer_lookup`: `for select to zuru_owner using (true)`. It is SELECT-only and only for the NOLOGIN owner role; `zuru_app` is never a member of `zuru_owner` (see D-024).
 
-After the lookup, all further work (PIN check, session creation, etc.) runs inside `withTenant`. These four functions are the **complete** list of exceptions; adding one requires a `DECISIONS.md` entry and an isolation test. (Approved, added in R3: a fifth, `auth.report_schedule()`, for the report email scheduler, D-075. Until R3 ships, the four above are the complete list.)
+After the lookup, all further work (PIN check, session creation, etc.) runs inside `withTenant`. These functions are the **complete** list of exceptions; adding one requires a `DECISIONS.md` entry and an isolation test. The first five are live; the sixth, `auth.find_public_menu`, is approved (D-081, 2026-11-27) and is added with its tests in O2. Until O2 ships, the first five are the complete list. Its `auth_definer_lookup` policies (SELECT-only, `zuru_owner`) are on `menu_slugs`, `menu_profiles` and `users`.
 
 ### 3.5 System tables (no tenant RLS)
 
@@ -208,10 +219,11 @@ Location: `apps/api/test/rls/`. Runs in CI against real Postgres as `zuru_app`. 
 2. **DB-level:** with tenant A set, rows of tenant B are invisible; `update`/`delete` targeting B's ids affect 0 rows; `insert` with `tenant_id = B` fails the `with check`.
 3. **DB-level:** a script enumerates `pg_class` for all tables in `public` and asserts every table except the allowlist (`outbox`, `schema_migrations`) has `relrowsecurity = true` and `relforcerowsecurity = true`. New tables without RLS fail the build.
 4. **DB-level:** assert `zuru_app` is not superuser, has no `BYPASSRLS`, owns no tables, is not a member of `zuru_owner`, and neither `zuru_app` nor `zuru_worker` has `CREATE` on schemas `public` or `auth`.
-5. **DB-level:** assert the only `SECURITY DEFINER` functions are the four in §3.4.
+5. **DB-level:** assert the only `SECURITY DEFINER` functions are the ones live in §3.4 (five; six once O2 ships).
 6. **API-level:** create shops A and B with full data. For **every** route in the OpenAPI document, call it with A's credentials using B's resource ids → expect 404 (never 200, never B's data). The test iterates the OpenAPI spec so new routes are covered automatically.
 7. **API-level:** a device token from shop A plus a PIN of a user from shop B → rejected.
 8. **Pooling:** run 50 concurrent requests alternating tenants A/B on a small pool (size 2); every response contains only its own tenant's data.
+9. **Public routes** (`/v1/public/*`, O2): they take a slug, not credentials, and are meant to show a shop's published data, so the #6 sweep skips them. Instead: A's slug never returns any of B's rows; an unpublished menu, an unknown slug and a shop without an active owner are `404`; hidden, inactive and archived items and categories never appear; the response holds exactly the fields in §12.7 (schema with `additionalProperties: false`); the page data is read in a `read only` transaction. Include them in #8 (concurrent public requests for A's and B's slugs).
 
 ## 4. Data model
 
@@ -284,6 +296,9 @@ Conventions:
 | sort | int | |
 | is_active | bool | shown in POS at all |
 | is_available | bool | sold-out toggle |
+| show_online | bool | default true; shown on the online menu (§12.7, O1) |
+| is_recommended | bool | default false; at most 5 non-archived per tenant (§12.7) |
+| photo_media_id | uuid null | composite FK to `media`; online menu only, never in bootstrap |
 | archived_at | timestamptz null | |
 
 **modifier_groups** — `id, tenant_id, name, selection ('single'|'multiple'), min_select int, max_select int, sort, archived_at`. Validation: `0 ≤ min ≤ max`; single ⇒ `max = 1`; required ⇔ `min ≥ 1`.
@@ -377,6 +392,34 @@ Conventions:
 | created_at | timestamptz | |
 
 **audit_log** (append-only) — `id, tenant_id, actor_user_id, action, entity_type, entity_id, data jsonb, created_at`. Actions logged at minimum: void, custom discount, price change, recipe change, user create/deactivate/role change/PIN reset, device pair/revoke, settings change, stock count.
+
+**Online menu tables** (O1, §12.7; all tenant tables with RLS per §3.2)
+
+**media** — `id, tenant_id, purpose ('item'|'logo'|'cover'|'gallery'), storage_key text unique (random, 32 hex; never contains a tenant or item id), width int, height int (of the largest variant), bytes int (of the upload), created_at`. Variants are derived from the key (§12.7).
+
+**menu_profiles** — one row per tenant, pk `tenant_id`.
+| column | type | notes |
+|---|---|---|
+| tenant_id | uuid pk | |
+| is_published | bool | default false |
+| published_at | timestamptz null | |
+| description | text null | ≤ 160 characters |
+| template | text | check in (`foto`,`papan`,`hangat`), default `papan` |
+| accent_color | text | check `^#[0-9a-f]{6}$`, default `#6b4f3a` |
+| logo_media_id, cover_media_id | uuid null | composite FKs to `media` |
+| whatsapp | text null | digits only, `62` + 8–13 digits |
+| instagram | text null | handle, `^[a-z0-9._]{1,30}$` |
+| maps_url | text null | `https://` on `google.com/maps`, `maps.google.com`, `maps.app.goo.gl` or `goo.gl/maps` only |
+
+The shop name and address come from `tenants.name` and `tenants.address` (the same as the receipt).
+
+**menu_slugs** — `slug citext pk, tenant_id, is_current bool, created_at`; partial unique `(tenant_id) where is_current`. The primary key on `slug` alone makes a slug unique across all shops; constraint checks aren't filtered by RLS, so a slug taken by another shop fails the insert. Rows are never deleted (D-080).
+
+**menu_hours** — `tenant_id, weekday smallint (1 = Monday … 7), opens time, closes time`, pk `(tenant_id, weekday)`, check `opens <> closes`. `closes < opens` means it closes after midnight. A weekday without a row is closed; no rows at all hides the hours.
+
+**menu_gallery** — `id, tenant_id, media_id (composite FK), created_at`; at most 6 per tenant; ordered by `created_at`.
+
+**menu_views_daily** — `tenant_id, business_date, source ('qr'|'link'), views int`, pk `(tenant_id, business_date, source)`.
 
 **outbox** (system table, §3.5) — `id, tenant_id, kind, to_addresses text[], subject, html, text, status ('pending'|'sent'|'failed'), attempts, next_attempt_at, last_error, created_at, sent_at`.
 
@@ -551,7 +594,7 @@ Base path `/v1`. JSON. Errors:
 ```json
 { "error": { "code": "PAYMENT_MISMATCH", "message": "Human readable (id/en by Accept-Language)", "details": {} } }
 ```
-Codes include: `VALIDATION`, `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `PIN_LOCKED`, `PAYMENT_MISMATCH`, `PRICE_CHANGED`, `ITEM_UNAVAILABLE`, `RATE_LIMITED`.
+Codes include: `VALIDATION`, `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `PIN_LOCKED`, `PAYMENT_MISMATCH`, `PRICE_CHANGED`, `ITEM_UNAVAILABLE`, `RATE_LIMITED`, `FILE_TOO_LARGE` (§12.7).
 Cross-tenant ids always return `NOT_FOUND`. List endpoints use cursor pagination (`?cursor=&limit=`, max 100).
 
 Auth headers: dashboard = cookie; cashier app = `X-Device-Token` + `Authorization: Bearer <staff token>` (except pairing/staff list/PIN login).
@@ -570,6 +613,8 @@ Auth headers: dashboard = cookie; cashier app = `X-Device-Token` + `Authorizatio
 | Discounts | CRUD `/discounts` (owner, manager) |
 | Orders | `POST /orders` (owner, manager, cashier), `GET /orders` (filters: date range, status, method, user, q), `GET /orders/:id`, `POST /orders/:id/void`, `GET /orders/today` (device: all roles, employee gets no money fields beyond totals) |
 | Reports (owner) | `GET /reports/summary?from&to`, `/reports/daily`, `/reports/hourly`, `/reports/items`, `/reports/categories`, `/reports/payments`, `/reports/margin`, `/reports/voids`, `/reports/stock-value`, `/reports/heatmap` (§12.4), `/reports/menu-matrix` (§12.5) |
+| Online menu (§12.7) | `GET/PATCH /online-menu`, `PUT /online-menu/hours`, `POST /online-menu/publish`, `POST /online-menu/unpublish`, `PUT/DELETE /online-menu/logo`, `PUT/DELETE /online-menu/cover`, `POST /online-menu/gallery`, `DELETE /online-menu/gallery/:id`, `GET /online-menu/preview`, `GET /online-menu/views` (owner); `PUT/DELETE /items/:id/photo`, and `show_online`, `is_recommended` via `PATCH /items/:id` (owner, manager) |
+| Public (§12.7, no auth) | `GET /public/menus/:slug`, `POST /public/menus/:slug/views` |
 | Admin | `GET /admin/stock-invariant` (owner; returns ingredients where Σ movements ≠ stock_qty — should always be empty) |
 
 `POST /orders` request:
@@ -675,6 +720,7 @@ Role determines navigation; the API enforces it regardless.
 - `/ingredients` — owner, manager (cost columns owner only)
 - `/discounts` — owner, manager
 - `/users`, `/devices` — owner
+- `/online-menu` (§12.7, O1) — owner; the item page's *Menu online* card (photo, *Tampilkan online*, *Rekomendasi*) — owner, manager
 - `/settings` — owner (profile, tax & service with live example calculation, payment methods, receipt text, alerts, business day cutoff, timezone)
 
 Mobile-first: every page usable at 375 px width; tables collapse to cards. Use Nuxt UI components; date range picker with presets (Hari ini, Kemarin, 7 hari, Bulan ini, Bulan lalu).
@@ -727,7 +773,7 @@ Two outbox kinds, rendered at enqueue time like every email (§10):
 | `weekly_summary` | Monday 07:30 | the previous Monday–Sunday business dates | the week has no paid orders |
 
 - **Daily content:** net sales, orders, average order value for `D`; change against `D − 7` (same weekday), as a whole percent with `div`, or "—" when `D − 7` had no orders; totals per payment method; top 3 items by net after order discount; voids count and total when > 0; number of ingredients at or below threshold now; a link to the dashboard Home. When `D` has no paid orders the email says *Tidak ada transaksi tercatat* instead of the sales figures, and still shows the comparison with `D − 7`, voids and the low-stock count.
-- **Weekly content:** net sales and orders against the week before; the §12.4 insight over the 4 weeks ending that Sunday (left out when not reliable); up to 3 menu actions from §12.5 over the same 4 weeks, taken from every category whose state is `ok` (`naikkan_harga` items by `extra_30d` desc, then `promosikan` by `qty` asc); a coverage nudge when any category with sales is `incomplete_costs`.
+- **Weekly content:** net sales and orders against the week before; the §12.4 insight over the 4 weeks ending that Sunday (left out when not reliable); up to 3 menu actions from §12.5 over the same 4 weeks, taken from every category whose state is `ok` (`naikkan_harga` items by `extra_30d` desc, then `promosikan` by `qty` asc); a coverage nudge when any category with sales is `incomplete_costs`; while the online menu is published (O3), one line with its views that week against the week before (§12.7).
 - Money through the API's one IDR formatter. Subject (id): `[ZuruPOS] Ringkasan {Kamis, 26 Nov}: Rp …` and `[ZuruPOS] Ringkasan minggu {23–29 Nov}`. Locale of the owner.
 - **Recipient:** the active owner only (not `alert_extra_emails`).
 - **Settings:** `tenants.daily_summary_enabled`, `tenants.weekly_summary_enabled` (bool, default true), in Settings → Alerts.
@@ -735,9 +781,68 @@ Two outbox kinds, rendered at enqueue time like every email (§10):
 - **Scheduler:** a separate process (`node dist/scheduler/scheduler.js`, Compose service `scheduler`) connecting as `zuru_app` with the startup role guard. Every 5 minutes it gets the list of shops and their schedule fields from `auth.report_schedule()` (see D-075), works out which periods are due with a pure function (`domain/report-schedule`), and handles each shop in its own `withTenant` transaction. Catch-up is bounded: a daily summary is sent at most 24 h late and a weekly at most 72 h late; older periods are skipped, so a long outage never sends a backlog.
 - Needs a fifth reviewed `auth.*` function (§3.4, D-075, approved 2026-11-25), added with its isolation tests in R3.
 
+### 12.7 Online menu (PRD F18–F19, D-078 to D-083)
+
+A public, read-only page per shop at `menu.zurupos.com/<slug>`. Nothing is ordered or paid on it. Off until the owner publishes it.
+
+**Routing.** Caddy serves `menu.zurupos.com`: `/v1/public/*` goes to the API (same origin, so the dashboard-only CORS rule stays), everything else to the `menu` service (Nuxt SSR, Compose service `menu`, port 3001 locally). The SSR server fetches from the API over the internal network. `/` redirects (302) to the landing page. `media.zurupos.com` is the R2 bucket's custom domain (`MEDIA_PUBLIC_BASE_URL`); locally the API serves `MEDIA_LOCAL_DIR` under `/media/*`.
+
+**Slugs (D-080).** `^[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){2,39}$`, not in the reserved list (`apps/api/src/modules/online-menu/reserved-slugs.ts`). The dashboard suggests one from `tenants.name` (lowercase, accents removed, spaces to hyphens). Setting a slug inserts a new `menu_slugs` row with `is_current = true` and sets the previous one to false in the same transaction; a slug of another shop gives `409 CONFLICT` (`details.reason = 'slug_taken'`), a reserved or badly formed one `VALIDATION`. Setting a slug this shop used before makes that row current again. Publishing needs a current slug.
+
+**Images (D-079).**
+- Upload: `multipart/form-data`, one file, field `file`, route body limit 2 MB (`413 FILE_TOO_LARGE` above it). The dashboard downsizes to ≤ 2000 px on the long side (JPEG, quality 0.85) in the browser before sending.
+- Server: decode with `sharp` (`limitInputPixels` 40 MP, first frame only); accept only when the decoded format is `jpeg`, `png` or `webp`, else `VALIDATION`. `rotate()` by EXIF, no metadata kept. Variants as WebP (quality 80), never upscaled, fitted inside the box:
+
+| purpose | variants (long side, px) |
+|---|---|
+| `item`, `gallery` | 480, 1200 |
+| `cover` | 800, 1600 |
+| `logo` | 128, 512 |
+
+- Object keys `m/<storage_key>-<size>.webp`, `Cache-Control: public, max-age=31536000, immutable`.
+- Order of work: process → put objects → `withTenant` transaction (insert `media`, point the item/profile/gallery row at it, delete the replaced `media` row) → after commit, delete the replaced objects. If the transaction fails, delete the new objects. A failed delete only leaves an orphan; log it at warn.
+- Restoring an older database dump can point at objects deleted since; the page treats a missing image as no image.
+
+**Limits** (checked in the service while holding `select … for update` on the shop's `menu_profiles` row, created on first use, so two parallel requests can't both pass): at most 5 non-archived items with `is_recommended` (`409 CONFLICT`, `reason = 'recommended_limit'`); at most 6 gallery photos (`reason = 'gallery_limit'`).
+
+**Dashboard endpoints** (§9). `GET /online-menu` returns the profile, current slug, public URL, hours, gallery, logo and cover URLs, and `recommended_count`. `PATCH /online-menu` takes `slug, description, template, accent_color, whatsapp, instagram, maps_url` (any subset; `null` clears). `PUT /online-menu/hours` replaces the week: `[{ weekday, opens, closes }]`, times `HH:MM`, at most one per weekday. Publish, unpublish, slug change and profile changes are written to the audit log (`online_menu.publish`, `online_menu.unpublish`, `online_menu.slug`, `settings.change`). `GET /online-menu/preview` returns the public payload below for this shop whether or not it is published, with optional unsaved `template` and `accent_color` query values so the preview follows the form. Changing `show_online`, `is_recommended` or the photo bumps the item's `updated_at`, so devices refetch bootstrap once; bootstrap leaves these fields out.
+
+**Public read.** `GET /v1/public/menus/:slug` (rate limit 120/min per IP):
+1. `auth.find_public_menu(slug)` (D-081). No row → `404 NOT_FOUND`.
+2. `slug ≠ current_slug` → `200 { kind: 'moved', slug: current_slug }`; the SSR app answers `308` to `/<current_slug>`, keeping `?s=qr`.
+3. Otherwise `withTenant(tenant_id)` with `set transaction read only`, reading through `public-menu/queries.ts` only:
+
+```
+{ kind: 'menu',
+  shop: { name, description, address, timezone, template, accent_color,
+          logo: Img|null, cover: Img|null, whatsapp, instagram, maps_url,
+          hours: [{ weekday, opens, closes }],
+          price_note: { tax_name|null, service_charge: bool } | null },
+  recommended: [item_id],
+  categories: [{ id, name, items: [{ id, name, price, sold_out, recommended, photo: Img|null }] }],
+  gallery: [Img],
+  menu_version }
+Img = { url_small, url_large, width, height }
+```
+- Categories: `is_active`, not archived, with at least one listed item, by `sort`. Items: `is_active`, not archived, `show_online`, by `sort`; `price` = `items.price` (base, without tax); `sold_out = not is_available`. `recommended` keeps category then item order. No modifiers, costs, recipes, stock or staff fields. `price_note` is set when tax or service charge is enabled.
+- The SSR app keeps each slug's response in memory for 15 s, so a sold-out tap shows on the page within about 15 s. The HTML is sent with `Cache-Control: no-cache`.
+
+**Page** (`packages/menu-ui`, rendered by `apps/menu` and by the dashboard preview):
+- Fixed order (D-078): cover → logo, name, description → *Hari ini 07.00–22.00* / *Hari ini tutup* (today in the shop's timezone, by calendar day; a range past midnight shows as `18.00–01.00`) with the week below it → address, *Buka peta*, *WhatsApp* (`https://wa.me/<digits>`), *Instagram* → *Rekomendasi* → category tabs (sticky, scroll to section) and sections → gallery → *Harga belum termasuk PB1 dan biaya layanan* (only what applies) → footer *Menu oleh ZuruPOS* linking to the landing page. Missing parts are left out without gaps.
+- Item: name, price via the package's one IDR formatter (`Rp 25.000`), *Habis* badge (item stays, muted), recommended badge, photo when there is one. Templates must look right with no photos, some and all; *Foto* falls back to a text card without the photo slot when an item has none.
+- Templates *Foto*, *Papan*, *Hangat* are token sets on the same markup (D-082). Accent: `accent.ts` returns `{ accent, on_accent, accent_text }`: `on_accent` is `#ffffff` or `#111111`, whichever contrasts more with `accent`; `accent_text` is `accent` darkened in OKLCH lightness steps of 0.02 until it has at least 4.5:1 contrast against the template background.
+- Language: Bahasa Indonesia; English when the browser's first preferred language is English. Text through i18n keys.
+- Head: `<title>{name} — Menu dan harga</title>`, meta description (the description, or a generated line with the categories), canonical URL, Open Graph and Twitter tags (cover 1600, else logo 512), JSON-LD `FoodEstablishment` with address, `openingHoursSpecification` and `hasMenu` (sections and items with `offers` in IDR). Published pages are indexable; 404 pages get `noindex`.
+- Budget: HTML + CSS + JS under 150 KB compressed before images; images below the first screen lazy-loaded with width and height set; usable at 360 px; LCP under 2.5 s on a mid-range Android over 4G with the cover photo.
+- 404 page: *Menu tidak ditemukan* with a link to the landing page.
+
+**Dashboard `/online-menu`** (owner, mobile-first): status card (publish switch, link with copy, QR download as PNG 1024 px and a printable A6 card, *Buka halaman*), *Tampilan* (three template choices, colour picker), *Profil* (logo, cover, description with counter, address shown read-only with a link to Settings, WhatsApp, Instagram, Maps link), *Jam buka* (seven rows, closed switch), *Galeri* (up to 6, delete), *Dilihat* (F19, O3). A phone-sized live preview from `/online-menu/preview` sits beside the form on desktop and behind a *Pratinjau* button on mobile. QR codes are drawn in the browser (`qrcode`), encoding `<MENU_PUBLIC_BASE_URL>/<slug>?s=qr`, error correction M. The item page gets a *Menu online* card: photo, *Tampilkan online*, *Rekomendasi* (with `n/5`, and the limit message when full). The Home setup checklist (D-056) is not changed.
+
+**Views (O3, D-083).** After load the page calls `navigator.sendBeacon('/v1/public/menus/<slug>/views', JSON.stringify({ source }))` once, with `source = 'qr'` when the URL had `s=qr`, else `'link'`. The dashboard preview never sends it. `POST /v1/public/menus/:slug/views` (rate limit 30/min per IP) always answers `204`. It counts only when the slug resolves to a published menu, the user agent isn't on the bot list (`apps/api/src/modules/public-menu/bots.ts`: WhatsApp, facebookexternalhit, Instagram link preview, Twitterbot, TelegramBot, Slackbot, Discordbot, Googlebot, bingbot and generic `bot|crawler|spider|preview` matches), and the same IP + user agent + slug wasn't counted in the last 30 minutes (in-memory, capped at 100 000 entries, never written anywhere). Counting is an upsert `views = views + 1` on `menu_views_daily` for the current business date (§12.1) in its own short `withTenant` transaction. `GET /online-menu/views?days=7|30|90` returns `{ today, last_7, previous_7, days: [{ business_date, qr, link }] }` with empty days as 0. The card says *kali dibuka* and explains in a help tip that the number is approximate.
+
 ## 13. Seed data
 
-`db/seeds/demo.sql` (dev only): one shop *"Kopi Demo"* with timezone Asia/Jakarta, PB1 10% and service 5% **off** by default, users (owner, manager, cashier, employee with known dev PINs), ~12 ingredients (espresso beans, fresh milk, oat milk, palm sugar syrup, vanilla syrup, caramel syrup, ice, cup 12oz, cup 16oz, lid, straw, water bottle), categories (Kopi, Non-Kopi, Makanan), ~10 items (Americano, Kopi Susu Gula Aren, Latte, Cappuccino, Matcha Latte, Chocolate, Croissant, Air Mineral …), modifier groups (Ukuran, Gula, Es, Susu, Tambahan) with effects as in §7.1 examples, two preset discounts, and ~200 historical orders over 14 days for dashboard development.
+`db/seeds/demo.sql` (dev only): one shop *"Kopi Demo"* with timezone Asia/Jakarta, PB1 10% and service 5% **off** by default, users (owner, manager, cashier, employee with known dev PINs), ~12 ingredients (espresso beans, fresh milk, oat milk, palm sugar syrup, vanilla syrup, caramel syrup, ice, cup 12oz, cup 16oz, lid, straw, water bottle), categories (Kopi, Non-Kopi, Makanan), ~10 items (Americano, Kopi Susu Gula Aren, Latte, Cappuccino, Matcha Latte, Chocolate, Croissant, Air Mineral …), modifier groups (Ukuran, Gula, Es, Susu, Tambahan) with effects as in §7.1 examples, two preset discounts, and ~200 historical orders over 14 days for dashboard development. Online menu (O1): slug `kopi-demo`, unpublished, template `papan`, a description, opening hours 07:00–22:00 Monday–Saturday and 08:00–20:00 Sunday, three recommended items, no photos.
 
 ## 14. Next-phase readiness (design constraints now, features later)
 
@@ -762,14 +867,16 @@ Constraints to respect in the MVP so this is an addition, not a rewrite:
 3. Pricing (§6) and recipe resolution (§7.1) are pure functions independent of who submits the order, so a public QR ordering endpoint can reuse them.
 4. Stock deduction stays tied to the **paid** transition (§7.2), not to order creation, so unpaid QR orders won't move stock.
 5. The future `tables` table will be a normal tenant table (`id, tenant_id, name, qr_token, is_active`). The QR encodes a URL with an unguessable `qr_token` (random, ≥ 128 bits), never a sequential id or tenant id; the public endpoint resolves the token via a reviewed `auth.*` function (§3.4 process).
-6. The `/device/bootstrap` menu payload shape should be reusable for the public QR menu (minus staff-only fields).
+6. The `/device/bootstrap` menu payload shape should be reusable for the public QR menu (minus staff-only fields). The view-only online menu (§12.7) already has a public read path through `auth.find_public_menu` and a read-only transaction; QR ordering would add per-table tokens and write paths, under their own decision.
 
 ## 15. Non-functional, security and operations
 
 - HTTPS only (TLS terminated by reverse proxy in deployment — not part of this build). HSTS on dashboard.
 - Security headers via `@fastify/helmet`; CORS: dashboard origin only (app uses tokens, not cookies).
 - All input validated by TypeBox schemas; unknown properties rejected.
-- Rate limits: login, PIN, password reset, signup.
+- Rate limits: login, PIN, password reset, signup, and the public menu routes (§12.7).
+- Public online menu (§12.7): the only unauthenticated routes that read tenant data, through `auth.find_public_menu` and a read-only transaction; uploads decoded and re-encoded by the server, never stored as sent; `menu.zurupos.com` sends a CSP allowing images only from itself and `MEDIA_PUBLIC_BASE_URL`, no third-party scripts, and no `X-Robots-Tag: noindex` (unlike app/api, D-061).
+- Media env vars, documented in `.env.example` with O1: `MEDIA_DRIVER` (`local`|`s3`), `MEDIA_LOCAL_DIR`, `MEDIA_PUBLIC_BASE_URL`, `MEDIA_S3_ENDPOINT`, `MEDIA_S3_BUCKET`, `MEDIA_S3_ACCESS_KEY_ID`, `MEDIA_S3_SECRET_ACCESS_KEY`, `MENU_PUBLIC_BASE_URL`.
 - Secrets only from env; `.env.example` documents all vars. Never commit secrets.
 - Structured logs; never log PINs, passwords, tokens or full request bodies of auth routes.
 - Health endpoint `GET /healthz` (db ping).
@@ -797,6 +904,14 @@ Each milestone ends with its tests green and a short note appended to `docs/PROG
 | R1 | Operational heatmap (§12.4): API + `/reports/heatmap` | Integration tests on seeded orders with hand-computed cells, incl. a cutoff of 2 (01:30 order lands at the end of the previous day's row), a closed weekday (null row), 5 vs 4 occurrences of a weekday (averages, not sums), a non-Jakarta timezone and the `reliable` threshold; RLS suite green (new route covered); 375 px check |
 | R2 | Menu matrix (§12.5): API + `/reports/menu` | Integration tests for each quadrant boundary (exactly 70% share, exactly the average margin), each `incomplete` reason, the 50% coverage state, `N < 3`, a negative margin, and `suggested_increase` / `extra_30d` by hand; RLS suite green; 375 px check |
 | R3 | Report emails (§12.6) | D-075 approved 2026-11-25. Unit tests for `domain/report-schedule` (timezones, cutoff, Monday rollover, bounded catch-up); integration tests: one email per period even with two scheduler passes in parallel, an empty day still sends its email (weekly: skipped), toggles respected, owner-only recipient; the §3.6 suite updated for the fifth `auth.*` function and still green; both emails arrive in Mailpit |
+
+**Online menu** (PRD F18–F19, §12.7), in order, local only until the user asks to deploy. DNS for `menu.` and `media.`, the R2 bucket and its keys are set up by the user at deploy time.
+
+| # | Milestone | Exit criteria |
+|---|---|---|
+| O1 | Data, images and dashboard: migrations (§4.1 online menu tables and item columns), `MediaStore` (local + S3) and image pipeline, dashboard endpoints, `/online-menu` without preview and views, the item page's *Menu online* card, QR download, seed | Integration tests: 2 MB limit (`413`), a renamed non-image file rejected, EXIF orientation applied and GPS/EXIF gone from every variant, no upscaling, replaced photo's objects deleted after commit and kept when the transaction fails; slug rules (reserved, malformed, taken by another shop → `409`, reusing an own old slug); recommended limit and gallery limit each with two parallel requests (exactly one wins); manager can change item fields and photos but gets `403` on the profile routes; bootstrap response unchanged (no photo fields); RLS suite green with the new tables (#3) and routes (#6); 375 px check |
+| O2 | Public page: `auth.find_public_menu` with its tests (D-081), public read route, `packages/menu-ui` with the three templates and `accent.ts`, `apps/menu` SSR, Compose `menu` service (in local dev a Nitro `routeRules` proxy sends `/v1/public/*` to the API; Caddy does it in production), dashboard live preview | §3.6 #5 expects six functions and #9 passes; `accent.ts` unit tests (pale yellow, white, black, mid grey: every result ≥ 4.5:1); old slug → `308` keeping `?s=qr`; Playwright: publish in the dashboard → the page shows the right items, prices, *Habis*, *Rekomendasi* and today's hours, for each template with no photos and with all photos, at 360 px and desktop; the head has canonical, Open Graph and valid JSON-LD; unpublishing → `404` within 15 s; page budget met |
+| O3 | Views: beacon route, bot list and 30-minute window, `menu_views_daily`, the *Dilihat* card, the weekly email line | Tests: a bot user agent isn't counted; the same IP + user agent twice in 30 minutes counts once; `?s=qr` → `qr`; a business-day cutoff of 2 puts a 01:30 view on the previous business date; an unpublished slug never counts; the preview never sends a beacon; the weekly email shows the line only while published; RLS suite green |
 
 ## 17. UAT checklist (pilot readiness)
 

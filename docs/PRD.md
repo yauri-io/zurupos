@@ -69,7 +69,7 @@ Quality over speed: the date may move if needed. The MVP must be free of major b
 - Loyalty, customer database, promotions engine beyond preset discounts.
 - Multi-outlet.
 - WhatsApp notifications (explicitly avoided).
-- Item photos, supplier management, purchase orders.
+- Item photos in the cashier app or on receipts (photos are for the online menu only, F18, D-079), supplier management, purchase orders.
 - Subscription billing.
 
 ## 6. Users and roles
@@ -100,7 +100,9 @@ Four fixed roles. Owners cannot create custom roles.
 | Manage users (create, deactivate, reset PIN) | ✓ | ✗ | ✗ | ✗ |
 | Pair / revoke counter devices | ✓ | ✓ (pair only) | ✗ | ✗ |
 | Shop settings (tax, service charge, receipt, alerts) | ✓ | ✗ | ✗ | ✗ |
-| Access web dashboard | ✓ | ✓ (menu, recipes, ingredients, stock, discounts only) | ✗ | ✗ |
+| Online menu per item: photo, show online, recommended (F18) | ✓ | ✓ | ✗ | ✗ |
+| Online menu: shop profile, photos, hours, address, publish, view counts (F18–F19) | ✓ | ✗ | ✗ | ✗ |
+| Access web dashboard | ✓ | ✓ (menu incl. online-menu item fields, recipes, ingredients, stock, discounts only) | ✗ | ✗ |
 
 **All roles have a PIN** (4–6 digits) for the counter device. Owner and manager additionally have email + password for the dashboard and for pairing devices.
 
@@ -237,6 +239,26 @@ Scope agreed on 2026-11-25 (D-071 to D-075). The owner already gets the numbers 
 - To the shop owner only (not the extra low-stock alert addresses, because these emails contain the shop's money figures). Each email can be turned off in Settings; both are on by default.
 - Email only. No WhatsApp (D-072).
 
+### Online menu (F18–F19)
+
+Scope agreed on 2026-11-27 (D-078 to D-083). Help a shop be seen online: people can look at the menu before they visit. The link goes in the shop's Instagram bio, Google Business Profile and WhatsApp, and a QR code goes on the window or counter. Its edge over a Linktree, a PDF or an Instagram highlight: it comes from the POS data, so prices, new items and sold-out are always current, with no extra work. Owner-facing, included in the flat price. Built in the order O1 → O3 (SPEC §16).
+
+#### F18. Online menu and shop profile
+- **Question it answers (for the customer):** "What do they sell, what does it cost, and when are they open?"
+- A public page at `menu.zurupos.com/<slug>` (e.g. `menu.zurupos.com/kopi-senja`), **off until the owner publishes it**. The owner picks the slug (suggested from the shop name). Changing it later keeps the old address working.
+- **It is a template with slots, not a website builder.** The owner fills in facts about the shop; ZuruPOS makes the design decisions. The layout is always: cover photo → logo, shop name and a short description (up to 160 characters) → today's opening hours → address with a map link, WhatsApp and Instagram buttons → *Rekomendasi* → the menu by category → photo gallery → "Menu oleh ZuruPOS" footer. Anything left empty is hidden.
+- **Look:** the owner picks one of three templates (*Foto*, *Papan*, *Hangat*) and any brand colour; ZuruPOS keeps text readable whatever the colour. No custom fonts, layouts, sections or pages.
+- **Menu:** active categories and items, in the POS order, with name and **base price** (without tax; a note says so when the shop adds tax or a service charge). No modifiers. Sold-out items stay visible with *Habis*. Per item the owner or manager can hide it from the online menu (*Tampilkan online*, on by default), add one photo, and mark it **recommended**: up to 5 items, shown in *Rekomendasi* at the top and with a badge in their category.
+- **Photos:** item photos, a logo, one cover and a simple gallery of up to 6 photos. Up to 2 MB per upload, converted to WebP; the dashboard shrinks large phone photos before uploading. Photos are for the online menu only, never in the cashier app or on receipts. Every template must look good with no photos at all.
+- **Opening hours:** a weekly schedule, one time range per day or closed. No one-off closures. The page shows today's hours ("Hari ini 07.00–22.00"), not a live "open now".
+- **QR code:** download as PNG or a printable card from the dashboard.
+- Readable by search engines and with a good link preview in WhatsApp and Instagram (shop name, description, cover photo).
+
+#### F19. Menu views
+- **Question it answers (for the owner):** "Is anyone looking at my menu?"
+- How many times the menu was opened: today, the last 7 days against the 7 before, a daily chart over 30 days, and how many came from the QR code versus a link. Counted without cookies; link-preview bots aren't counted. The numbers are approximate and labelled "kali dibuka", not visitors.
+- One line in the weekly summary email (F17) while the menu is published.
+
 ## 8. Non-functional requirements
 
 - **Language:** Bahasa Indonesia default UI; English available. All copy externalised for i18n.
@@ -272,6 +294,8 @@ Scope agreed on 2026-11-25 (D-071 to D-075). The owner already gets the numbers 
 **Next phase** (directly after MVP):
 1. **Post-pilot reporting**: operational heatmap, menu matrix, daily and weekly summary emails (F15–F17).
 2. **Offline ordering** with sync.
+
+**Building now** (after the pilot opened): the online menu and shop profile (F18–F19, D-078).
 
 **Deferred until the pilot shows the need** (D-069):
 - **QR table ordering.** The owner sets up tables in the dashboard. ZuruPOS generates one **static QR code per table** (printable sheet / downloadable PNG). A customer scans it, sees the menu on their phone, and places an order tagged with that table. The order arrives at the counter device. Payment is still recorded by the cashier, not processed online. Open questions for that phase: pay-at-counter vs. pay-before-prepare, how QR orders are confirmed by staff, spam/abuse protection on a public ordering page, and whether QR codes can be regenerated if leaked.

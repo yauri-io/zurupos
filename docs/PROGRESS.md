@@ -302,3 +302,7 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 
 ### Guide PDFs refreshed — 2026-11-26
 - Done (D-066): the source Claude Doc *Panduan Pengguna ZuruPOS* got sections D5 *Jam ramai*, D6 *Evaluasi menu* and D7 *Email ringkasan* (figures D11–D15 from the demo shop), two rows in the D2 report table, an *Email ringkasan* line in A2, and no *Buka laci kas* step or switch in A8/A13 (D-067). Parts 1 and 3 re-exported (part 2 unchanged) and uploaded over the same names on `dl.zurupos.com/panduan/`; `/panduan/` shows part 3 as 22 pages, 3.9 MB (`c570761`, pulled on the server).
+
+### Online menu scoped — 2026-11-27
+- Scoped after a brainstorm with the owner (D-078 to D-083): a public, read-only menu with a mini shop profile at `menu.zurupos.com/<slug>` (PRD F18–F19, SPEC §12.7), built as milestones O1 (data, images, dashboard) → O2 (public page, three templates) → O3 (view counts). Item photos are now allowed, for the online menu only (D-079). The sixth `auth.*` function, `auth.find_public_menu`, was approved by the user on 2026-11-27 (D-081).
+- Not built yet. Deploying it later needs DNS for `menu.` and `media.`, an R2 bucket for media and its keys, set up by the user.
