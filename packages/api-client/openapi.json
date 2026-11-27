@@ -10325,6 +10325,76 @@
         }
       }
     },
+    "/v1/online-menu/views": {
+      "get": {
+        "tags": ["online-menu"],
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": ["7"]
+                },
+                {
+                  "type": "string",
+                  "enum": ["30"]
+                },
+                {
+                  "type": "string",
+                  "enum": ["90"]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "days",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["today", "last_7", "previous_7", "days"],
+                  "properties": {
+                    "today": {
+                      "type": "integer"
+                    },
+                    "last_7": {
+                      "type": "integer"
+                    },
+                    "previous_7": {
+                      "type": "integer"
+                    },
+                    "days": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["business_date", "qr", "link"],
+                        "properties": {
+                          "business_date": {
+                            "type": "string"
+                          },
+                          "qr": {
+                            "type": "integer"
+                          },
+                          "link": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/online-menu/hours": {
       "put": {
         "tags": ["online-menu"],
@@ -13292,6 +13362,28 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/v1/public/menus/{slug}/views": {
+      "post": {
+        "tags": ["public"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response"
           }
         }
       }
