@@ -17,6 +17,9 @@ COPY --from=build /repo/apps/api/dist ./dist
 # Build version (D-057), passed by deploy/prod.sh. Last, so a new version only rebuilds this layer.
 ARG ZURU_VERSION=dev
 ENV ZURU_VERSION=$ZURU_VERSION
+# MEDIA_DRIVER=local keeps online-menu photos here (a volume in compose). A new
+# volume takes this directory's owner, so the API can write without root.
+RUN mkdir -p /data/media && chown node:node /data/media
 USER node
 EXPOSE 4000
 CMD ["node", "dist/server.js"]
