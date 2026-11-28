@@ -124,7 +124,8 @@ pnpm --filter @zurupos/menu dev           # on the host, against the API on :400
 pnpm --filter @zurupos/menu build
 
 # Landing site (apps/landing, static; D-059, D-060)
-node --test apps/landing/test/*.test.mjs   # HPP calculator math
+node --test apps/landing/test/*.test.mjs   # HPP calculator math, guide page counts
+node apps/landing/scripts/guide-meta.mjs   # rewrite /panduan/ page counts and sizes from docs/user PDFs (D-093)
 cd apps/landing && python3 -m http.server 8765   # preview at http://localhost:8765
 
 # Demo shop (dev database only; prints the logins and PINs; D-046)
