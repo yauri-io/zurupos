@@ -1,0 +1,79 @@
+# Publishes the user guide PDFs in docs/user (D-066, D-093) to the public R2 bucket
+# behind dl.zurupos.com, over the same names:
+#   panduan/zurupos-panduan-1-pengantar-persiapan.pdf
+#   panduan/zurupos-panduan-2-di-kasir.pdf
+#   panduan/zurupos-panduan-3-stok-laporan.pdf
+# Runs when one of them changes on main, or by hand (Actions → Guide publish → Run workflow).
+# Uses the R2 secrets of the `production` environment, which must allow the main branch.
+name: Guide publish
+
+on:
+  push:
+    branches: [main]
+    paths: ['docs/user/zurupos-panduan-*.pdf']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: guide-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 10
+    env:
+      R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      # R2 rejects the newer default checksum headers of the AWS CLI.
+      AWS_REQUEST_CHECKSUM_CALCULATION: WHEN_REQUIRED
+      AWS_RESPONSE_CHECKSUM_VALIDATION: WHEN_REQUIRED
+      AWS_DEFAULT_REGION: auto
+      BUCKET: ${{ vars.R2_DOWNLOADS_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The download page lists page counts and sizes; don't publish PDFs it doesn't describe.
+      - name: Download page matches the PDFs
+        run: node apps/landing/scripts/guide-meta.mjs --check
+
+      # A short cache, so Cloudflare serves a new copy within 5 minutes without a purge.
+      - name: Upload to R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          for f in docs/user/zurupos-panduan-*.pdf; do
+            aws s3 cp --endpoint-url "$R2_ENDPOINT" --no-progress "$f" "s3://$BUCKET/panduan/$(basename "$f")" \
+              --content-type application/pdf --cache-control "public, max-age=300"
+          done
+
+      - name: R2 has the same files
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          for f in docs/user/zurupos-panduan-*.pdf; do
+            key="panduan/$(basename "$f")"
+            remote=$(aws s3api head-object --endpoint-url "$R2_ENDPOINT" --bucket "$BUCKET" --key "$key" \
+              --query ContentLength --output text)
+            size=$(stat -c %s "$f")
+            [ "$remote" = "$size" ] || { echo "::error::$key is $remote bytes in R2, $size here"; exit 1; }
+          done
+
+      - name: Summary
+        run: |
+          {
+            echo "### User guide published"
+            for f in docs/user/zurupos-panduan-*.pdf; do
+              echo "- https://dl.zurupos.com/panduan/$(basename "$f")"
+            done
+            echo
+            node apps/landing/scripts/guide-meta.mjs --check | sed 's/^/    /'
+          } >> "$GITHUB_STEP_SUMMARY"

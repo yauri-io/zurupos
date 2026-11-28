@@ -435,7 +435,7 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - A static page at `zurupos.com/panduan/` lists the three guide parts (who each is for, what's inside, page count and size) with a download button each. Linked from the footer of every landing page and listed in the sitemap.
 - The PDFs are hosted in the R2 downloads bucket behind `dl.zurupos.com` (the one the cashier APK uses, D-055), under `panduan/`, with URL-safe names: `zurupos-panduan-1-pengantar-persiapan.pdf`, `zurupos-panduan-2-di-kasir.pdf`, `zurupos-panduan-3-stok-laporan.pdf`. They stay out of git and off the VPS.
 - The sales deck is not published: the owner chose to keep it off the public site.
-**Consequences:** Uploading is manual (Cloudflare dashboard → R2 → `zurupos-downloads` → `panduan/`). When the guide changes, upload over the same names and update the page counts and sizes on the page. Cloudflare may serve the old copy until its cache expires; purge `dl.zurupos.com/panduan/*` after replacing a file.
+**Consequences:** *(Superseded by D-093: the PDFs are now in git and a workflow uploads them.)* Uploading is manual (Cloudflare dashboard → R2 → `zurupos-downloads` → `panduan/`). When the guide changes, upload over the same names and update the page counts and sizes on the page. Cloudflare may serve the old copy until its cache expires; purge `dl.zurupos.com/panduan/*` after replacing a file.
 
 ## D-067: No cash-drawer kick
 **Context:** On 2026-11-25 the owner asked to remove *Open the cash drawer after a cash receipt* from the cashier's printer settings. SPEC §11.3 and the PRD had it as an optional per-printer setting (`ESC p 0 25 250` after a receipt with a cash payment).
@@ -609,3 +609,13 @@ Record every product or technical decision that isn't spelled out in `SPEC.md`, 
 - After counting a QR view the page removes `?s=qr` from the address bar, so a link copied from the page later counts as `link`.
 - The weekly email's line ("Menu online dibuka ±37 kali (21 lewat QR, 16 lewat link)") appears whenever the menu is published when the email is built, also with 0 views; the *Dilihat* card appears once the menu has an address.
 **Consequences:** Tests: `test/public-menu/views.test.ts` (bots, window, QR source, cutoff 2 at 01:30, unpublished, old slug, rate limit, body size, owner counts, weekly line) and `e2e/public-menu.spec.ts` (beacon from a phone counts once, a QR scan counts as `qr`, the dashboard and preview send none).
+
+## D-093: Guide PDFs are tracked in git and published by a workflow (2026-11-28)
+**Context:** D-066 kept the user guide PDFs out of git and had the owner upload them by hand to R2 and purge the Cloudflare cache after each change. On 2026-11-28 the owner asked for them to be published to R2 automatically by GitHub Actions.
+**Decision:**
+- The three guide PDFs in `docs/user/` (`zurupos-panduan-*.pdf`) are tracked in git; everything else in that folder (the sales deck) stays ignored. The repository is public, and so are the PDFs.
+- `.github/workflows/guide-publish.yml` runs on a push to main that changes one of them, or by hand. It first checks that `zurupos.com/panduan/` shows each PDF's page count and size (`apps/landing/scripts/guide-meta.mjs --check`), then uploads all three to `zurupos-downloads/panduan/` over the same names and checks that R2 has the same sizes.
+- Uploads carry `Cache-Control: public, max-age=300`, so Cloudflare serves a new copy within 5 minutes and no purge is needed. No Cloudflare API token is added.
+- It uses the R2 secrets of the `production` environment (the cashier release's, D-055), so that environment allows the `main` branch as well as `cashier-v*` tags.
+- `node apps/landing/scripts/guide-meta.mjs` rewrites the page counts and sizes on the download page from the PDFs; CI's `landing` job fails if they don't match.
+**Consequences:** Each regeneration adds a few MB to the git history; acceptable at a few updates a month. The PDFs still come from the Claude Doc *Panduan Pengguna ZuruPOS* (exported by the agent), so the steps are: update the doc → export → copy into `docs/user/` → run `guide-meta.mjs` → commit and push. The download page itself still goes live with a `git pull` on the server (DEPLOY.md §6), so for a few minutes the page can describe the new PDFs while the old ones are served, or the other way round.

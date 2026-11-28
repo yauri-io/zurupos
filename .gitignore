@@ -61,3 +61,7 @@ deploy/certs/
 
 # Local online-menu media (MEDIA_DRIVER=local, SPEC §12.7)
 apps/api/var/
+
+# User guide: only the published guide PDFs are tracked (D-093); the sales deck stays local.
+docs/user/*
+!docs/user/zurupos-panduan-*.pdf

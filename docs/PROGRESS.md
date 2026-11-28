@@ -352,3 +352,9 @@ Status legend: ⬜ Not started · 🟡 In progress · 🔍 Awaiting review · �
 - Checked live: `menu.zurupos.com/` → 302 to the landing page; unknown slug → 404 page and API 404; the menu CSP (nonce, images from `https://media.zurupos.com/`); the dashboard CSP allows the media domain; the API wrote a test object to the `zurupos-media` bucket, `media.zurupos.com` served it (`immutable`), and the API deleted it.
 - Not done on production: no shop has published a menu yet. The owner's first publish is the real end-to-end check (DEPLOY.md, "Online menu page", step 5).
 - 2026-11-27 23:35 WIB: deployed `2026.11.27-c376d45` (backup `zuru-20261127-2333.dump` first): the slug field's domain label no longer covers the typed slug.
+
+### Guide refresh and automatic publishing — 2026-11-28 (local; not pushed)
+- Done: `docs/USER_GUIDE.id.md` §10 *Menu online*; the Claude Doc got section A9 *Menu online* (figures A14–A19) and three *Masalah umum* rows; parts 1 (20 pages) and 3 (23 pages) re-exported. The *Dilihat* chart now opens on the newest day (`332f5ea`).
+- Done (D-093): the guide PDFs are tracked in `docs/user/`; `.github/workflows/guide-publish.yml` uploads them to `dl.zurupos.com/panduan/` when they change on main (`Cache-Control: max-age=300`, no purge needed); `apps/landing/scripts/guide-meta.mjs` writes the page counts and sizes on `/panduan/`, and CI's new `landing` job checks them.
+- Run: `node --test apps/landing/test/*.test.mjs`; `node apps/landing/scripts/guide-meta.mjs --check`.
+- Before the first run: allow the `main` branch on the `production` environment (Settings → Environments → production → Deployment branches and tags → add `main`), since the workflow uses its R2 secrets.
